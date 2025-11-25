@@ -15,13 +15,15 @@ urlpatterns = [
     # Include All App Urls=======
     path('', include("accounts.urls")),
     path('', include("analytics.urls")),
-    path('', include("api.urls")),
     path('', include("catalog.urls")),
     path('', include("landing_pages.urls")),
     path('', include("marketing.urls")),
     path('', include("offers.urls")),
     path('', include("orders.urls")),
     path('', include("settings_app.urls")),
+
+    # Include For API Develop URL
+    path('api/v1/', include("api.urls")),
 ]
 
 SERVE_MEDIA = os.getenv("SERVE_MEDIA", "False").strip().lower() in ("true","1","yes")

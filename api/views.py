@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 
-# Create your views here.
+def api_welcome_message(request):
+    return JsonResponse({"message": "Welcome Buyelox API Server!"})
+
