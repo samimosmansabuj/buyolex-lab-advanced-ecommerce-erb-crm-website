@@ -1,0 +1,126 @@
+{% load static %}
+<!------------------------ REVIEWS ------------------------>
+<section class="testimonial-section motion-scale">
+    <h2 class="review-section-title">কাস্টমাররা যা বলছেন</h2>
+
+    <div class="testi-slider-wrapper">
+        <div class="testi-slider">
+
+            <article class="testi-card">
+                <div class="testi-header">
+                    <div class="testi-person">
+                        <div class="testi-avatar">J</div>
+                        <div class="testi-meta">
+                            <div class="testi-name-line">
+                                Jamal <span>· Uttara</span>
+                            </div>
+                            <div class="testi-stars">★★★★★</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="testi-quote">
+                    “Living room-এ রাখার মতো সুন্দর, আবার রাতে crib হিসেবেও use হয়। একই furniture দুভাবে কাজ
+                    করায় জায়গা বাঁচলো অনেক।”
+                </p>
+            </article>
+
+            <article class="testi-card">
+                <div class="testi-header">
+                    <div class="testi-person">
+                        <div class="testi-avatar">N</div>
+                        <div class="testi-meta">
+                            <div class="testi-name-line">
+                                Nadia <span>· Mirpur</span>
+                            </div>
+                            <div class="testi-stars">★★★★★</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="testi-quote">
+                    “কালারটা হাতে পাওয়ার পর মনে হয়েছে আরও সুন্দর! Build quality 10/10.”
+                </p>
+            </article>
+
+            <article class="testi-card">
+                <div class="testi-header">
+                    <div class="testi-person">
+                        <div class="testi-avatar">F</div>
+                        <div class="testi-meta">
+                            <div class="testi-name-line">
+                                Fahim <span>· Banani</span>
+                            </div>
+                            <div class="testi-stars">★★★★★</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="testi-quote">
+                    “Gift হিসেবে নিয়েছিলাম, সামনের মানুষটার রিঅ্যাকশন দেখেই বুঝলাম ঠিক জায়গায় টাকা খরচ করেছি।”
+                </p>
+            </article>
+
+        </div>
+
+        <!-- Arrows -->
+        <button class="testi-arrow left">&#10094;</button>
+        <button class="testi-arrow right">&#10095;</button>
+    </div>
+    <div class="testi-dots"></div>
+</section>
+<script>
+    const tSlider = document.querySelector(".testi-slider");
+    const tDotsContainer = document.querySelector(".testi-dots");
+    const tCards = document.querySelectorAll(".testi-card");
+
+    let tIndex = 0;
+    let tTotal = tCards.length;
+
+    // Create dots
+    for (let i = 0; i < tTotal; i++) {
+        let dot = document.createElement("span");
+        if (i === 0) dot.classList.add("active");
+        dot.addEventListener("click", () => moveTo(i));
+        tDotsContainer.appendChild(dot);
+    }
+
+    function updateDots() {
+        document.querySelectorAll(".testi-dots span").forEach(dot => {
+            dot.classList.remove("active");
+        });
+        document.querySelectorAll(".testi-dots span")[tIndex].classList.add("active");
+    }
+
+    function moveTo(i) {
+        tIndex = i;
+        tSlider.style.transform = `translateX(-${tIndex * 100}%)`;
+        updateDots();
+    }
+
+    // Arrows
+    document.querySelector(".testi-arrow.left").onclick = () => {
+        tIndex = tIndex > 0 ? tIndex - 1 : tTotal - 1;
+        moveTo(tIndex);
+    };
+    document.querySelector(".testi-arrow.right").onclick = () => {
+        tIndex = tIndex < tTotal - 1 ? tIndex + 1 : 0;
+        moveTo(tIndex);
+    };
+
+    // Swipe
+    let startX = 0;
+
+    tSlider.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    tSlider.addEventListener("touchend", (e) => {
+        let endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) {
+            tIndex = tIndex < tTotal - 1 ? tIndex + 1 : 0;
+            moveTo(tIndex);
+        }
+        if (endX - startX > 50) {
+            tIndex = tIndex > 0 ? tIndex - 1 : tTotal - 1;
+            moveTo(tIndex);
+        }
+    });
+</script>

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block landing_page_title %}
+<title>Buyolex - প্রিমিয়াম কাশ্মিরি মাফলার</title>
+{% endblock landing_page_title %}
+
+{% block body_container %}
+<div class="container">
+
+    {% include 'hero.html' %}
+
+    {% include 'highlights.html' %}
+
+    {% include 'product_details.html' %}
+
+    {% include 'color_preview.html' %}
+
+    {% include 'why_buyolex.html' %}
+
+    {% include 'review.html' %}
+
+    {% include 'delivery_policy.html' %}
+
+    {% include 'order_modal.html' %}
+
+</div>
+
+<!-- STICKY BUY NOW BAR -->
+<div class="sticky-bar">
+    <div class="sticky-info">
+        <strong>কাস্মিরি মাফলার</strong><br>
+        <span style="opacity:.8">আজ মাত্র ৳৮৯৯ • ৩০% OFF</span>
+    </div>
+
+    <button class="sticky-buy-btn">
+        Buy Now – <span id="stickyTotalPrice">৳৮৯৯</span>
+    </button>
+</div>
+
+
+<script>
+    const modal = document.getElementById("orderModal");
+    const stickyBtn = document.querySelector(".sticky-buy-btn");
+    const ctaButtons = document.querySelectorAll(".cta-btn");
+    const closeBtn = document.getElementById("closeModal");
+
+    // Sticky Buy Button → Open Modal
+    if (stickyBtn) {
+        stickyBtn.addEventListener("click", () => {
+            modal.style.display = "flex";
+        });
+    }
+
+    // Any CTA button → Open Modal
+    ctaButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            modal.style.display = "flex";
+        });
+    });
+
+    // Close Button
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Click outside to close modal
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    // Quantity (Increment/Decrement)============
+    document.querySelectorAll('.qty-group').forEach(group => {
+        const input = group.querySelector('input[type="number"]');
+        const btnPlus = group.querySelector('.plus');
+        const btnMinus = group.querySelector('.minus');
+
+        btnPlus.addEventListener('click', () => {
+            input.value = parseInt(input.value) + 1;
+            updateTotal(); // Optional: call function to update price
+        });
+
+        btnMinus.addEventListener('click', () => {
+            if (parseInt(input.value) > parseInt(input.min)) {
+                input.value = parseInt(input.value) - 1;
+                updateTotal(); // Optional: call function to update price
+            }
+        });
+    });
+</script>
+
+<!-- TOTAL PRICE JS -->
+<script>
+    const productDiscountPrice = document.getElementById("product-discount-price");
+    const basePrice = parseInt(productDiscountPrice.dataset.price);
+    const deliveryDhaka = 80;
+    const deliveryOutside = 120;
+
+    const qtyField = document.getElementById("qty");
+    const locationField = document.getElementById("location");
+
+    const totalDisplay = document.getElementById("totalDisplay");
+    const stickyTotalPrice = document.getElementById("stickyTotalPrice");
+
+    function updateTotal() {
+        const qty = parseInt(qtyField.value) || 1;
+        const location = locationField.value;
+
+        let delivery = 0;
+        if (location === "dhaka") delivery = deliveryDhaka;
+        else if (location === "outside") delivery = deliveryOutside;
+
+        const total = (qty * basePrice) + delivery;
+
+        totalDisplay.innerHTML = `মোট মূল্য: ৳${total}`;
+        stickyTotalPrice.innerHTML = `৳${total}`;
+    }
+
+    qtyField.addEventListener("input", updateTotal);
+    locationField.addEventListener("change", updateTotal);
+
+    updateTotal();
+</script>
+
+{% endblock body_container %}
+
