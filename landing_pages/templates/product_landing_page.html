@@ -29,12 +29,15 @@
 <!-- STICKY BUY NOW BAR -->
 <div class="sticky-bar">
     <div class="sticky-info">
-        <strong>কাস্মিরি মাফলার</strong><br>
-        <span style="opacity:.8">আজ মাত্র ৳৮৯৯ • ৩০% OFF</span>
+        <strong>{{ landing_page_product.product.title|truncatewords:5 }}</strong><br>
+        <span style="opacity:.8">
+            আজ মাত্র <span class="price-regular">৳{{landing_page_product.product.price}}</span> <span class="price-now" id="product-discount-price" data-price="{{landing_page_product.product.discount_price}}">{{landing_page_product.product.discount_price}}</span> • ৩০% OFF
+        </span>
     </div>
 
     <button class="sticky-buy-btn">
-        Buy Now – <span id="stickyTotalPrice">৳৮৯৯</span>
+        Buy Now – <span id="stickyTotalPrice"></span>
+        <!-- Buy Now – <span id="stickyTotalPrice">৳৮৯৯</span> -->
     </button>
 </div>
 

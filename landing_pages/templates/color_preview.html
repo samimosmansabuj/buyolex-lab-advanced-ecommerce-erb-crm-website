@@ -1,22 +1,22 @@
 {% load static %}
 <!-- COLOR PREVIEW -->
 <section class="color-preview-section motion-scale">
-    <div class="color-preview-title">কালার প্রিভিউ (উপরে দেখে নিন)</div>
+    <div class="color-preview-title">{{landing_page_product.product_details_section_title}}</div>
 
     <div class="color-grid">
+        {% for variante in landing_page_product.product.variants.all %}
         <div class="color-item">
+            
+            {% with img=variante.images.all|first %}
+            {% if img %}
+            <img src="{{ img.image.url }}">
+            {% else %}
             <img src="{% static 'assets/images/reading-table.png' %}">
-            <div class="color-name">Black–White</div>
-        </div>
+            {% endif %}
+            {% endwith %}
 
-        <div class="color-item">
-            <img src="{% static 'assets/images/reading-table.png' %}">
-            <div class="color-name">Black–Yellow</div>
+            <div class="color-name">{{variante.sku}}</div>
         </div>
-
-        <div class="color-item">
-            <img src="{% static 'assets/images/reading-table.png' %}">
-            <div class="color-name">White–Pink</div>
-        </div>
+        {% endfor %}
     </div>
 </section>

@@ -2,6 +2,9 @@ from django.db import models
 from accounts.models import CustomUser
 from catalog.models import Product, ProductVariant
 from .utix import *
+import random, string
+from django.utils import timezone
+import uuid
 
 class Cart(models.Model):
     user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE)
@@ -28,17 +31,9 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.quantity}x {self.variant} in cart {self.cart.pk}"
 
-
-
-
-
-
-
-
-
 class Order(models.Model):
-    # order_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    order_number = models.CharField(max_length=128, unique=True, blank=True, null=True)
+    order_uuid = models.CharField(max_length=255, unique=True, editable=False)
+    order_id = models.CharField(max_length=128, unique=True, blank=True, null=True)
     user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
 
     # currency = models.CharField(max_length=3, default='USD')
@@ -48,8 +43,8 @@ class Order(models.Model):
     discount_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     grand_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
-    payment_status = models.CharField(max_length=50, default='pending')
-    payment_method = models.JSONField(default=dict, blank=True)  # provider snapshot
+    payment_status = models.CharField(max_length=50, choices=ORDER_PAYMENT_STATUS.choices, default=ORDER_PAYMENT_STATUS.PENDING)
+    payment_method = models.JSONField(default=dict, blank=True)
 
     order_status = models.CharField(max_length=50, choices=ORDER_STATUS.choices, default=ORDER_STATUS.NEW)
     billing_address = models.JSONField(default=dict, blank=True)
@@ -57,19 +52,53 @@ class Order(models.Model):
     promotions_applied = models.JSONField(default=list, blank=True)
     metadata = models.JSONField(default=dict, blank=True)
     placed_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def generate_order_id(self):
+        while True:
+            prefix = ''.join(random.choices(string.ascii_uppercase, k=3))
+            suffix = ''.join(random.choices(string.digits, k=6))
+            unique_id = prefix + suffix
+            if not Order.objects.filter(order_id=unique_id).exists():
+                return unique_id
 
     def save(self, *args, **kwargs):
-        # if not self.order_number:
-        #     # simple example order number
-        #     self.order_number = f"ORD-{timezone.now().strftime('%Y%m%d')}-{str(self.order_uuid)[:8]}"
+        if not self.order_id:
+            self.order_id = self.generate_order_id()
+        if not self.order_uuid:
+            self.order_uuid = uuid.uuid4().hex
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Order {self.order_number}"
+        return f"Order {self.order_id}"
+
+    # def edit_restricted_method(self):
+    #     if not self.pk:
+    #         return
+
+    #     original = Invoice.objects.only('pay_status').filter(pk=self.pk).first()
+    #     if not original:
+    #         return
+        
+    #     if original.status.lower() in ['deactive', 'delete']:
+    #         raise ValidationError(f"This Invoice is {original.status}. Can't Update!")
+
+    #     if original.pay_status == 'paid':
+    #         changed = set()
+    #         current = Invoice.objects.get(pk=self.pk)
+    #         for f in self._meta.concrete_fields:
+    #             name = f.name
+    #             if name in ('id', 'created_at'):
+    #                 continue
+    #             if getattr(current, name) != getattr(self, name):
+    #                 changed.add(name)
+
+    #         if changed - self.ALLOWED_WHEN_PAID:
+    #             raise ValidationError("This invoice is already paid and cannot be edited.")
 
 
 class OrderItem(models.Model):
-    id = models.BigAutoField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True)
@@ -79,7 +108,7 @@ class OrderItem(models.Model):
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    fulfillment_status = models.CharField(max_length=50, default='pending')
+    # fulfillment_status = models.CharField(max_length=50, default='pending')
 
     def __str__(self):
         return f"{self.quantity} x {self.product}"
@@ -87,7 +116,7 @@ class OrderItem(models.Model):
 class Shipment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='shipments')
     # shipment_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    carrier = models.CharField(max_length=255, blank=True, null=True)
+    courier = models.CharField(max_length=255, blank=True, null=True)
     tracking_number = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, default='pending')
     items = models.JSONField(default=list, blank=True)
@@ -97,7 +126,7 @@ class Shipment(models.Model):
     label_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
-        return f"Shipment {self.carrier} for {self.order.order_number}"
+        return f"Shipment {self.courier} for {self.order.order_id}"
 
 
 class Payment(models.Model):
@@ -106,7 +135,6 @@ class Payment(models.Model):
     provider = models.CharField(max_length=128)  # e.g., stripe, bkash
     provider_reference = models.CharField(max_length=255, blank=True, null=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
     status = models.CharField(max_length=50, default='pending')
     raw_response = models.JSONField(default=dict, blank=True)
     attempts = models.IntegerField(default=0)
@@ -127,4 +155,20 @@ class Refund(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
 
     def __str__(self):
-        return f"Refund {self.id} for {self.order.order_number}"
+        return f"Refund {self.id} for {self.order.order_id}"
+
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    order = models.OneToOneField(Order, on_delete=models.SET_NULL, related_name="order", blank=True, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    rating = models.PositiveSmallIntegerField(default=5)
+    title = models.CharField(max_length=255, blank=True)
+    comment = models.TextField(blank=True)
+    status = models.CharField(max_length=32, choices=REVIEW_STATUS.choices, default=REVIEW_STATUS.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.rating} stars — {self.product}"
+

@@ -2,10 +2,9 @@
 <!-- HIGHLIGHTS -->
 <section class="section motion-scale">
     <div class="chips">
-        <div class="chip">✨ প্রিমিয়াম কাশ্মিরি সফট ফ্যাব্রিক</div>
-        <div class="chip">🧣 ইউনিক প্যাটার্ন ও রিচ টেক্সচার</div>
-        <div class="chip">🎁 গিফট দেওয়ার জন্য পারফেক্ট</div>
-        <div class="chip">🚚 সারা বাংলাদেশে ক্যাশ অন ডেলিভারি</div>
+        {% for chip in landing_page_product.product.description_json %}
+        <div class="chip">{{chip}}</div>
+        {% endfor %}
     </div>
 </section>
 

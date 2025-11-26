@@ -1,15 +1,16 @@
 {% load static %}
 <!-- PRODUCT DETAIL -->
 <section class="section motion-scale">
-    <div class="section-title">কেন এই কাশ্মিরি মাফলার আলাদা?</div>
+    <div class="section-title">{{landing_page_product.product_details_section_title}}</div>
+
+    {% with lines=landing_page_product.product.description_html.splitlines %}
     <p>
-        প্রতিটা কাশ্মিরি মাফলার বানানো হয়েছে এমন ফ্যাব্রিক দিয়ে, যা প্রথম স্পর্শেই সফট আর কমফোর্টেবল লাগে।
-        ঘন টেক্সচার, ফাজারি ফিল আর ডিটেইলড প্যাটার্ন – সব মিলিয়ে এটা শুধু শীত থেকে প্রটেকশন না, বরং
-        এক ধরনের প্রিমিয়াম স্টাইল স্টেটমেন্ট।
+        {{ lines.0 }} <br>
     </p>
     <ul style="font-size:13px;color:var(--text-muted);margin-top:6px;padding-left:18px;">
-        <li>সারাদিন পরলেও গলা/ঘাড়ে চুলকানি কম</li>
-        <li>শার্ট, পাঞ্জাবি, হুডি – সব কিছুর সাথেই যায়</li>
-        <li>বয়েজ & গার্লস – সবাই ইউজ করতে পারবে</li>
+        {% for line in lines|slice:"1:" %}
+        <li>{{ line }}</li>
+        {% endfor %}
     </ul>
+    {% endwith %}
 </section>
