@@ -13,12 +13,18 @@ def previous_image_delete_os(old_picture, new_picture):
         return True
 
 
-def generate_unique_slug(model_object, field_value):
+def generate_unique_slug(model_object, field_value, old_slug=None):
     slug = slugify(field_value)
-    unique_slug = slug
-    num = 1
-    while model_object.objects.filter(slug=unique_slug).exists():
-        unique_slug = f'{slug}-{num}'
-        num+=1
-    return unique_slug
+    if slug != old_slug:
+        unique_slug = slug
+        num = 1
+        while model_object.objects.filter(slug=unique_slug).exists():
+            if unique_slug == old_slug:
+                return old_slug
+            unique_slug = f'{slug}-{num}'
+            num+=1
+        return unique_slug
+    else:
+        return old_slug
+
 

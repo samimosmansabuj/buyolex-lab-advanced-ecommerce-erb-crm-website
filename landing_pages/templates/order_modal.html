@@ -19,6 +19,16 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
 
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 15px; margin-top: 3px;">
+                    <input type="checkbox" name="have_email" id="have_email" style="margin: 0; width: 5%; transform: scale(2);">
+                    <label for="have_email" style="margin: 0; cursor: pointer; font-size: 17px;">Have you any email?</label>
+                </div>
+
+                <div class="field-group" id="email_group" style="display: none;">
+                    <label for="email">ইমেইল নম্বর</label>
+                    <input type="email" id="email" name="email">
+                </div>
+
                 <div class="field-group">
                     <label for="address">ঠিকানা</label>
                     <textarea id="address" name="address" required></textarea>
@@ -28,8 +38,6 @@
                     <label for="location">আপনি কোথায় আছেন?</label>
                     <select id="location" name="location" required>
                         <option value="">-- সিলেক্ট করুন --</option>
-                        <option value="dhaka">ঢাকা বিভাগ</option>
-                        <option value="outside">ঢাকার বাইরে</option>
                     </select>
                 </div>
 
@@ -37,9 +45,9 @@
                     <label for="color">কালার সিলেক্ট করুন</label>
                     <select id="color" name="color" required>
                         <option value="">-- সিলেক্ট করুন --</option>
-                        <option value="Black-White">Black–White</option>
-                        <option value="Black-Yellow">Black–Yellow</option>
-                        <option value="White-Pink">White–Pink</option>
+                        {% for variante in landing_page_product.product.variants.all %}
+                        <option value="{{variante.sku}}">{{variante.sku}}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -63,7 +71,39 @@
 
         <!-- FOOTER -->
         <div class="modal-footer" id="totalDisplay">
-            মোট মূল্য: ৳৮৯৯
+            মোট মূল্য: ৳{{landing_page_product.product.price}}
         </div>
     </div>
 </div>
+
+
+
+<script>
+    const checkbox = document.getElementById('have_email');
+    const emailField = document.getElementById('email_group');
+
+    checkbox.addEventListener('change', function () {
+        emailField.style.display = this.checked ? "block" : "none";
+    });
+
+
+
+
+    const select = document.getElementById('location')
+    fetch('https://bdapi.vercel.app/api/v.1/district')
+    .then(response => response.json())
+    .then(data =>{
+        if(data.status === 200 && data.success){
+            data.data.forEach(district => {
+                const option = document.createElement('option')
+                option.value = district.name.toLowerCase()
+                option.textContent = district.bn_name
+                select.appendChild(option)
+                // if(district.name.toLowerCase() !== "dhaka"){
+
+                // }
+            });
+        }
+    })
+    .catch(error => console.error('Error fetching divisions:', error))
+</script>

@@ -1,30 +1,30 @@
 {% load static %}
 <!------------------------ REVIEWS ------------------------>
 <section class="testimonial-section motion-scale">
-    <h2 class="review-section-title">কাস্টমাররা যা বলছেন</h2>
+    <h2 class="review-section-title">{{landing_page_product.review_section_title}}</h2>
 
     <div class="testi-slider-wrapper">
         <div class="testi-slider">
-
+            {% for review in landing_page_product.product.reviews.all %}
             <article class="testi-card">
                 <div class="testi-header">
                     <div class="testi-person">
                         <div class="testi-avatar">J</div>
                         <div class="testi-meta">
                             <div class="testi-name-line">
-                                Jamal <span>· Uttara</span>
+                                {{review.title}} <span>· Uttara</span>
                             </div>
                             <div class="testi-stars">★★★★★</div>
                         </div>
                     </div>
                 </div>
                 <p class="testi-quote">
-                    “Living room-এ রাখার মতো সুন্দর, আবার রাতে crib হিসেবেও use হয়। একই furniture দুভাবে কাজ
-                    করায় জায়গা বাঁচলো অনেক।”
+                    “{{review.comment}}”
                 </p>
             </article>
+            {% endfor %}
 
-            <article class="testi-card">
+            <!-- <article class="testi-card">
                 <div class="testi-header">
                     <div class="testi-person">
                         <div class="testi-avatar">N</div>
@@ -39,24 +39,7 @@
                 <p class="testi-quote">
                     “কালারটা হাতে পাওয়ার পর মনে হয়েছে আরও সুন্দর! Build quality 10/10.”
                 </p>
-            </article>
-
-            <article class="testi-card">
-                <div class="testi-header">
-                    <div class="testi-person">
-                        <div class="testi-avatar">F</div>
-                        <div class="testi-meta">
-                            <div class="testi-name-line">
-                                Fahim <span>· Banani</span>
-                            </div>
-                            <div class="testi-stars">★★★★★</div>
-                        </div>
-                    </div>
-                </div>
-                <p class="testi-quote">
-                    “Gift হিসেবে নিয়েছিলাম, সামনের মানুষটার রিঅ্যাকশন দেখেই বুঝলাম ঠিক জায়গায় টাকা খরচ করেছি।”
-                </p>
-            </article>
+            </article> -->
 
         </div>
 
