@@ -7,8 +7,10 @@
         <div class="modal-header">অর্ডার করতে নিচের ফর্মটি পূরণ করুন</div>
 
         <!-- BODY (Scroll) -->
-        <div class="modal-body">
-            <form method="post">
+        <div class="modal-body" id="formDivContainer">
+            <form method="post" id="placeOrderForm">
+
+                <!-- ======Hidden Input ====== -->
                 <div class="field-group">
                     <label for="name">নাম</label>
                     <input type="text" id="name" name="name" required>
@@ -20,8 +22,11 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 15px; margin-top: 3px;">
-                    <input type="checkbox" name="have_email" id="have_email" style="margin: 0; width: 5%; transform: scale(2);">
-                    <label for="have_email" style="margin: 0; cursor: pointer; font-size: 17px;">Have you any email?</label>
+                    <input type="checkbox" name="have_email" id="have_email"
+                        style="margin: 0; width: 5%; transform: scale(2);">
+                    <label for="have_email"
+                        style="margin: 0; cursor: pointer; font-size: 17px; padding-left: 10px;">Have you any
+                        email?</label>
                 </div>
 
                 <div class="field-group" id="email_group" style="display: none;">
@@ -34,16 +39,32 @@
                     <textarea id="address" name="address" required></textarea>
                 </div>
 
-                <div class="field-group">
-                    <label for="location">আপনি কোথায় আছেন?</label>
-                    <select id="location" name="location" required>
-                        <option value="">-- সিলেক্ট করুন --</option>
+                <div class="address-district-upazila-row">
+                    <div class="field-group">
+                        <label for="district">জেলা</label>
+                        <select id="district" name="district" required>
+                            <option value="">-- সিলেক্ট করুন --</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group" id="upazila_div" style="visibility: hidden;">
+                        <label for="upazila">থানা</label>
+                        <select id="upazila" name="upazila" required>
+                            <option>-- সিলেক্ট করুন --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-group" id="area_div" style="display: none;">
+                    <label for="area">এরিয়া</label>
+                    <select id="area" name="area" required>
+                        <option>-- সিলেক্ট করুন --</option>
                     </select>
                 </div>
 
                 <div class="field-group">
-                    <label for="color">কালার সিলেক্ট করুন</label>
-                    <select id="color" name="color" required>
+                    <label for="variante">কালার সিলেক্ট করুন</label>
+                    <select id="variante" name="variante" required>
                         <option value="">-- সিলেক্ট করুন --</option>
                         {% for variante in landing_page_product.product.variants.all %}
                         <option value="{{variante.sku}}">{{variante.sku}}</option>
@@ -71,11 +92,155 @@
 
         <!-- FOOTER -->
         <div class="modal-footer" id="totalDisplay">
-            মোট মূল্য: ৳{{landing_page_product.product.price}}
+            মোট মূল্য: ৳{{landing_page_product.product.discount_price}}
         </div>
     </div>
 </div>
 
+
+
+
+
+<!-- ===========Order Create Scripts=========== -->
+<script>
+    // Processing Card Show Script============== 
+    function showProcessingCard() {
+        const formDivContainer = document.getElementById("formDivContainer");
+
+        const card = document.createElement("div");
+        card.className = "status-card";
+        card.id = "orderProcessingCard"
+        card.innerHTML = `
+            <div class="loader"></div>
+            <h3>আপনার অর্ডার প্রসেস করা হচ্ছে...</h3>
+            <p>একটু অপেক্ষা করুন।</p>
+        `;
+
+        formDivContainer.appendChild(card);
+    }
+    function deleteProcessingCard() {
+        const card = document.getElementById("orderProcessingCard");
+        if (card) {
+            card.remove();
+        }
+    }
+
+
+    // Success Card Show Script============== 
+    function showSuccessCard() {
+        const formDivContainer = document.getElementById("formDivContainer");
+
+        const card = document.createElement("div");
+        card.className = "status-card success";
+        card.id = "orderSuccessCard"
+        card.innerHTML = `
+            <div class="icon">✔</div>
+            <h3>অর্ডার সফলভাবে সম্পন্ন হয়েছে!</h3>
+            <p>ধন্যবাদ! আমরা খুব দ্রুতই আপনার সাথে যোগাযোগ করব।</p>
+            <button onclick="closeOrderSuccess()" class="cta-btn">ঠিক আছে</button>
+        `;
+        formDivContainer.appendChild(card);
+    }
+    function deleteSuccessCard() {
+        const card = document.getElementById("orderSuccessCard");
+        if (card) {
+            card.remove();
+        }
+    }
+
+    // Failed Card Show Script==============    
+    function showFailedCard() {
+        const formDivContainer = document.getElementById("formDivContainer");
+
+        const card = document.createElement("div");
+        card.className = "status-card failed";
+        card.style.display = "none"
+        card.id = "orderFailedCard"
+        card.innerHTML = `
+            <div class="icon">✖</div>
+            <h3>অর্ডার সম্পন্ন হয়নি!</h3>
+            <p id="failedMessage">কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন।</p>
+            <button onclick="retryOrder()" class="cta-btn danger">পুনরায় চেষ্টা করুন</button>
+        `;
+        formDivContainer.appendChild(card);
+    }
+    function deleteFailedCard() {
+        const card = document.getElementById("orderFailedCard");
+        if (card) {
+            card.remove();
+        }
+    }
+
+    const orderForm = document.getElementById("placeOrderForm");
+    orderForm.addEventListener("submit", async function (event) {
+        event.preventDefault()
+
+        // product id 
+        const inputProductId = document.createElement("input");
+        inputProductId.type = "hidden";
+        inputProductId.name = "product_id";
+        inputProductId.value = "{{ landing_page_product.product.id }}";
+        orderForm.appendChild(inputProductId);
+        // product price 
+        const inputProductPrice = document.createElement("input");
+        inputProductPrice.type = "hidden";
+        inputProductPrice.name = "product_price";
+        inputProductPrice.value = "{{ landing_page_product.product.discount_price }}";
+        console.log("inputProductPrice: ", inputProductPrice)
+        orderForm.appendChild(inputProductPrice);
+
+        orderForm.style.display = "none";
+        showProcessingCard();
+
+        const formData = new FormData(orderForm);
+
+        try {
+            const csrftoken = '{{ csrf_token }}';
+            const response = await fetch("{% url 'create_order' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": csrftoken
+                },
+            });
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            const data = await response.json()
+            deleteProcessingCard();
+
+            if (!data.success) {
+                showFailedCard()
+                document.getElementById("failedMessage").innerHTML = data.message || "অজানা ত্রুটি হয়েছে!";
+                orderFailedCard.style.display = "block"
+                console.log("Failed Message: ", data.message)
+            } else {
+                showSuccessCard()
+                console.log("Success Message: ", data.message)
+            }
+
+        } catch (error) {
+            deleteProcessingCard();
+            showFailedCard()
+            document.getElementById("failedMessage").innerHTML = error || "নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।";
+            orderFailedCard.style.display = "block"
+            console.log("Fetch Error: ", error)
+        }
+
+    })
+
+
+    function closeOrderSuccess() {
+        document.getElementById("orderModal").style.display = "none";
+        location.reload();
+    }
+
+    function retryOrder() {
+        deleteFailedCard()
+        orderForm.style.display = "block";
+    }
+</script>
 
 
 <script>
@@ -89,21 +254,68 @@
 
 
 
-    const select = document.getElementById('location')
-    fetch('https://bdapi.vercel.app/api/v.1/district')
-    .then(response => response.json())
-    .then(data =>{
-        if(data.status === 200 && data.success){
-            data.data.forEach(district => {
-                const option = document.createElement('option')
-                option.value = district.name.toLowerCase()
-                option.textContent = district.bn_name
-                select.appendChild(option)
-                // if(district.name.toLowerCase() !== "dhaka"){
+    const districtSelect = document.getElementById('district');
+    const upazilaSelect = document.getElementById('upazila');
+    const areaSelect = document.getElementById('area');
 
-                // }
-            });
-        }
+    fetch('https://bdapi.vercel.app/api/v.1/district')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 200 && data.success) {
+                data.data.forEach(district => {
+                    const option = document.createElement('option')
+                    option.value = district.id
+                    // option.value = district.name.toLowerCase()
+                    option.textContent = district.bn_name
+                    districtSelect.appendChild(option)
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching district:', error))
+
+    districtSelect.addEventListener("change", function () {
+        document.getElementById('upazila_div').style.visibility = "visible";
+
+        const districtId = this.value;
+        upazilaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
+        if (!districtId) return;
+
+        fetch(`https://bdapi.vercel.app/api/v.1/upazilla/${districtId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 200 && data.success) {
+                    data.data.forEach(upazila => {
+                        const option = document.createElement('option')
+                        option.value = upazila.id
+                        option.textContent = upazila.bn_name
+                        upazilaSelect.appendChild(option)
+                    })
+                }
+            })
+            .catch(error => console.error("Error fetching upazila: ", error))
     })
-    .catch(error => console.error('Error fetching divisions:', error))
+
+    upazilaSelect.addEventListener("change", function () {
+        area_div = document.getElementById('area_div')
+        area_div.style.display = "block";
+
+        const upazilaId = this.value;
+        areaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
+        if (!upazilaId) return;
+
+        fetch(`https://bdapi.vercel.app/api/v.1/union/${upazilaId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 200 && data.success) {
+                    data.data.forEach(area => {
+                        const option = document.createElement('option')
+                        option.value = area.id
+                        option.textContent = area.bn_name
+                        areaSelect.appendChild(option)
+                    })
+                }
+            })
+            .catch(error => console.error("Error fetching upazila: ", error))
+    })
+
 </script>

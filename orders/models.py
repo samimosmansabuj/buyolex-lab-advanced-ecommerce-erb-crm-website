@@ -51,7 +51,7 @@ class Order(models.Model):
     shipping_address = models.JSONField(default=dict, blank=True)
     promotions_applied = models.JSONField(default=list, blank=True)
     metadata = models.JSONField(default=dict, blank=True)
-    placed_at = models.DateTimeField(null=True, blank=True)
+    placed_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def generate_order_id(self):
@@ -109,6 +109,10 @@ class OrderItem(models.Model):
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     # fulfillment_status = models.CharField(max_length=50, default='pending')
+
+    def save(self, *args, **kwargs):
+        self.subtotal = float(self.unit_price) * self.quantity
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.quantity} x {self.product}"

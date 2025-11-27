@@ -36,7 +36,6 @@ class RolePermission(models.Model):
         return self.module_name
 
 class CustomUser(AbstractUser):
-    uuid = models.CharField(max_length=100, editable=False, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     phone = models.CharField(max_length=14, blank=True, null=True)
     full_name = models.CharField(max_length=50, blank=True)

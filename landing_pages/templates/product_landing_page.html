@@ -36,8 +36,7 @@
     </div>
 
     <button class="sticky-buy-btn">
-        Buy Now – <span id="stickyTotalPrice"></span>
-        <!-- Buy Now – <span id="stickyTotalPrice">৳৮৯৯</span> -->
+        Buy Now - <span id="stickyTotalPrice"></span>
     </button>
 </div>
 
@@ -76,7 +75,8 @@
 
     // Quantity (Increment/Decrement)============
     document.querySelectorAll('.qty-group').forEach(group => {
-        const input = group.querySelector('input[type="number"]');
+        // const input = group.querySelector('input[type="number"]');
+        const input = group.querySelector('input[id="qty"]');
         const btnPlus = group.querySelector('.plus');
         const btnMinus = group.querySelector('.minus');
 
@@ -98,31 +98,32 @@
 <script>
     const productDiscountPrice = document.getElementById("product-discount-price");
     const basePrice = parseInt(productDiscountPrice.dataset.price);
-    const deliveryDhaka = 80;
-    const deliveryOutside = 120;
+    // const deliveryDhaka = 80;
+    // const deliveryOutside = 120;
 
     const qtyField = document.getElementById("qty");
-    const locationField = document.getElementById("location");
+    // const locationField = document.getElementById("location");
 
     const totalDisplay = document.getElementById("totalDisplay");
     const stickyTotalPrice = document.getElementById("stickyTotalPrice");
 
     function updateTotal() {
         const qty = parseInt(qtyField.value) || 1;
-        const location = locationField.value;
+        // const location = locationField.value;
 
-        let delivery = 0;
-        if (location === "dhaka") delivery = deliveryDhaka;
-        else if (location === "outside") delivery = deliveryOutside;
+        // let delivery = 0;
+        // if (location === "dhaka") delivery = deliveryDhaka;
+        // else if (location === "outside") delivery = deliveryOutside;
 
-        const total = (qty * basePrice) + delivery;
+        // const total = (qty * basePrice) + delivery;
+        const total = (qty * basePrice);
 
         totalDisplay.innerHTML = `মোট মূল্য: ৳${total}`;
         stickyTotalPrice.innerHTML = `৳${total}`;
     }
 
     qtyField.addEventListener("input", updateTotal);
-    locationField.addEventListener("change", updateTotal);
+    // locationField.addEventListener("change", updateTotal);
 
     updateTotal();
 </script>
