@@ -38,11 +38,8 @@ class Order(models.Model):
     customer = models.ForeignKey(CustomerProfile, null=True, blank=True, on_delete=models.SET_NULL)
 
     # currency = models.CharField(max_length=3, default='USD')
-    items_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     shipping_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     tax_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    discount_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    grand_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     payment_status = models.CharField(max_length=50, choices=ORDER_PAYMENT_STATUS.choices, default=ORDER_PAYMENT_STATUS.PENDING)
     payment_method = models.JSONField(default=dict, blank=True)
@@ -54,6 +51,35 @@ class Order(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
     placed_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def get_items_total(self):
+        product_item = len(self.items.all())
+        return product_item
+    
+    @property
+    def get_total_quantity(self):
+        total_quantity = sum(item.quantity for item in self.items.all())
+        return total_quantity
+        
+    
+    @property
+    def get_discount_total(self):
+        discount_total = sum(item.discount_total_price for item in self.items.all())
+        return discount_total
+    
+    @property
+    def get_current_total(self):
+        current_total = sum(item.total_price for item in self.items.all())
+        return current_total
+    
+    @property
+    def get_discount_percentage(self):
+        if not self.get_discount_total or self.get_discount_total >= self.get_current_total:
+            return 0
+        discount_amount = self.get_current_total - self.get_discount_total
+        discount_percentage = (discount_amount / self.get_current_total) * 100
+        return round(discount_percentage, 2)
 
     def generate_order_id(self):
         while True:
@@ -74,29 +100,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.order_id}"
 
-    # def edit_restricted_method(self):
-    #     if not self.pk:
-    #         return
-
-    #     original = Invoice.objects.only('pay_status').filter(pk=self.pk).first()
-    #     if not original:
-    #         return
-        
-    #     if original.status.lower() in ['deactive', 'delete']:
-    #         raise ValidationError(f"This Invoice is {original.status}. Can't Update!")
-
-    #     if original.pay_status == 'paid':
-    #         changed = set()
-    #         current = Invoice.objects.get(pk=self.pk)
-    #         for f in self._meta.concrete_fields:
-    #             name = f.name
-    #             if name in ('id', 'created_at'):
-    #                 continue
-    #             if getattr(current, name) != getattr(self, name):
-    #                 changed.add(name)
-
-    #         if changed - self.ALLOWED_WHEN_PAID:
-    #             raise ValidationError("This invoice is already paid and cannot be edited.")
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -104,14 +107,20 @@ class OrderItem(models.Model):
     variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True)
     product_snapshot = models.JSONField(default=dict, blank=True)
     quantity = models.IntegerField(default=1)
-    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    c_unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    d_unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    discount_total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     # fulfillment_status = models.CharField(max_length=50, default='pending')
 
     def save(self, *args, **kwargs):
-        self.subtotal = float(self.unit_price) * self.quantity
+        if not self.total_price:
+            self.total_price = float(self.c_unit_price) * self.quantity
+        if not self.discount_total_price:
+            self.discount_total_price = float(self.d_unit_price) * self.quantity
+        
         return super().save(*args, **kwargs)
 
     def __str__(self):
