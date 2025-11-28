@@ -1,9 +1,8 @@
 from django.db import models
-from accounts.models import CustomUser
+from accounts.models import CustomUser, CustomerProfile
 from catalog.models import Product, ProductVariant
 from .utix import *
 import random, string
-from django.utils import timezone
 import uuid
 
 class Cart(models.Model):
@@ -31,10 +30,12 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.quantity}x {self.variant} in cart {self.cart.pk}"
 
+
+
 class Order(models.Model):
     order_uuid = models.CharField(max_length=255, unique=True, editable=False)
     order_id = models.CharField(max_length=128, unique=True, blank=True, null=True)
-    user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(CustomerProfile, null=True, blank=True, on_delete=models.SET_NULL)
 
     # currency = models.CharField(max_length=3, default='USD')
     items_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -97,7 +98,6 @@ class Order(models.Model):
     #         if changed - self.ALLOWED_WHEN_PAID:
     #             raise ValidationError("This invoice is already paid and cannot be edited.")
 
-
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -117,6 +117,8 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product}"
 
+
+
 class Shipment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='shipments')
     # shipment_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -132,7 +134,6 @@ class Shipment(models.Model):
     def __str__(self):
         return f"Shipment {self.courier} for {self.order.order_id}"
 
-
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
     # payment_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -147,7 +148,6 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment {self.pk} ({self.provider})"
 
-
 class Refund(models.Model):
     id = models.BigAutoField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='refunds')
@@ -161,12 +161,10 @@ class Refund(models.Model):
     def __str__(self):
         return f"Refund {self.id} for {self.order.order_id}"
 
-
-
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     order = models.OneToOneField(Order, on_delete=models.SET_NULL, related_name="order", blank=True, null=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey(CustomerProfile, on_delete=models.SET_NULL, null=True, blank=True)
     rating = models.PositiveSmallIntegerField(default=5)
     title = models.CharField(max_length=255, blank=True)
     comment = models.TextField(blank=True)

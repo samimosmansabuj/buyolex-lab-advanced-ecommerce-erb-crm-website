@@ -4,7 +4,10 @@ from .utix import USER_TYPE
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import uuid
+
 
 class Role(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -37,9 +40,7 @@ class RolePermission(models.Model):
 
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
-    phone = models.CharField(max_length=14, blank=True, null=True)
     full_name = models.CharField(max_length=50, blank=True)
-    profile_photo = models.ImageField(upload_to="user/profile_picture/", blank=True, null=True)
     user_type = models.CharField(max_length=50, choices=USER_TYPE.choices, default=USER_TYPE.CUSTOMER)
     role = models.ForeignKey(Role, on_delete=models.DO_NOTHING, blank=True, null=True)
 
@@ -67,9 +68,57 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         self.update_staff_superuser()
         super().save(*args, **kwargs)
+    
+    def __str__(self) -> str:
+        return f"{self.email} - {self.full_name}"
 
 
+class CustomerProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, blank=True, null=True, related_name="customer_profile")
+    profile_uuid = models.CharField(max_length=255, unique=True, editable=False)
+    phone = models.CharField(max_length=14, blank=True, null=True)
+    full_name = models.CharField(max_length=50, blank=True)
+    profile_photo = models.ImageField(upload_to="user/profile_picture/", blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.profile_uuid:
+            self.profile_uuid = uuid.uuid4().hex
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"Customer Profile of {self.user.email}" if self.user else f"{self.full_name}"
 
 
+@receiver(post_save, sender=CustomUser)
+def customer_profile_create(sender, instance, created, **kwargs):
+    if created:
+        if instance.user_type == USER_TYPE.CUSTOMER and not CustomerProfile.objects.filter(user=instance).exists():
+            CustomerProfile.objects.create(
+                user=instance,
+                full_name = instance.full_name,
+            )
+
+class CustomerAddress(models.Model):
+    customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE, related_name="address")
+    address = models.CharField(max_length=100)
+    area = models.CharField(max_length=50, blank=True, null=True)
+    upazila = models.CharField(max_length=50, blank=True, null=True)
+    district = models.CharField(max_length=50)
+    country = models.CharField(max_length=50, default="Bangladesh")
+    post_code = models.CharField(max_length=10, blank=True, null=True)
+
+    @property
+    def get_address(self):
+        address = self.address
+        if self.area:
+            address = f"{address}, {self.area}"
+        if self.upazila:
+            address = f"{address}, {self.upazila}"
+        if self.district:
+            address = f"{address}, {self.district}"
+        if self.post_code:
+            address = f"{address}, {self.post_code}"
+        return address
+    
 
 
