@@ -31,6 +31,7 @@ class OrderConfirmatinoEmailSend:
             server = SMTP(host=email_server.host, port=email_server.port)
             server.starttls()
             server.login(email_server.host_user, email_server.host_password)
+            print("server login: ", server)
             server.sendmail(
                 from_addr=email_server.email, to_addrs=self.email, msg=mime_msg.as_string()
             )
