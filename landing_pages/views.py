@@ -11,7 +11,8 @@ from http import HTTPStatus
 from django.core.exceptions import ObjectDoesNotExist
 from orders.models import Order, OrderItem
 from accounts.models import CustomUser, CustomerProfile, CustomerAddress
-from marketing.models import EmailConfig
+from .utils import OrderConfirmatinoEmailSend
+from django.db import transaction
 
 
 def product_landing_page(request):
@@ -43,7 +44,7 @@ class CreateOrderView(View):
     def get_product(self, id):
         try:
             product = get_object_or_404(Product, id=id)
-            return product, product.discount_price
+            return product
         except Product.DoesNotExist as e:
             raise ObjectDoesNotExist("Product Not Found or Wrong Product ID")
 
@@ -89,41 +90,45 @@ class CreateOrderView(View):
     
     def post(self, request, *args, **kwargs):
         try:
-            data = request.POST
-            product, price = self.get_product(data.get("product_id"))
-            variante = None
-            if data.get("variante"):
-                variante, price = self.get_product_variante(product, data.get("variante"))
-            
-            self.price_verify___(data.get("product_price"), price)
-            customer = self.get_user_profile(data.get("name"), data.get("phone"), data.get("email") or None)
+            with transaction.atomic():
+                data = request.POST
+                product = self.get_product(data.get("product_id"))
+                variante = None
+                if data.get("variante"):
+                    variante, price = self.get_product_variante(product, data.get("variante"))
+                
+                self.price_verify___(data.get("product_price"), product.discount_price)
+                customer = self.get_user_profile(data.get("name"), data.get("phone"), data.get("email") or None)
 
-            address = self.get_make_address(customer, data.get("address"), data.get("district"), data.get("upazila"), data.get("area"))
-            
-            qty = data.get("qty")
-            metadata = {"note": data.get("notes")}
+                address = self.get_make_address(customer, data.get("address"), data.get("district"), data.get("upazila"), data.get("area"))
+                
+                qty = data.get("qty")
+                metadata = {"note": data.get("notes")}
 
-            order = Order.objects.create(
-                customer = customer,
-                items_total = qty,
-                billing_address = address,
-                shipping_address = address,
-                metadata=metadata
-            )
-            OrderItem.objects.create(
-                order= order,
-                product= product,
-                variant= variante,
-                quantity= int(qty),
-                unit_price= price,
-            )
+                order = Order.objects.create(
+                    customer = customer,
+                    billing_address = address,
+                    shipping_address = address,
+                    metadata=metadata
+                )
+                OrderItem.objects.create(
+                    order= order,
+                    product= product,
+                    variant= variante,
+                    quantity= int(qty),
+                    c_unit_price= product.price,
+                    d_unit_price= product.discount_price,
+                )
+                if data.get("email"):
+                    send_mail = OrderConfirmatinoEmailSend(order, data.get("email"))
+                    send_mail.order_confirmation_mail_send()
 
-            return JsonResponse(
-                {
-                    "success": True,
-                    "message": "Order Successfully Created!"
-                }, status=HTTPStatus.CREATED
-            )
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "message": "Order Successfully Created!"
+                    }, status=HTTPStatus.CREATED
+                )
         except Exception as e:
             print("error: ", str(e))
             return JsonResponse(
@@ -132,6 +137,32 @@ class CreateOrderView(View):
                     "message": str(e)
                 }, status=HTTPStatus.BAD_REQUEST
             )
+
+
+def get_order(request, id):
+    try:
+        order = get_object_or_404(Order, id=id)
+        return JsonResponse(
+            {
+                "status": True,
+                "message": "OK",
+                "data": {
+                    "get_items_total" : order.get_items_total,
+                    "get_total_quantity" : order.get_total_quantity,
+                    "get_current_total" : order.get_current_total,
+                    "get_discount_total" : order.get_discount_total,
+                    "get_discount_percentage" : order.get_discount_percentage,
+                }
+            }, status=HTTPStatus.OK
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "status": True,
+                "message": str(e)
+            }
+        )
+
 
 
 

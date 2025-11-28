@@ -186,7 +186,6 @@
         inputProductPrice.type = "hidden";
         inputProductPrice.name = "product_price";
         inputProductPrice.value = "{{ landing_page_product.product.discount_price }}";
-        console.log("inputProductPrice: ", inputProductPrice)
         orderForm.appendChild(inputProductPrice);
 
         orderForm.style.display = "none";
@@ -264,8 +263,8 @@
             if (data.status === 200 && data.success) {
                 data.data.forEach(district => {
                     const option = document.createElement('option')
-                    option.value = district.id
-                    // option.value = district.name.toLowerCase()
+                    option.value = district.name.toLowerCase()
+                    option.setAttribute('district_id', district.id);
                     option.textContent = district.bn_name
                     districtSelect.appendChild(option)
                 });
@@ -276,7 +275,7 @@
     districtSelect.addEventListener("change", function () {
         document.getElementById('upazila_div').style.visibility = "visible";
 
-        const districtId = this.value;
+        const districtId = this.options[this.selectedIndex].getAttribute('district_id');
         upazilaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
         if (!districtId) return;
 
@@ -286,7 +285,8 @@
                 if (data.status === 200 && data.success) {
                     data.data.forEach(upazila => {
                         const option = document.createElement('option')
-                        option.value = upazila.id
+                        option.value = upazila.name.toLowerCase()
+                        option.setAttribute('upazila_id', upazila.id)
                         option.textContent = upazila.bn_name
                         upazilaSelect.appendChild(option)
                     })
@@ -299,7 +299,7 @@
         area_div = document.getElementById('area_div')
         area_div.style.display = "block";
 
-        const upazilaId = this.value;
+        const upazilaId = this.options[this.selectedIndex].getAttribute('upazila_id');
         areaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
         if (!upazilaId) return;
 
