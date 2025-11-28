@@ -3,4 +3,5 @@ from .models import *
 
 admin.site.register(MarketingIntegration)
 admin.site.register(MarketingEventLog)
+admin.site.register(EmailConfig)
 
