@@ -11,7 +11,8 @@ from http import HTTPStatus
 from django.core.exceptions import ObjectDoesNotExist
 from orders.models import Order, OrderItem
 from accounts.models import CustomUser, CustomerProfile, CustomerAddress
-from accounts.utix import USER_TYPE
+from marketing.models import EmailConfig
+
 
 def product_landing_page(request):
     landing_page_product = HomePageLandingPage.objects.filter(is_active=True).first()
@@ -27,7 +28,6 @@ def product_landing_page(request):
         "whybuyolex": WhyBuyolex.objects.first(),
         "deliveryreturnpolicy": DeliveryReturnPolicy.objects.first()
     }
-
     return render(request, "product_landing_page.html", context)
 
 
@@ -86,12 +86,10 @@ class CreateOrderView(View):
             district= district,
         )
         return address.get_address
-
     
     def post(self, request, *args, **kwargs):
         try:
             data = request.POST
-            print("data: ", data)
             product, price = self.get_product(data.get("product_id"))
             variante = None
             if data.get("variante"):
