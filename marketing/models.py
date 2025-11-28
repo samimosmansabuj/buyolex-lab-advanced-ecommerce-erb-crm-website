@@ -48,7 +48,6 @@ class EmailConfig(models.Model):
 
     api_key = models.CharField(max_length=500, blank=True, null=True)
     ssl = models.BooleanField(default=False)
-    is_default = models.BooleanField(default=False)
     today_count = models.PositiveIntegerField(default=0, blank=True, null=True)
     daily_limit = models.PositiveIntegerField(blank=True, null=True)
     today_date = models.DateField(blank=True, null=True)
