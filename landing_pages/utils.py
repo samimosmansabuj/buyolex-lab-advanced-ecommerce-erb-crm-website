@@ -1,6 +1,6 @@
 from marketing.models import EmailConfig
 from marketing.utix import EmailConfigMailType, EmailConfigServerType
-from smtplib import SMTP
+from smtplib import SMTP, SMTP_SSL
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
@@ -28,12 +28,18 @@ class OrderConfirmatinoEmailSend:
             mime_msg["Reply-To"] = formataddr(("Samim Osman", email_server.reply_to))
             mime_msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
-            server = SMTP(host=email_server.host, port=email_server.port)
-            server.starttls()
+            print("Email Server: ", email_server)
+            # server = SMTP(host=email_server.host, port=email_server.port)
+            server = SMTP_SSL(email_server.host, email_server.port)
+            print("server connect: ", server)
+            # server.starttls()
             server.login(email_server.host_user, email_server.host_password)
+            print("server login: ", server)
             server.sendmail(
                 from_addr=email_server.email, to_addrs=self.email, msg=mime_msg.as_string()
             )
+            server.quit()
+            print("mail send: ", server)
             return True
         return True
     
