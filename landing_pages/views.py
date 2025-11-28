@@ -10,7 +10,7 @@ from catalog.models import Product, ProductVariant
 from http import HTTPStatus
 from django.core.exceptions import ObjectDoesNotExist
 from orders.models import Order, OrderItem
-from accounts.models import CustomUser
+from accounts.models import CustomUser, CustomerProfile, CustomerAddress
 from accounts.utix import USER_TYPE
 
 def product_landing_page(request):
@@ -29,16 +29,6 @@ def product_landing_page(request):
     }
 
     return render(request, "product_landing_page.html", context)
-
-
-def create_order(request):
-    time.sleep(1)
-    # if request.method == "POST":
-        
-    return JsonResponse(
-        {"success": False, "message": "Get method not allowed!"}, status=404
-    )
-
 
 
 class CreateOrderView(View):
@@ -69,27 +59,33 @@ class CreateOrderView(View):
             raise Exception("Input Price and Product Price not Same!")
         return True
 
-    def get_user(self, name, phone, email=None):
+    def get_user_profile(self, name, phone, email=None):
         if CustomUser.objects.filter(email=email).exists():
-            return CustomUser.objects.get(email=email)
+            return CustomUser.objects.get(email=email).customer_profile
         else:
-            user, created = CustomUser.objects.get_or_create(full_name=name, phone=phone)
             if email:
-                user.email = email
-            user.save()
-            return user
+                user = CustomUser.objects.create(
+                    email=email, full_name=name
+                )
+                customer = user.customer_profile
+                customer.phone = phone
+                customer.save()
+            else:
+                customer, created = CustomerProfile.objects.get_or_create(
+                    phone = phone,
+                    full_name = name
+                )
+            return customer
     
-    def get_make_address(self, address, district, upazila, area):
-        full_address = ""
-        if address:
-            full_address = address
-        if area:
-            full_address = f"{full_address}, {area}"
-        if upazila:
-            full_address = f"{full_address}, {upazila}"
-        if district:
-            full_address = f"{full_address}, {district}"
-        return full_address
+    def get_make_address(self, customer, address, district, upazila, area):
+        address = CustomerAddress.objects.create(
+            customer=customer,
+            address= address,
+            area= area,
+            upazila= upazila,
+            district= district,
+        )
+        return address.get_address
 
     
     def post(self, request, *args, **kwargs):
@@ -102,21 +98,15 @@ class CreateOrderView(View):
                 variante, price = self.get_product_variante(product, data.get("variante"))
             
             self.price_verify___(data.get("product_price"), price)
-            user = self.get_user(data.get("name"), data.get("phone"), data.get("email") or None)
+            customer = self.get_user_profile(data.get("name"), data.get("phone"), data.get("email") or None)
 
-            address = self.get_make_address(data.get("address"), data.get("district"), data.get("upazila"), data.get("area"))
-
+            address = self.get_make_address(customer, data.get("address"), data.get("district"), data.get("upazila"), data.get("area"))
+            
             qty = data.get("qty")
             metadata = {"note": data.get("notes")}
 
-            print("product: ", product)
-            print("prince: ", price)
-            print("address: ", address)
-            print("quantity: ", qty)
-            # price("Metadata: ", metadata)
-
             order = Order.objects.create(
-                user = user,
+                customer = customer,
                 items_total = qty,
                 billing_address = address,
                 shipping_address = address,
