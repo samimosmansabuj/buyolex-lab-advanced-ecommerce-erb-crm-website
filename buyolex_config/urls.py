@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
-from django.conf.urls.static import static
 from django.views.static import serve as static_serve
 import os
 
@@ -24,6 +23,9 @@ urlpatterns = [
 
     # Include For API Develop URL
     path('api/v1/', include("api.urls")),
+    
+    # Dashboard
+    path('dashboard/', include("dashboard.urls")),
 ]
 
 SERVE_MEDIA = os.getenv("SERVE_MEDIA", "False").strip().lower() in ("true","1","yes")

@@ -21,8 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'django_htmx',
 
-    'accounts', 'analytics', 'api', 'catalog', 'landing_pages', 'marketing', 'offers', 'orders', 'settings_app'
+    'accounts', 'analytics', 'api', 'catalog', 'landing_pages', 'marketing', 'offers', 'orders', 'settings_app', 'dashboard'
 ]
 
 MIDDLEWARE = [
@@ -33,6 +35,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware'
 ]
 
 ROOT_URLCONF = 'buyolex_config.urls'
