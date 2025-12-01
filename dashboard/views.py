@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from catalog.models import Product, Category
 from catalog.utix import CATEGORY_STATUS
 from django.views import View
@@ -48,6 +48,17 @@ class CategoryView(View):
         try:
             with transaction.atomic():
                 data = request.POST
+
+                if data.get("category_id"):
+                    category = Category.objects.get(id=data.get("category_id"))
+                    category.name = data.get("category_title")
+                    category.description = data.get("category_description")
+                    category.save()
+                    return JsonResponse({
+                        "status": True,
+                        "message": "Category updated successfully"
+                    }, status=HTTPStatus.OK)
+                
                 if data.get("category_title") == "":
                     return JsonResponse({
                         "status": False,
@@ -73,3 +84,43 @@ class CategoryView(View):
                 "status": False,
                 "message": str(e)
             }, status=HTTPStatus.BAD_REQUEST)
+
+def get_category(request, id):
+    try:
+        category = get_object_or_404(Category, id=id)
+        return JsonResponse({
+            "status": True,
+            "category": {
+                "id": category.id,
+                "name": category.name,
+                "description": category.description,
+                "status": category.status
+            }
+        }, status=HTTPStatus.OK)
+    except Exception as e:
+        print("Exception", e)
+        return JsonResponse({
+            "status": False,
+            "message": str(e)
+        }, status=HTTPStatus.BAD_REQUEST)
+
+def delete_category(request, id):
+    if request.method == "DELETE":
+        try:
+            category = get_object_or_404(Category, id=id)
+            category.delete()
+            return JsonResponse({
+                "status": True,
+                "message": "Category deleted successfully"
+            }, status=HTTPStatus.OK)
+        except Exception as e:
+            print("Exception", e)
+            return JsonResponse({
+                "status": False,
+                "message": str(e)
+            }, status=HTTPStatus.BAD_REQUEST)
+    return JsonResponse({
+        "status": False,
+        "message": "Invalid request"
+    }, status=HTTPStatus.BAD_REQUEST)
+

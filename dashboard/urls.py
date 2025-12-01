@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import dashboard, product_list, add_product, CategoryView, add_category
+from .views import dashboard, product_list, add_product, CategoryView, add_category, get_category, delete_category
 
 urlpatterns = [
     path('', dashboard, name='dashboard'),
@@ -9,4 +9,6 @@ urlpatterns = [
 
     path('category-list/', CategoryView.as_view(), name='category_list'),
     path('category-add/', add_category, name='category_add'),
+    path('get-category/<int:id>/', get_category, name='get_category'),
+    path('delete-category/<int:id>/', delete_category, name='delete_category'),
 ]

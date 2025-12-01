@@ -142,9 +142,6 @@
                                     <div class="product-tags">
                                         <a href="javascript:;" class="btn-tags">Jeans</a>
                                         <a href="javascript:;" class="btn-tags">iPhone</a>
-                                        <a href="javascript:;" class="btn-tags">Laptops</a>
-                                        <a href="javascript:;" class="btn-tags">Mobiles</a>
-                                        <a href="javascript:;" class="btn-tags">Wallets</a>
                                     </div>
                                 </td>
                                 <td>
@@ -160,15 +157,18 @@
                                 </td>
                                 <td>
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-filter dropdown-toggle dropdown-toggle-nocaret"
-                                            type="button" data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#">Action</a></li>
-                                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                        </ul>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-filter edit-category-btn"
+                                                data-id="{{ category.id }}" data-bs-toggle="modal"
+                                                data-bs-target="#CategoryModal">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-filter delete-category-btn"
+                                                data-id="{{ category.id }}" data-bs-toggle="modal"
+                                                data-bs-target="#deleteCategoryModal">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

@@ -1,7 +1,8 @@
 <!-- Modal -->
-<form method="post" enctype="multipart/form-data" id="add_category_form">
+<form method="post" enctype="multipart/form-data" id="add_category_form" hx-ignore="true">
     {% csrf_token %}
-    <div class="modal fade" id="AddCategoryModal">
+    <input type="hidden" name="category_id" id="category_id">
+    <div class="modal fade" id="CategoryModal">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header border-bottom-0 bg-grd-primary py-2">
@@ -95,33 +96,75 @@
 </form>
 
 <script>
+    // Create Category Modal Js=================== 
     const addCategoryForm = document.getElementById("add_category_form");
     const closeAddCategoryModal = document.getElementById("close_add_category_modal");
-    addCategoryForm.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const csrftoken = document.querySelector("#add_category_form input[name=csrfmiddlewaretoken]").value;
-        const formData = new FormData(addCategoryForm);
-        console.log(formData);
-        const response = await fetch("{% url 'category_list' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRFToken": csrftoken,
-            },
-        })
-        const data = await response.json();
-        if (data.status) {
-            closeAddCategoryModal.click();
-            successNotificationCustom(data.message);
+    document.addEventListener("submit", async function (e) {
+        if (e.target.id === "add_category_form") {
+            e.preventDefault();
 
-            htmx.trigger("body", "refreshCategoryList");
-            addCategoryForm.reset();
-        } else {
-            errorNotificationCustom(data.message);
+            try {
+                const csrftoken = getCookie("csrftoken");
+                const form = e.target;
+                const formData = new FormData(form);
+
+                const response = await fetch("{% url 'category_list' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRFToken": csrftoken,
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.status) {
+                    document.getElementById("close_add_category_modal").click();
+                    form.reset();
+                    successNotificationCustom(data.message);
+                    htmx.trigger("body", "refreshCategoryList");
+                } else {
+                    errorNotificationCustom(data.message);
+                }
+
+            } catch (error) {
+                errorNotificationCustom(error.message);
+            }
         }
-    }).catch(error => {
-        errorNotificationCustom(error.message);
     });
+
+    // Update Category Modal Js=======================
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".edit-category-btn");
+        if (btn) {
+            const categoryId = btn.dataset.id;
+            document.querySelector(".modal-title").textContent = "Update Category";
+            document.getElementById("category_id").value = categoryId;
+            document.querySelector("input[name='category_title']").value = "Loading...";
+            document.querySelector("textarea[name='category_description']").value = "Loading...";
+            fetch(`/dashboard/get-category/${categoryId}/`, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        document.querySelector("input[name='category_title']").value = data.category.name;
+                        document.querySelector("textarea[name='category_description']").value = data.category.description;
+                    } else {
+                        errorNotificationCustom(data.message);
+                    }
+                })
+                .catch(error => {
+                    errorNotificationCustom(error.message);
+                });
+        }
+    });
+
+
 
     function successNotificationCustom(message) {
         Lobibox.notify('success', {
@@ -136,7 +179,6 @@
             msg: message
         });
     }
-
     function errorNotificationCustom(message) {
         Lobibox.notify('error', {
             title: "Error",
@@ -150,4 +192,99 @@
             msg: message
         });
     }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+
+    // Delete Category Modal Js=======================
+    let deleteCategoryId = null;
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".delete-category-btn");
+        if (btn) {
+            deleteCategoryId = btn.dataset.id;
+            document.querySelector(".modal-title").textContent = "Delete Category";
+            fetch(`/dashboard/get-category/${deleteCategoryId}/`, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        document.querySelector("div.delete-category-modal-body").textContent = "Are you sure you want to delete the category " + data.category.name + "?";
+                    } else {
+                        errorNotificationCustom(data.message);
+                    }
+                })
+                .catch(error => {
+                    errorNotificationCustom(error.message);
+                });
+        }
+    });
+
+    document.addEventListener("click", function (e) {
+        if (e.target.closest("#confirmDeleteBtn")) {
+            if (!deleteCategoryId) {
+                errorNotificationCustom("Category ID is not found");
+                return;
+            }
+            fetch(`/dashboard/delete-category/${deleteCategoryId}/`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        document.getElementById("close_delete_category_modal").click();
+                        successNotificationCustom(data.message);
+                        htmx.trigger("body", "refreshCategoryList");
+                    } else {
+                        errorNotificationCustom(data.message);
+                    }
+                })
+                .catch(error => {
+                    errorNotificationCustom(error.message);
+                });
+        }
+    });
+
+
 </script>
+
+
+<div class="modal fade" id="deleteCategoryModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 py-2">
+                <h5 class="modal-title">Delete Category</h5>
+                <a href="javascript:;" class="primaery-menu-close" data-bs-dismiss="modal"
+                    id="close_delete_category_modal">
+                    <i class="material-icons-outlined">close</i>
+                </a>
+            </div>
+            <div class="modal-body delete-category-modal-body">Are you Configm delete the Category?</div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-grd-danger" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-grd-info" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
