@@ -78,7 +78,7 @@
         </div>
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
-                <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#AddCategoryModal">
+                <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#CategoryModal">
                     <i class="bi bi-plus-lg me-2"></i>Add Category
                 </button>
                 {% include 'db_category/partial/add_category_modal.html' %}
@@ -130,17 +130,20 @@
                                 </td>
                                 <td>
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-filter dropdown-toggle dropdown-toggle-nocaret">
+                                        <button class="btn btn-sm btn-filter edit-category-btn"
+                                            data-id="{{ category.id }}" data-bs-toggle="modal"
+                                            data-bs-target="#CategoryModal">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-filter dropdown-toggle dropdown-toggle-nocaret">
+                                        <button class="btn btn-sm btn-filter delete-category-btn"
+                                            data-id="{{ category.id }}" data-bs-toggle="modal"
+                                            data-bs-target="#deleteCategoryModal">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                             {% endfor %}
-
                         </tbody>
                     </table>
                 </div>
