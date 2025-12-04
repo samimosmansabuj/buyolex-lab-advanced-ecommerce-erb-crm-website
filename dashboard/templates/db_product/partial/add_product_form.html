@@ -1,21 +1,144 @@
 <div class="row">
     <div class="col-12 col-lg-8">
+        <!-- Product Details -->
         <div class="card">
             <div class="card-body">
                 <div class="mb-4">
                     <h5 class="mb-3">Product Title</h5>
                     <input type="text" class="form-control" placeholder="write title here....">
                 </div>
-                <div class="mb-4">
-                    <h5 class="mb-3">Product Description</h5>
-                    <textarea class="form-control" cols="4" rows="6"
-                        placeholder="write a description here.."></textarea>
+                <div class="mb-4 row g-3">
+                    <div class="col-4">
+                        <select class="form-select" id="AddCategory">
+                            <option selected disabled>Select Category</option>
+                            <option value="0">Topwear</option>
+                            <option value="1">Bottomwear</option>
+                            <option value="2">Casual Tshirt</option>
+                            <option value="3">Electronic</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-select" id="AddCategory">
+                            <option selected disabled>Select Sub Category</option>
+                            <option value="0">Topwear</option>
+                            <option value="1">Bottomwear</option>
+                            <option value="2">Casual Tshirt</option>
+                            <option value="3">Electronic</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-select" id="AddCategory">
+                            <option selected disabled>Select Sub Sub Category</option>
+                            <option value="0">Topwear</option>
+                            <option value="1">Bottomwear</option>
+                            <option value="2">Casual Tshirt</option>
+                            <option value="3">Electronic</option>
+                        </select>
+                    </div>
                 </div>
+                <div class="mb-4">
+                    <h5 class="mb-3">Product Highlights</h5>
+                    <textarea class="form-control" cols="4" rows="6"
+                        placeholder="write a short description here.."></textarea>
+                </div>
+                <div class="mb-4">
+                    <h5 class="mb-3">Product Full Description</h5>
+                    <div id="quill-editor" style="height: 300px;"></div>
+                    <textarea id="full-description" class="form-control" cols="4" rows="10"
+                        placeholder="write a description here.." style="display:none;"></textarea>
+                </div>
+                <div class="mb-4">
+                    <h5 class="mb-3">Tags</h5>
+                    <div class="col-12 mb-2">
+                        <input type="text" class="form-control" id="Tags" placeholder="Tags">
+                    </div>
+                    <div class="col-12 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm">Woman <i
+                                    class="bi bi-x"></i></a>
+                            <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm">Fashion <i
+                                    class="bi bi-x"></i></a>
+                            <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm">Furniture <i
+                                    class="bi bi-x"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Images -->
+        <div class="card">
+            <div class="card-body">
                 <div class="mb-4">
                     <h5 class="mb-3">Display images</h5>
                     <input id="fancy-file-upload" type="file" name="files" accept=".jpg, .png, image/jpeg, image/png"
                         multiple>
                 </div>
+            </div>
+        </div>
+        <!-- Price, Stock & Variants -->
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5 class="mb-3">Price, Stock & Variants</h5>
+                    <div class="col-12 mb-2">
+                        <label for="Color" class="form-label">Color</label>
+                        <input type="text" class="form-control" id="Color" placeholder="Color">
+                    </div>
+                    <div class="col-12 mb-2">
+                        <label for="Size" class="form-label">Size</label>
+                        <input type="text" class="form-control" id="Size" placeholder="Size">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h6 class="mb-3">Price & Stock</h6>
+                    <table class="table table-bordered mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Color</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Stock</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Discount Price</th>
+                                <th scope="col">Cost Price</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Jacob</td>
+                                <td>Thornton</td>
+                                <td>@fat</td>
+                                <td>@fat</td>
+                                <td>@fat</td>
+                                <td>@fat</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>Larry the Bird</td>
+                                <td>@twitter</td>
+                                <td>@twitter</td>
+                                <td>@twitter</td>
+                                <td>@twitter</td>
+                                <td>@twitter</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Inventory -->
+        <div class="card">
+            <div class="card-body">
                 <div class="mb-4">
                     <h5 class="mb-3">Inventory</h5>
 
@@ -226,6 +349,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Product Add Form Side Bar -->
     <div class="col-12 col-lg-4">
         <div class="card">
             <div class="card-body">
@@ -243,6 +368,7 @@
             <div class="card-body">
                 <h5 class="mb-3">Organize</h5>
                 <div class="row g-3">
+                    <!-- Product Category Section====== -->
                     <div class="col-12">
                         <label for="AddCategory" class="form-label">Category</label>
                         <select class="form-select" id="AddCategory">
@@ -252,10 +378,26 @@
                             <option value="3">Electronic</option>
                         </select>
                     </div>
-                    <div class="col-12">
-                        <label for="Collection" class="form-label">Collection</label>
-                        <input type="text" class="form-control" id="Collection" placeholder="Collection">
+                    <div class="col-12" style="display: none;">
+                        <label for="AddCategory" class="form-label">Category</label>
+                        <select class="form-select" id="AddCategory">
+                            <option value="0">Topwear</option>
+                            <option value="1">Bottomwear</option>
+                            <option value="2">Casual Tshirt</option>
+                            <option value="3">Electronic</option>
+                        </select>
                     </div>
+                    <div class="col-12" style="display: none;">
+                        <label for="AddCategory" class="form-label">Category</label>
+                        <select class="form-select" id="AddCategory">
+                            <option value="0">Topwear</option>
+                            <option value="1">Bottomwear</option>
+                            <option value="2">Casual Tshirt</option>
+                            <option value="3">Electronic</option>
+                        </select>
+                    </div>
+
+                    <!-- Product Tags Section====== -->
                     <div class="col-12">
                         <label for="Tags" class="form-label">Tags</label>
                         <input type="text" class="form-control" id="Tags" placeholder="Tags">
@@ -270,18 +412,18 @@
                                     class="bi bi-x"></i></a>
                         </div>
                     </div>
-                    <div class="col-12">
-                        <label for="Vendor" class="form-label">Vendor</label>
-                        <input type="text" class="form-control" id="Vendor" placeholder="Vendor">
-                    </div>
+
                 </div><!--end row-->
             </div>
         </div>
-
         <div class="card">
             <div class="card-body">
                 <h5 class="mb-3">Variants</h5>
                 <div class="row g-3">
+                    <div class="col-12">
+                        <label for="Vendor" class="form-label">Vendor</label>
+                        <input type="text" class="form-control" id="Vendor" placeholder="Vendor">
+                    </div>
                     <div class="col-12">
                         <label for="Brand" class="form-label">Brand</label>
                         <input type="text" class="form-control" id="Brand" placeholder="Brand">
@@ -310,3 +452,22 @@
     </div>
 
 </div><!--end row-->
+
+<script>
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow'
+    });
+    // Save HTML into textarea on form submit
+    document.querySelector("form")?.addEventListener("submit", function () {
+        document.getElementById("full-description").value = quill.root.innerHTML;
+    });
+
+
+
+    $('#fancy-file-upload').FancyFileUpload({
+        params: {
+            action: 'fileuploader'
+        },
+        maxfilesize: 1000000
+    });
+</script>
