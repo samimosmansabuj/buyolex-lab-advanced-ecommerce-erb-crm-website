@@ -45,7 +45,7 @@
                     </li>
                     <li>
                         <a href="{% url 'media_center' %}" hx-get="{% url 'media_center' %}" hx-target="#content-area"
-                            hx-push-url="true">
+                            hx-push-url="true" hx-trigger="click, refreshMediaCenter from:body" hx-swap="innerHTML">
                             <i class="material-icons-outlined">arrow_right</i>Media Center
                         </a>
                     </li>
@@ -77,16 +77,24 @@
                 </a>
                 <ul>
                     <li>
-                        <a><i class="material-icons-outlined">arrow_right</i>Order</a>
+                        <a href="{% url 'order_list' %}" hx-get="{% url 'order_list' %}" hx-target="#content-area"
+                            hx-push-url="true" hx-trigger="click, refreshOrderList from:body" hx-swap="innerHTML"><i
+                                class="material-icons-outlined">arrow_right</i>Order</a>
                     </li>
                     <li>
-                        <a><i class="material-icons-outlined">arrow_right</i>Return Order</a>
+                        <a href="{% url 'order_list' %}" hx-get="{% url 'order_list' %}" hx-target="#content-area"
+                            hx-push-url="true" hx-trigger="click, refreshReturnOrderList from:body"
+                            hx-swap="innerHTML"><i class="material-icons-outlined">arrow_right</i>Return Order</a>
                     </li>
                     <li>
-                        <a><i class="material-icons-outlined">arrow_right</i>Reviews</a>
+                        <a href="{% url 'order_list' %}" hx-get="{% url 'order_list' %}" hx-target="#content-area"
+                            hx-push-url="true" hx-trigger="click, refreshReviewList from:body" hx-swap="innerHTML"><i
+                                class="material-icons-outlined">arrow_right</i>Reviews</a>
                     </li>
                     <li>
-                        <a><i class="material-icons-outlined">arrow_right</i>Create Order</a>
+                        <a href="{% url 'order_list' %}" hx-get="{% url 'order_list' %}" hx-target="#content-area"
+                            hx-push-url="true" hx-trigger="click, refreshCreateOrder from:body" hx-swap="innerHTML"><i
+                                class="material-icons-outlined">arrow_right</i>Create Order</a>
                     </li>
                 </ul>
             </li>
