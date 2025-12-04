@@ -124,3 +124,10 @@ def delete_category(request, id):
         "message": "Invalid request"
     }, status=HTTPStatus.BAD_REQUEST)
 
+
+def order_list(request):
+    if request.htmx:
+        return render(request, "db_order/partial/partial_order_list.html")
+    return render(request, "db_order/order_list.html")
+
+
