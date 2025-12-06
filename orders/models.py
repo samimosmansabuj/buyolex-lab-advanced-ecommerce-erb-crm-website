@@ -51,6 +51,8 @@ class Order(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
     placed_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
+    delivery_date = models.DateField(null=True, blank=True)
+    delivery_type = models.CharField(max_length=50, choices=DELIVERY_TYPE.choices, default=DELIVERY_TYPE.COD)
 
     @property
     def get_items_total(self):

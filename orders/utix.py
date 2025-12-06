@@ -24,3 +24,10 @@ class REVIEW_STATUS(models.TextChoices):
     DELETE = "delete"
 
 
+class DELIVERY_TYPE(models.TextChoices):
+    COD = "cod"
+    ONLINE_PAYMENT = "online_payment"
+    DELIVERY = "delivery"
+    PICKUP = "pickup"
+
+
