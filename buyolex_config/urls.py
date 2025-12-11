@@ -22,7 +22,7 @@ urlpatterns = [
     path('', include("settings_app.urls")),
 
     # Include For API Develop URL
-    path('api/v1/', include("api.urls")),
+    path('api/v1/', include("api.urls", namespace="api")),
     
     # Dashboard
     path('dashboard/', include("dashboard.urls")),
