@@ -2,10 +2,16 @@
 <aside class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
         <div class="logo-icon">
-            <img src="{% static 'dashboard_assets/images/logo-icon.png' %}" class="logo-img" alt="">
+            <a href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#content-area"
+                hx-push-url="true">
+                <img src="{% static 'dashboard_assets/images/logo-icon.png' %}" class="logo-img" alt="">
+            </a>
         </div>
         <div class="logo-name flex-grow-1">
-            <h5 class="mb-0">Maxton</h5>
+            <a href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#content-area"
+                hx-push-url="true">
+                <h5 class="mb-0">Buyolex</h5>
+            </a>
         </div>
         <div class="sidebar-close">
             <span class="material-icons-outlined">close</span>

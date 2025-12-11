@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from settings_app.models import SiteSettings
+from catalog.models import Category
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,3 +15,19 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
         if request:
             return request.build_absolute_uri(pic.url)
         return pic.url
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+    
+    def get_banner_image(self, obj):
+        pic = getattr(obj, "banner_image", None)
+        if not pic or getattr(pic, "url", None):
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(pic.url)
+        return pic.url
+

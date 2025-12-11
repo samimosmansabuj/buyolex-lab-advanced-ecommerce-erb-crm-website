@@ -3,50 +3,88 @@
         <!-- Product Details -->
         <div class="card">
             <div class="card-body">
+                <!-- Product Title  -->
                 <div class="mb-4">
                     <h5 class="mb-3">Product Title</h5>
                     <input type="text" class="form-control" placeholder="write title here....">
                 </div>
+                <!-- Product Category -->
                 <div class="mb-4 row g-3">
                     <div class="col-4">
                         <select class="form-select" id="AddCategory">
                             <option selected disabled>Select Category</option>
-                            <option value="0">Topwear</option>
-                            <option value="1">Bottomwear</option>
-                            <option value="2">Casual Tshirt</option>
-                            <option value="3">Electronic</option>
                         </select>
                     </div>
-                    <div class="col-4">
-                        <select class="form-select" id="AddCategory">
-                            <option selected disabled>Select Sub Category</option>
-                            <option value="0">Topwear</option>
-                            <option value="1">Bottomwear</option>
-                            <option value="2">Casual Tshirt</option>
-                            <option value="3">Electronic</option>
+                    <div class="col-4" id="AddSubCategoryDiv" style="display: none;">
+                        <select class="form-select" id="AddSubCategory">
+
                         </select>
                     </div>
-                    <div class="col-4">
-                        <select class="form-select" id="AddCategory">
+                    <div class="col-4" id="AddSubSubCategoryDiv" style="display: none;">
+                        <select class="form-select" id="AddSubSubCategory">
                             <option selected disabled>Select Sub Sub Category</option>
-                            <option value="0">Topwear</option>
-                            <option value="1">Bottomwear</option>
-                            <option value="2">Casual Tshirt</option>
-                            <option value="3">Electronic</option>
                         </select>
                     </div>
                 </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        // Dom Element Get 
+                        const AddCategory = document.getElementById("AddCategory")
+                        const AddSubCategory = document.getElementById("AddSubCategory")
+                        const AddSubSubCategory = document.getElementById("AddSubSubCategory")
+
+                        const AddSubCategoryDiv = document.getElementById("AddSubCategoryDiv")
+                        const AddSubSubCategoryDiv = document.getElementById("AddSubSubCategoryDiv")
+
+                        const API_URL = "{% url 'api:category_api' %}"
+
+                        // Helper: Fetch Data 
+                        const fetchData = async (url) => {
+                            const response = fetch(url)
+                            const data = await response.json()
+                            return data
+                        }
+
+                        // Helper: Populate Selected 
+                        const populateselected = (select, placeholder, items, KayAttr) => {
+                            select.innerHTML = `<option selected disabled>${placeholder}</option>`
+                            if (!items) return;
+                            items.forEach(item => {
+                                // select.innerHTML += `<option value="${item[KayAttr]}">${item.name}</option>`
+                                const option = document.createElement("option")
+                                option.value = item.slug
+                                option.setAttribute(KayAttr, item.id)
+                                option.textContent = item.name
+                                select.appendChild(option)
+                            })
+                        }
+
+                        const LoadMainCategory = async () => {
+                            const data = await fetchData(API_URL)
+                            if (data.status) {
+                                populateselected(AddCategory, "Select Category", data.data, "category_id")
+                            }
+                        }
+
+
+                        LoadMainCategory()
+                    })
+                </script>
+
+                <!-- Product Highlights -->
                 <div class="mb-4">
                     <h5 class="mb-3">Product Highlights</h5>
                     <textarea class="form-control" cols="4" rows="6"
                         placeholder="write a short description here.."></textarea>
                 </div>
+                <!-- Product Full Description -->
                 <div class="mb-4">
                     <h5 class="mb-3">Product Full Description</h5>
                     <div id="quill-editor" style="height: 300px;"></div>
                     <textarea id="full-description" class="form-control" cols="4" rows="10"
                         placeholder="write a description here.." style="display:none;"></textarea>
                 </div>
+                <!-- Product Tags -->
                 <div class="mb-4">
                     <h5 class="mb-3">Tags</h5>
                     <div class="col-12 mb-2">
@@ -461,6 +499,87 @@
     document.querySelector("form")?.addEventListener("submit", function () {
         document.getElementById("full-description").value = quill.root.innerHTML;
     });
+
+
+    // AddCategory = document.getElementById("AddCategory")
+    // fetch("{% url 'api:category_api' %}")
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.status) {
+    //             data.data.forEach(options => {
+    //                 const option = document.createElement('option')
+    //                 option.value = options.slug
+    //                 option.setAttribute('category_id', options.id);
+    //                 option.textContent = options.name
+    //                 AddCategory.appendChild(option)
+    //             })
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error fetching data:', error);
+    //     });
+
+    // AddSubCategory = document.getElementById("AddSubCategory")
+    // AddSubCategoryDiv = document.getElementById("AddSubCategoryDiv")
+    // AddSubSubCategory = document.getElementById("AddSubSubCategory")
+    // AddSubSubCategoryDiv = document.getElementById("AddSubSubCategoryDiv")
+    // // Sub Category Fetch 
+    // AddCategory.addEventListener('change', function () {
+    //     var selectedValue = this.value;
+    //     var category_id = this.options[this.selectedIndex].getAttribute('category_id');
+
+    //     AddSubCategoryDiv.style.display = "block";
+    //     AddSubSubCategoryDiv.style.display = "none";
+    //     AddSubCategory.innerHTML = "<option selected disabled>Select Sub Category</option>"
+    //     AddSubSubCategory.innerHTML = "<option selected>Select Sub Sub Category</option>"
+
+    //     if (!category_id) return;
+
+    //     fetch("{% url 'api:category_api' %}?category=" + category_id)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.status) {
+    //                 data.data.forEach(options => {
+    //                     const option = document.createElement('option')
+    //                     option.value = options.slug
+    //                     option.setAttribute('sub_category_id', options.id);
+    //                     option.textContent = options.name
+    //                     AddSubCategory.appendChild(option)
+    //                 })
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('Error fetching data:', error);
+    //         });
+    // });
+
+    // // Sub Sub Category Fetch 
+    // AddSubCategory.addEventListener('change', function () {
+    //     var selectedValue = this.value;
+    //     var sub_category_id = this.options[this.selectedIndex].getAttribute('sub_category_id');
+
+    //     AddSubSubCategoryDiv.style.display = "block";
+    //     AddSubSubCategory.innerHTML = "<option selected>Select Sub Sub Category</option>"
+
+    //     if (!sub_category_id) return;
+
+    //     fetch("{% url 'api:category_api' %}?category=" + sub_category_id)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.status) {
+    //                 data.data.forEach(options => {
+    //                     const option = document.createElement('option')
+    //                     option.value = options.slug
+    //                     option.setAttribute('sub_sub_category_id', options.id);
+    //                     option.textContent = options.name
+    //                     AddSubSubCategory.appendChild(option)
+    //                 })
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('Error fetching data:', error);
+    //         });
+    // });
 
 
 

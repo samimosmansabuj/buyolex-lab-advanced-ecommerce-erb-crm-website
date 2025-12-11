@@ -34,7 +34,6 @@ def add_category(request):
             image=request.FILES.get("image"),
         )
         return JsonResponse({"message": "Category added successfully"})
-
     if request.htmx:
         return render(request, "db_category/partial/partial_add_category.html")
     return render(request, "db_category/add_category.html")
