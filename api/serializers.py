@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from settings_app.models import SiteSettings
 from catalog.models import Category
+from settings_app.models import Tag
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +32,7 @@ class CategorySerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(pic.url)
         return pic.url
 
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ["name", "slug"]

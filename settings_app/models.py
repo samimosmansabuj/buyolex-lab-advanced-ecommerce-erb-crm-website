@@ -1,4 +1,5 @@
 from django.db import models
+from .utils import generate_unique_slug
 
 # Create your models here.
 class SiteSettings(models.Model):
@@ -39,5 +40,20 @@ class DeliveryReturnPolicy(models.Model):
     footer = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        old_slug = Tag.objects.get(pk=self.pk) if self.pk else None
+        self.slug = generate_unique_slug(Tag, self.name, old_slug.slug if old_slug else None)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
 

@@ -3,6 +3,7 @@ from .utix import *
 from settings_app.utils import generate_unique_slug, image_delete_os, previous_image_delete_os
 from .utils import generate_product_sku
 import uuid
+from settings_app.models import Tag
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -223,6 +224,11 @@ class ProductVideo(models.Model):
     def __str__(self):
         return f"Video {self.pk} for {self.product.title}"
 
+class ProductTag(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_tags')
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='product_tags')
 
+    def __str__(self):
+        return f"Tag {self.tag.name} for {self.product.title}"
 
 

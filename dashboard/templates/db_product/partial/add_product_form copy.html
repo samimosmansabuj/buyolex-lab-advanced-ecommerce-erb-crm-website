@@ -12,22 +12,96 @@
                     <!-- Product Category -->
                     <div class="mb-4 row g-3">
                         <div class="col-4">
-                            <select class="form-select" id="AddCategory" data-category-api="{% url 'api:category_api' %}">
+                            <select class="form-select" id="AddCategory">
                                 <!-- <option selected disabled>Select Category</option> -->
                             </select>
                         </div>
                         <div class="col-4" id="AddSubCategoryDiv" style="display: none;">
-                            <select class="form-select" id="AddSubCategory" data-category-api="{% url 'api:category_api' %}">
+                            <select class="form-select" id="AddSubCategory">
 
                             </select>
                         </div>
                         <div class="col-4" id="AddSubSubCategoryDiv" style="display: none;">
-                            <select class="form-select" id="AddSubSubCategory" data-category-api="{% url 'api:category_api' %}">
+                            <select class="form-select" id="AddSubSubCategory">
                                 <option selected disabled>Select Sub Sub Category</option>
                             </select>
                         </div>
                     </div>
-                    
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            // ---------- DOM Elements ----------
+                            const AddCategory = document.getElementById("AddCategory");
+                            const AddSubCategory = document.getElementById("AddSubCategory");
+                            const AddSubSubCategory = document.getElementById("AddSubSubCategory");
+
+                            const AddSubCategoryDiv = document.getElementById("AddSubCategoryDiv");
+                            const AddSubSubCategoryDiv = document.getElementById("AddSubSubCategoryDiv");
+
+                            const CATEGORY_API_URL = "{% url 'api:category_api' %}";
+
+                            // ---------- Populate Select ----------
+                            const populateSelect = (select, placeholder, items, keyAttr) => {
+                                select.innerHTML = `<option selected disabled>${placeholder}</option>`;
+
+                                if (!items) return;
+
+                                items.forEach(item => {
+                                    const option = document.createElement("option");
+                                    option.value = item.slug;
+                                    option.setAttribute(keyAttr, item.id);
+                                    option.textContent = item.name;
+                                    select.appendChild(option);
+                                });
+                            };
+
+                            // ---------- Load Main Categories ----------
+                            const loadCategories = async () => {
+                                const data = await fetchData(CATEGORY_API_URL);
+                                if (data.status) {
+                                    populateSelect(AddCategory, "Select Category", data.data, "category_id");
+                                }
+                            };
+
+                            // ---------- Category → Load Sub Categories ----------
+                            AddCategory.addEventListener("change", async function () {
+                                const category_id = this.options[this.selectedIndex].getAttribute("category_id");
+
+                                AddSubCategoryDiv.style.display = "block";
+                                AddSubSubCategoryDiv.style.display = "none";
+
+                                populateSelect(AddSubCategory, "Select Sub Category", null);
+                                populateSelect(AddSubSubCategory, "Select Sub Sub Category", null);
+
+                                if (!category_id) return;
+
+                                const data = await fetchData(`${CATEGORY_API_URL}?category=${category_id}`);
+
+                                if (data.status) {
+                                    populateSelect(AddSubCategory, "Select Sub Category", data.data, "sub_category_id");
+                                }
+                            });
+
+                            // ---------- Sub Category → Load Sub Sub Categories ----------
+                            AddSubCategory.addEventListener("change", async function () {
+                                const sub_category_id = this.options[this.selectedIndex].getAttribute("sub_category_id");
+
+                                AddSubSubCategoryDiv.style.display = "block";
+                                populateSelect(AddSubSubCategory, "Select Sub Sub Category", null);
+
+                                if (!sub_category_id) return;
+
+                                const data = await fetchData(`${CATEGORY_API_URL}?category=${sub_category_id}`);
+
+                                if (data.status) {
+                                    populateSelect(AddSubSubCategory, "Select Sub Sub Category", data.data, "sub_sub_category_id");
+                                }
+                            });
+
+                            // Load main categories on page load
+                            loadCategories();
+                        });
+                    </script>
+
                     <!-- Product Highlights -->
                     <div class="mb-4">
                         <h5 class="mb-3">Product Highlights</h5>
@@ -45,7 +119,7 @@
                     <div class="mb-4">
                         <h5 class="mb-3">Tags</h5>
                         <div class="col-12 mb-2 position-relative tag-wrapper">
-                            <input type="text" class="form-control" id="Tags" placeholder="Tags" data-tag-api="{% url 'api:tag_api' %}">
+                            <input type="text" class="form-control" id="Tags" placeholder="Tags">
                             <ul class="list-group tag-suggestion-list d-none" id="tag_suggestions"></ul>
                         </div>
                         <div class="col-12 mb-2">
@@ -53,6 +127,69 @@
                             </div>
                         </div>
                     </div>
+
+                    <script>
+                        const TAG_API_URL = "{% url 'api:tag_api' %}";
+
+                        const tagInput = document.getElementById("Tags");
+                        const suggestionBox = document.getElementById("tag_suggestions");
+                        const tagsList = document.getElementById("tags_list");
+                        const selectedTags = new Map();
+
+                        tagInput.addEventListener("input", async function () {
+                            const query = this.value.trim();
+                            suggestionBox.innerHTML = "";
+                            suggestionBox.classList.add("d-none");
+                            if (!query) return;
+
+                            const data = await fetchData(`${TAG_API_URL}?q=${query}`);
+                            if (data.status && data.data.length) {
+                                suggestionBox.classList.remove("d-none");
+                                data.data.forEach(tag => {
+                                    const li = document.createElement("li");
+                                    li.className = "list-group-item list-group-item-action";
+                                    li.textContent = tag.name;
+                                    li.dataset.slug = tag.slug;
+                                    li.onclick = () => addTag(tag.slug, tag.name);
+                                    suggestionBox.appendChild(li);
+                                });
+                            }
+                        });
+
+
+                        function addTag(slug, name) {
+                            if (selectedTags.has(slug)) return;
+                            selectedTags.set(slug, name);
+
+                            const tagEl = document.createElement("a");
+                            tagEl.href = "javascript:;";
+                            tagEl.className = "btn btn-sm btn-light border shadow-sm d-flex align-items-center gap-1";
+                            tagEl.dataset.slug = slug;
+                            tagEl.innerHTML = `
+                            ${name}
+                            <i class="bi bi-x"></i>
+                        `;
+
+                            tagEl.querySelector("i").onclick = () => removeTag(slug, tagEl);
+
+                            tagsList.appendChild(tagEl);
+
+                            tagInput.value = "";
+                            suggestionBox.innerHTML = "";
+                            suggestionBox.classList.add("d-none");
+                        }
+
+                        function removeTag(slug, tagEl) {
+                            selectedTags.delete(slug);
+                            tagEl.remove();
+                        }
+
+                        document.addEventListener("click", (e) => {
+                            if (!e.target.closest(".position-relative")) {
+                                suggestionBox.classList.add("d-none");
+                            }
+                        });
+                    </script>
                 </div>
             </div>
             <!-- Images -->
@@ -453,6 +590,17 @@
     </div><!--end row-->
 </form>
 <script>
+    // Fetch Data
+    const fetchData = async (url) => {
+        try {
+            const response = await fetch(url);
+            return await response.json();
+        } catch (err) {
+            console.error("Fetch Error:", err);
+            return { status: false };
+        }
+    };
+
     var quill = new Quill('#quill-editor', {
         theme: 'snow'
     });
