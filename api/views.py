@@ -2,8 +2,8 @@ from django.http import JsonResponse
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
 
-from .serializers import SiteSettingsSerializer, CategorySerializer
-from settings_app.models import SiteSettings
+from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer
+from settings_app.models import SiteSettings, Tag
 from catalog.models import Category
 
 
@@ -30,8 +30,6 @@ class CategoryAPIViews(views.APIView):
     def get(self, request, *args, **kwargs):
         try:
             category_id = request.query_params.get('category')
-            # sub_category_id = request.query_params.get('sub-category')
-
             if category_id:
                 try:
                     category = Category.objects.get(id=category_id)
@@ -49,24 +47,6 @@ class CategoryAPIViews(views.APIView):
                             "message": "Category not found"
                         }, status=status.HTTP_404_NOT_FOUND
                     )
-            # if sub_category_id:
-            #     try:
-            #         sub_category = Category.objects.get(id=sub_category_id)
-            #         sub_sub_category = sub_category.children.all()
-            #         return Response(
-            #             {
-            #                 "status": True,
-            #                 "data": CategorySerializer(sub_sub_category, many=True).data
-            #             }, status=status.HTTP_200_OK
-            #         )
-            #     except Category.DoesNotExist:
-            #         return Response(
-            #             {
-            #                 "status": False,
-            #                 "message": "Sub-category not found"
-            #             }, status=status.HTTP_404_NOT_FOUND
-            #         )
-
             categories = Category.objects.filter(parent__isnull=True)
             return Response(
                 {
@@ -81,3 +61,69 @@ class CategoryAPIViews(views.APIView):
                     "message": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class TagAPIViews(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            q = request.query_params.get('q')
+            if q:
+                try:
+                    tags = Tag.objects.filter(name__icontains=q)
+                    print("Tags: ", tags)
+                    return Response(
+                        {
+                            "status": True,
+                            "data": TagSerializer(tags, many=True).data
+                        }, status=status.HTTP_200_OK
+                    )
+                except Tag.DoesNotExist:
+                    return Response(
+                        {
+                            "status": False,
+                            "message": "Tag not found"
+                        }, status=status.HTTP_404_NOT_FOUND
+                    )
+            tags = Tag.objects.all()
+            return Response(
+                {
+                    "status": True,
+                    "data": TagSerializer(tags, many=True).data
+                }, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            serializer = TagSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {
+                        "status": True,
+                        "message": "Tag created successfully",
+                        "data": serializer.data
+                    }, status=status.HTTP_201_CREATED
+                )
+            return Response(
+                {
+                    "status": False,
+                    "message": serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
