@@ -16,20 +16,28 @@ from django.db import transaction
 
 
 def product_landing_page(request):
-    landing_page_product = HomePageLandingPage.objects.filter(is_active=True).first()
-    product = landing_page_product.product
-    if len(product.videos.all()) > 0 and landing_page_product.hero_type == LandingPageHeroType.VIDEO:
-        primary_hero = product.videos.all().first()
-    else:
-        primary_hero = product.images.filter(role=PRODUCT_MEDIA_ROLE.PRIMARY).first()
-    
-    context = {
-        "landing_page_product": landing_page_product,
-        "primary_hero": primary_hero,
-        "whybuyolex": WhyBuyolex.objects.first(),
-        "deliveryreturnpolicy": DeliveryReturnPolicy.objects.first()
-    }
-    return render(request, "product_landing_page.html", context)
+    try:
+        landing_page_product = HomePageLandingPage.objects.filter(is_active=True).first()
+        product = landing_page_product.product
+        if len(product.videos.all()) > 0 and landing_page_product.hero_type == LandingPageHeroType.VIDEO:
+            primary_hero = product.videos.all().first()
+        else:
+            primary_hero = product.images.filter(role=PRODUCT_MEDIA_ROLE.PRIMARY).first()
+        
+        context = {
+            "landing_page_product": landing_page_product,
+            "primary_hero": primary_hero,
+            "whybuyolex": WhyBuyolex.objects.first(),
+            "deliveryreturnpolicy": DeliveryReturnPolicy.objects.first()
+        }
+        return render(request, "product_landing_page.html", context)
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": str(e)
+            }, status=HTTPStatus.BAD_REQUEST
+        )
 
 
 class CreateOrderView(View):

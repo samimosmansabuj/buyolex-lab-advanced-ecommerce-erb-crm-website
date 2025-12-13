@@ -1,17 +1,16 @@
 from django.http import JsonResponse
-from rest_framework import views, status, permissions
+from rest_framework import views, status, permissions, viewsets
 from rest_framework.response import Response
-
-from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer
+from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer
 from settings_app.models import SiteSettings, Tag
-from catalog.models import Category
+from catalog.models import Category, Attribute
 
 
 def api_welcome_message(request):
     return JsonResponse({"message": "Welcome Buyelox API Server!"})
 
 
-class SiteSettingsViews(views.APIView):
+class SiteSettingsAPIViews(views.APIView):
     permission_classes = [permissions.AllowAny]
     
     def get(self, request, *args, **kwargs):
@@ -61,7 +60,6 @@ class CategoryAPIViews(views.APIView):
                     "message": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
 
 class TagAPIViews(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -127,3 +125,24 @@ class TagAPIViews(views.APIView):
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+class AttributeAPIViews(viewsets.ModelViewSet):
+    queryset = Attribute.objects.all()
+    serializer_class = AttributeSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def list(self, request, *args, **kwargs):
+        try:
+            attributes = Attribute.objects.all()
+            return Response(
+                {
+                    "status": True,
+                    "data": AttributeSerializer(attributes, many=True).data
+                }, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

@@ -10,24 +10,26 @@
                         <input type="text" class="form-control" placeholder="write title here....">
                     </div>
                     <!-- Product Category -->
-                    <div class="mb-4 row g-3">
+                    <!-- <div class="mb-4 row g-3">
                         <div class="col-4">
-                            <select class="form-select" id="AddCategory" data-category-api="{% url 'api:category_api' %}">
-                                <!-- <option selected disabled>Select Category</option> -->
+                            <select class="form-select" id="AddCategory"
+                                data-category-api="{% url 'api:category_api' %}">
                             </select>
                         </div>
                         <div class="col-4" id="AddSubCategoryDiv" style="display: none;">
-                            <select class="form-select" id="AddSubCategory" data-category-api="{% url 'api:category_api' %}">
+                            <select class="form-select" id="AddSubCategory"
+                                data-category-api="{% url 'api:category_api' %}">
 
                             </select>
                         </div>
                         <div class="col-4" id="AddSubSubCategoryDiv" style="display: none;">
-                            <select class="form-select" id="AddSubSubCategory" data-category-api="{% url 'api:category_api' %}">
+                            <select class="form-select" id="AddSubSubCategory"
+                                data-category-api="{% url 'api:category_api' %}">
                                 <option selected disabled>Select Sub Sub Category</option>
                             </select>
                         </div>
-                    </div>
-                    
+                    </div> -->
+
                     <!-- Product Highlights -->
                     <div class="mb-4">
                         <h5 class="mb-3">Product Highlights</h5>
@@ -40,18 +42,6 @@
                         <div id="quill-editor" style="height: 300px;"></div>
                         <textarea id="full-description" class="form-control" cols="4" rows="10"
                             placeholder="write a description here.." style="display:none;"></textarea>
-                    </div>
-                    <!-- Product Tags -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Tags</h5>
-                        <div class="col-12 mb-2 position-relative tag-wrapper">
-                            <input type="text" class="form-control" id="Tags" placeholder="Tags" data-tag-api="{% url 'api:tag_api' %}">
-                            <ul class="list-group tag-suggestion-list d-none" id="tag_suggestions"></ul>
-                        </div>
-                        <div class="col-12 mb-2">
-                            <div class="d-flex align-items-center gap-2 flex-wrap" id="tags_list">
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -70,59 +60,75 @@
                 <div class="card-body">
                     <div class="mb-4">
                         <h5 class="mb-3">Price, Stock & Variants</h5>
+
+                        <!-- COLOR -->
                         <div class="col-12 mb-2">
                             <label for="Color" class="form-label">Color</label>
-                            <input type="text" class="form-control" id="Color" placeholder="Color">
+                            <div class="col-12 mb-2 position-relative custom-wrapper attribute-wrapper"
+                                data-attribute="color">
+                                <input type="text" class="form-control attr-input" id="Color" placeholder="Color">
+                                <ul class="list-group custom-suggestion-list d-none suggestion-list" id="color_suggestions"></ul>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <div class="d-flex align-items-center gap-2 flex-wrap mt-2 selected-list"
+                                    id="color_list">
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- SIZE -->
                         <div class="col-12 mb-2">
                             <label for="Size" class="form-label">Size</label>
-                            <input type="text" class="form-control" id="Size" placeholder="Size">
+                            <div class="col-12 mb-2 position-relative custom-wrapper attribute-wrapper"
+                                data-attribute="size">
+                                <input type="text" class="form-control attr-input" id="Size" placeholder="Size">
+                                <ul class="list-group custom-suggestion-list d-none suggestion-list" id="size_suggestions"></ul>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <div class="d-flex align-items-center gap-2 flex-wrap mt-2 selected-list"
+                                    id="size_list">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="mb-4">
-                        <h6 class="mb-3">Price & Stock</h6>
-                        <table class="table table-bordered mb-0">
+
+                        <!-- Buld Price set and Update -->
+                        <div class="mb-3" id="bulk_price_set" style="display: none;">
+                            <h6>Bulk Price & Stock</h6>
+                            <div class="row g-2">
+                                <div class="col"><input type="number" class="form-control" id="bulk_stock"
+                                        placeholder="Stock"></div>
+                                <div class="col"><input type="number" class="form-control" id="bulk_price"
+                                        placeholder="Price"></div>
+                                <div class="col"><input type="number" class="form-control" id="bulk_discount"
+                                        placeholder="Discount"></div>
+                                <div class="col"><input type="number" class="form-control" id="bulk_cost"
+                                        placeholder="Cost"></div>
+                                <div class="col">
+                                    <button type="button" class="btn btn-dark w-100" id="apply_bulk">Apply All</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Price Table  -->
+                        <table class="table table-bordered" id="variant_table">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col">Color</th>
-                                    <th scope="col">Size</th>
-                                    <th scope="col">Stock</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Discount Price</th>
-                                    <th scope="col">Cost Price</th>
-                                    <th scope="col">Action</th>
+                                    <!-- <tr id="variant_head"></tr> -->
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Discount</th>
+                                    <th>Cost</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                    <td>@mdo</td>
-                                    <td>@mdo</td>
-                                    <td>@mdo</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                    <td>Thornton</td>
-                                    <td>@fat</td>
-                                    <td>@fat</td>
-                                    <td>@fat</td>
-                                    <td>@fat</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry the Bird</td>
-                                    <td>@twitter</td>
-                                    <td>@twitter</td>
-                                    <td>@twitter</td>
-                                    <td>@twitter</td>
-                                    <td>@twitter</td>
-                                </tr>
                             </tbody>
                         </table>
+
                     </div>
                 </div>
             </div>
@@ -370,45 +376,34 @@
                         <!-- Product Category Section====== -->
                         <div class="col-12">
                             <label for="AddCategory" class="form-label">Category</label>
-                            <select class="form-select" id="AddCategory">
-                                <option value="0">Topwear</option>
-                                <option value="1">Bottomwear</option>
-                                <option value="2">Casual Tshirt</option>
-                                <option value="3">Electronic</option>
+                            <select class="form-select" id="AddCategory"
+                                data-category-api="{% url 'api:category_api' %}">
                             </select>
                         </div>
-                        <div class="col-12" style="display: none;">
-                            <label for="AddCategory" class="form-label">Category</label>
-                            <select class="form-select" id="AddCategory">
-                                <option value="0">Topwear</option>
-                                <option value="1">Bottomwear</option>
-                                <option value="2">Casual Tshirt</option>
-                                <option value="3">Electronic</option>
+                        <div class="col-12" id="AddSubCategoryDiv" style="display: none;">
+                            <select class="form-select" id="AddSubCategory"
+                                data-category-api="{% url 'api:category_api' %}">
+
                             </select>
                         </div>
-                        <div class="col-12" style="display: none;">
-                            <label for="AddCategory" class="form-label">Category</label>
-                            <select class="form-select" id="AddCategory">
-                                <option value="0">Topwear</option>
-                                <option value="1">Bottomwear</option>
-                                <option value="2">Casual Tshirt</option>
-                                <option value="3">Electronic</option>
+                        <div class="col-12" id="AddSubSubCategoryDiv" style="display: none;">
+                            <select class="form-select" id="AddSubSubCategory"
+                                data-category-api="{% url 'api:category_api' %}">
+                                <option selected disabled>Select Sub Sub Category</option>
                             </select>
                         </div>
 
                         <!-- Product Tags Section====== -->
-                        <div class="col-12">
-                            <label for="Tags" class="form-label">Tags</label>
-                            <input type="text" class="form-control" id="Tags" placeholder="Tags">
-                        </div>
-                        <div class="col-12">
-                            <div class="d-flex align-items-center gap-2">
-                                <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm">Woman <i
-                                        class="bi bi-x"></i></a>
-                                <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm">Fashion <i
-                                        class="bi bi-x"></i></a>
-                                <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm">Furniture <i
-                                        class="bi bi-x"></i></a>
+                        <div class="mb-4">
+                            <label for="AddTags" class="form-label">Tags</label>
+                            <div class="col-12 mb-2 position-relative custom-wrapper">
+                                <input type="text" class="form-control" id="Tags" placeholder="Tags"
+                                    data-tag-api="{% url 'api:tag_api' %}">
+                                <ul class="list-group custom-suggestion-list d-none" id="tag_suggestions"></ul>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <div class="d-flex align-items-center gap-2 flex-wrap" id="tags_list">
+                                </div>
                             </div>
                         </div>
 
@@ -432,14 +427,6 @@
                             <input type="text" class="form-control" id="SKU" placeholder="SKU">
                         </div>
                         <div class="col-12">
-                            <label for="Color" class="form-label">Color</label>
-                            <input type="text" class="form-control" id="Color" placeholder="Color">
-                        </div>
-                        <div class="col-12">
-                            <label for="Size" class="form-label">Size</label>
-                            <input type="text" class="form-control" id="Size" placeholder="Size">
-                        </div>
-                        <div class="col-12">
                             <div class="d-grid">
                                 <button type="button" class="btn btn-primary">Add Variants</button>
                             </div>
@@ -452,19 +439,3 @@
 
     </div><!--end row-->
 </form>
-<script>
-    var quill = new Quill('#quill-editor', {
-        theme: 'snow'
-    });
-    // Save HTML into textarea on form submit
-    document.querySelector("form")?.addEventListener("submit", function () {
-        document.getElementById("full-description").value = quill.root.innerHTML;
-    });
-
-    $('#fancy-file-upload').FancyFileUpload({
-        params: {
-            action: 'fileuploader'
-        },
-        maxfilesize: 1000000
-    });
-</script>

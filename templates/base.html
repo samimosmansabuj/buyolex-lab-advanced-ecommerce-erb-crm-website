@@ -1,27 +1,395 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="bn">
+<!doctype html>
+<html lang="en" data-bs-theme="blue-theme">
 
 <head>
-    <meta charset="UTF-8">
-    {% block landing_page_title %}
-    <title>Buyolex</title>
-    {% endblock landing_page_title %}
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Buyolex - Fashion & Wood Decor Product</title>
+    <!--favicon-->
+    <link rel="icon" href="{% static 'main_assets/images/favicon-32x32.png' %}" type="image/png">
+    <!-- loader-->
+    <link href="{% static 'main_assets/css/pace.min.css' %}" rel="stylesheet">
 
-
-    <!-- Simple custom CSS -->
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <!--plugins-->
+    <link rel="stylesheet" href="{% static 'main_assets/plugins/swiper/css/swiper-bundle.min.css' %}">
+    <!--bootstrap css-->
+    <link href="{% static 'main_assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons+Outlined" rel="stylesheet">
+    <!--main css-->
+    <link href="{% static 'main_assets/css/bootstrap-extended.css' %}" rel="stylesheet">
+    <link href="{% static 'main_assets/sass/main.css' %}" rel="stylesheet">
+    <link href="{% static 'main_assets/css/horizontal-menu.css' %}" rel="stylesheet">
+    <link href="{% static 'main_assets/sass/dark-theme.css' %}" rel="stylesheet">
+    <link href="{% static 'main_assets/sass/blue-theme.css' %}" rel="stylesheet">
+    <link href="{% static 'main_assets/sass/semi-dark.css' %}" rel="stylesheet">
+    <link href="{% static 'main_assets/sass/responsive.css' %}" rel="stylesheet">
 
 </head>
 
-<body>
+<body style="background-image: url({% static 'main_assets/images/bg-themes/body-background-1.webp' %});">
 
-    {% block body_container %}
-    {% endblock body_container %}
+    <!--start header-->
+    <header class="top-header">
+        <nav class="navbar navbar-expand align-items-center justify-content-between gap-4 container px-4">
+            <div class="logo-header d-none d-xl-flex align-items-center gap-2">
+                <div class="logo-icon">
+                    <a href=""><img class="logo-img" width="45" alt="" id="main-logo"></a>
+                </div>
+                <div class="logo-name">
+                    <h5 class="mb-0">Buyolex</h5>
+                </div>
+            </div>
+            <div class="btn-toggle d-xl-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
+                <a href="javascript:;"><i class="material-icons-outlined">menu</i></a>
+            </div>
+            <div class="search-bar d-lg-flex d-none">
+                <div class="position-relative w-100">
+                    <input class="form-control form-control-lg rounded-5 px-5 search-control" type="text"
+                        placeholder="Search">
+                    <span
+                        class="material-icons-outlined position-absolute ms-3 translate-middle-y start-0 top-50">search</span>
+                    <span
+                        class="material-icons-outlined position-absolute me-3 translate-middle-y end-0 top-50 mobile-search-close d-lg-none">close</span>
+                </div>
+            </div>
+            <ul class="navbar-nav gap-1 nav-right-links align-items-center">
+                <li class="nav-item d-lg-none mobile-search-btn">
+                    <a class="nav-link" href="javascript:;"><i class="material-icons-outlined">search</i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="account-my-profile.html"><i
+                            class="material-icons-outlined">account_circle</i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link position-relative" href="wishlist.html"><i
+                            class="material-icons-outlined">favorite_border</i>
+                        <span class="badge-notify">5</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link position-relative" data-bs-toggle="offcanvas" href="#offcanvasCart"><i
+                            class="material-icons-outlined">shopping_cart</i>
+                        <span class="badge-notify">8</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <!--end top header-->
 
-    <script src="{% static 'assets/js/custom.js' %}"></script>
+    <!--navigation-->
+    <div class="primary-menu">
+        <nav class="navbar navbar-expand-xl align-items-center container px-4 py-0 py-xl-2">
+            <div class="offcanvas offcanvas-start w-260" tabindex="-1" id="offcanvasNavbar">
+                <div class="offcanvas-header border-bottom h-70">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="">
+                            <img src="{% static 'main_assets/images/logo-icon.png' %}" class="logo-icon" width="45" alt="logo icon">
+                        </div>
+                        <div class="">
+                            <h4 class="logo-text">Maxton</h4>
+                        </div>
+                    </div>
+                    <a href="javascript:;" class="primaery-menu-close" data-bs-dismiss="offcanvas">
+                        <i class="material-icons-outlined">close</i>
+                    </a>
+                </div>
+                <div class="offcanvas-body p-0">
+                    <ul class="navbar-nav align-items-center flex-grow-1 gap-xl-2">
+                        <li class="nav-item">
+                            <a class="nav-link" href="">
+                                <div class="parent-icon"><i class="material-icons-outlined">home</i>
+                                </div>
+                                <div class="menu-title d-flex align-items-center">Home</div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">
+                                <div class="parent-icon"><i class="material-icons-outlined">storefront</i>
+                                </div>
+                                <div class="menu-title d-flex align-items-center">Product</div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">
+                                <div class="parent-icon"><i class="material-icons-outlined">info</i>
+                                </div>
+                                <div class="menu-title d-flex align-items-center">About</div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">
+                                <div class="parent-icon"><i class="material-icons-outlined">phone</i>
+                                </div>
+                                <div class="menu-title d-flex align-items-center">Contact</div>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!--end navigation-->
+
+    <!--start slider-->
+    <section class="main-slider-wrapper">
+        <div class="swiper main-slider position-relative">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide position-relative">
+                    <div class="slider-content">
+                        <div class="container px-4">
+                            <div class="row align-items-center g-4">
+                                <div class="col-12 col-lg-5">
+                                    <p class="sub-title mb-lg-3 mt-5 mt-lg-0">Elegance Redefined</p>
+                                    <h2 class="large-title">Stay Confident! <br>Shop the latest trends</h2>
+                                    <div class="slide-btn mt-lg-5">
+                                        <a href="shop-grid-left-sidebar.html"
+                                            class="btn btn-lg btn-grd-primary btn-grd rounded-5 alignContent w-fit gap-2 px-4 py-2">Shop
+                                            Now<span class="material-icons-outlined">
+                                                north_east</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-7 text-center">
+                                    <img src="{% static 'main_assets/images/slider/slider-2.png' %}" class="img-fluid" alt="">
+                                </div>
+                            </div><!--end row-->
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide position-relative">
+                    <div class="slider-content">
+                        <div class="container px-4">
+                            <div class="row align-items-center g-4">
+                                <div class="col-12 col-lg-5">
+                                    <p class="sub-title mb-lg-3 mt-5 mt-lg-0">Elegance Redefined</p>
+                                    <h2 class="large-title">Stay Confident! <br>Shop the latest trends</h2>
+                                    <div class="slide-btn mt-lg-5">
+                                        <a href="shop-list-left-sidebar.html"
+                                            class="btn btn-lg btn-grd-primary btn-grd rounded-5 alignContent w-fit gap-2 px-4 py-2">Shop
+                                            Now<span class="material-icons-outlined">
+                                                north_east</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-7 text-center">
+                                    <img src="{% static 'main_assets/images/slider/slider-3.png' %}" class="img-fluid" alt="">
+                                </div>
+                            </div><!--end row-->
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide position-relative">
+                    <div class="slider-content">
+                        <div class="container px-4">
+                            <div class="row align-items-center g-4">
+                                <div class="col-12 col-lg-5">
+                                    <p class="sub-title mb-lg-3 mt-5 mt-lg-0">Elegance Redefined</p>
+                                    <h2 class="large-title">Stay Confident! <br>Shop the latest trends</h2>
+                                    <div class="slide-btn mt-lg-5">
+                                        <a href="shop-grid-offcanvas-filter.html"
+                                            class="btn btn-lg btn-grd-primary btn-grd rounded-5 alignContent w-fit gap-2 px-4 py-2">Shop
+                                            Now<span class="material-icons-outlined">
+                                                north_east</span></a>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-7 text-center">
+                                    <img src="{% static 'main_assets/images/slider/slider-1.png' %}" class="img-fluid" alt="">
+                                </div>
+                            </div><!--end row-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="swiper-nav d-flex align-items-center justify-content-between gap-3 position-absolute end-0 start-0 mx-3 d-none d-lg-flex">
+                <div class="slide-icon main-slider-icon-left"><span class="material-icons-outlined">chevron_left</span>
+                </div>
+                <div class="slide-icon main-slider-icon-right"><span
+                        class="material-icons-outlined">navigate_next</span></div>
+            </div>
+        </div>
+    </section>
+    <!--end slider-->
+
+
+    <!--start main wrapper-->
+    <main class="main-wrapper">
+        {% block main_body_content %}
+        {% endblock %}
+    </main>
+    <!--end main wrapper-->
+
+
+    <!--footer widgets-->
+    <section class="footer-widgets py-5 border-top">
+        <div class="container px-4">
+            <div class="row g-4">
+                <div class="col-12 col-lg-4">
+                    <div class="footer-widget-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="{% static 'main_assets/images/logo-icon.png' %}" width="50" alt="">
+                            <h4 class="mb-0">Maxton</h4>
+                        </div>
+                        <div class="mt-3">
+                            <address>
+                                <strong>Address:</strong>
+                                84-A London Street, United Kingdom
+                            </address>
+                        </div>
+                        <p><button type="button" class="btn btn-sm btn-grd btn-grd-primary px-3">Get Darection<i
+                                    class="bi bi-arrow-up-right ms-2"></i></button></p>
+                        <p><span><i class="bi bi-envelope me-2"></i></span>example@gmail.com</p>
+                        <p><span><i class="bi bi-telephone me-2"></i></span>648-378-2255</p>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-3">
+                    <div class="d-flex align-items-start justify-content-between gap-4">
+                        <div class="">
+                            <h5 class="mb-3">Top Categories</h5>
+                            <ul class="list-unstyled d-flex flex-column gap-2">
+                                <li><a href="shop-circular-catgories.html" class="footer-link">Topwear</a></li>
+                                <li><a href="shop-list-left-sidebar.html" class="footer-link">Accessories</a></li>
+                                <li><a href="shop-grid-offcanvas-filter.html" class="footer-link">Men Fashion</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-widget-3">
+                            <h5 class="mb-3">Account</h5>
+                            <ul class="list-unstyled d-flex flex-column gap-2">
+                                <li><a href="checkout.html" class="footer-link">Order tracking</a></li>
+                                <li><a href="account-my-profile.html" class="footer-link">Your account</a></li>
+                                <li><a href="account-addresses.html" class="footer-link">Delivery info</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4 offset-lg-1">
+                    <div class="footer-widget-4">
+                        <h5 class="mb-3">Newletter</h5>
+                        <p class="news-letter-caption">Subscribe to our newsletter and enjoy 10% off your first order
+                        </p>
+                        <form method="post">
+                            <div class="input-group input-group-lg mt-3">
+                                <input type="email" class="form-control border border-2" placeholder="Enter your email"
+                                    required>
+                                <button class="btn btn-grd btn-grd-primary" type="submit"><i
+                                        class="bi bi-arrow-up-right"></i></button>
+                            </div>
+                        </form>
+                        <div class="social-link d-flex align-items-center gap-2 mt-4 mb-2">
+                            <a href="javascript:;" class="btn btn-grd btn-grd-info"><i class="bi bi-facebook"></i></a>
+                            <a href="javascript:;" class="btn btn-grd btn-grd-primary"><i
+                                    class="bi bi-twitter-x"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div><!--end row-->
+        </div>
+    </section>
+    <!--end footer widgets-->
+
+
+    <!--start footer strip-->
+    <footer class="footer-strip py-3 border-top">
+        <div class="container px-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-12 col-lg-auto">
+                    <p class="mb-0 font-12">@All rights reserved.</p>
+                </div>
+                <div class="col-12 col-lg-auto">
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="javascript:;" class="font-12 text-secondary">Privacy</a>
+                        <a href="javascript:;" class="font-12 text-secondary">Terms of use</a>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-auto ms-lg-auto">
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="javascript:;"><img src="{% static 'main_assets/images/payment/paypal.png' %}" class="p-2 border rounded-3"
+                                width="80" alt=""></a>
+                    </div>
+                </div>
+            </div><!--end row-->
+        </div>
+    </footer>
+    <!--end footer strip-->
+
+    <!--start cart-->
+    <div class="offcanvas offcanvas-end offcanvas-cart" tabindex="-1" id="offcanvasCart">
+        <div class="offcanvas-header border-bottom h-70">
+            <h5 class="mb-0" id="offcanvasRightLabel">Shopping cart</h5>
+            <a href="javascript:;" class="primaery-menu-close" data-bs-dismiss="offcanvas">
+                <i class="material-icons-outlined">close</i>
+            </a>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="order-list">
+                <div class="order-item d-flex align-items-start gap-3 p-3 border-bottom">
+                    <div class="order-img">
+                        <img src="{% static 'main_assets/images/products/01.png' %}" class="img-fluid rounded-3 bg-light p-1" width="80"
+                            alt="">
+                    </div>
+                    <div class="order-info flex-grow-1">
+                        <h5 class="mb-1 order-title">White Men Shoes</h5>
+                        <p class="mb-0 order-price">$69</p>
+                        <p class="mb-0 order-qty">Qty 1</p>
+                    </div>
+                    <div class="d-flex align-self-end">
+                        <a class="order-delete"><span class="material-icons-outlined">delete</span></a>
+                        <a class="order-delete"><span class="material-icons-outlined">visibility</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas-footer p-3 border-top">
+            <div class="cart-product-checout">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="mb-0">Subtotal</p>
+                    <h5 class="mb-0">$378.5</h5>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="shopping-cart.html" class="btn btn-light border px-4 py-2 flex-fill">View Cart</a>
+                    <a href="checkout.html"
+                        class="btn btn-grd btn-grd-primary px-4 py-2 border border-dark flex-fill">Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end cart-->
+
+    <!--back to top button-->
+    <a href="javaScript:;" class="back-to-top"><i class="bi bi-arrow-up"></i></a>
+    <!--end back to top button-->
+
+    <!--bootstrap js-->
+    <script src="{% static 'main_assets/js/bootstrap.bundle.min.js' %}"></script>
+    <!--loader js-->
+    <script src="{% static 'main_assets/js/pace.min.js' %}"></script>
+
+    <!--plugins-->
+    <script src="{% static 'main_assets/js/jquery.min.js' %}"></script>
+    <!-- Swiper JS -->
+    <script src="{% static 'main_assets/plugins/swiper/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'main_assets/js/index-eCommerce.js' %}"></script>
+
+    <script src="{% static 'main_assets/js/main.js' %}"></script>
+
+    <script>
+        const siteSettings = fetch('{% url "api:site_settings_api" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    console.log("data: ", data.data)
+                    document.getElementById("main-logo").src = data.data.primary_logo
+                }
+            })
+            .catch(error => {
+                console.log("error: ", error)
+            })
+
+
+    </script>
+
 
 </body>
 
