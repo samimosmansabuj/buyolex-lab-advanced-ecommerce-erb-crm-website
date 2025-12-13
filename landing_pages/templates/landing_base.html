@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8">
+    {% block landing_page_title %}
+    <title>Buyolex</title>
+    {% endblock landing_page_title %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+    <!-- Simple custom CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+
+</head>
+
+<body>
+
+    {% block body_container %}
+    {% endblock body_container %}
+
+    <script src="{% static 'assets/js/custom.js' %}"></script>
+
+</body>
+
+</html>
