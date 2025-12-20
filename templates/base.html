@@ -136,38 +136,8 @@
     <!--end navigation-->
 
     <!--start slider-->
-    <section class="main-slider-wrapper">
-        <div class="swiper main-slider position-relative">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide position-relative">
-                    <div class="slider-content">
-                        <div class="container px-4">
-                            <div class="row align-items-center g-4">
-                                <img src="{% static 'main_assets/images/slider/slide-first.jpg' %}" alt="">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide position-relative">
-                    <div class="slider-content">
-                        <div class="container px-4">
-                            <div class="row align-items-center g-4">
-                                <img src="{% static 'main_assets/images/slider/slide-second.jpg' %}" alt="">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="swiper-nav d-flex align-items-center justify-content-between gap-3 position-absolute end-0 start-0 mx-3 d-none d-lg-flex">
-                <div class="slide-icon main-slider-icon-left"><span class="material-icons-outlined">chevron_left</span>
-                </div>
-                <div class="slide-icon main-slider-icon-right"><span
-                        class="material-icons-outlined">navigate_next</span>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% block slider %}
+    {% endblock %}
     <!--end slider-->
 
 
@@ -336,7 +306,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status) {
-                    console.log("data: ", data.data)
                     document.getElementById("main-logo").src = data.data.primary_logo
                 }
             })

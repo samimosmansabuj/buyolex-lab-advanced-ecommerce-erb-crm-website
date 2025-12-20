@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from .models import MainSlider
 
 
 def custom_404_view(request, exception):
@@ -6,4 +8,6 @@ def custom_404_view(request, exception):
 
 def home(request):
     return render(request, "home/index.html")
+
+
 

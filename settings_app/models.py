@@ -22,6 +22,18 @@ class SiteSettings(models.Model):
     def __str__(self):
         return self.site_name or "Site Settings"
 
+class MainSlider(models.Model):
+    title = models.CharField(max_length=255, blank=True, null=True)
+    subtitle = models.CharField(max_length=255, blank=True, null=True)
+    image = models.ImageField(upload_to="sliders/", blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.title or 'Slider'} - {'Active' if self.is_active else 'Inactive'}"
+
 class WhyBuyolex(models.Model):
     question = models.CharField(max_length=255, blank=True, null=True)
     header = models.TextField(blank=True, null=True)

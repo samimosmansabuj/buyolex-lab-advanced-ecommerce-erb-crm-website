@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from rest_framework import views, status, permissions, viewsets
 from rest_framework.response import Response
-from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer
-from settings_app.models import SiteSettings, Tag
+from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer, MainSliderSerializer
+from settings_app.models import SiteSettings, Tag, MainSlider
 from catalog.models import Category, Attribute
 
 
@@ -22,6 +22,27 @@ class SiteSettingsAPIViews(views.APIView):
                 "data": serializer.data
             }, status=status.HTTP_200_OK
         )
+
+class MainSliderAPIViews(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            sliders = MainSlider.objects.filter(is_active=True)
+            serializer = MainSliderSerializer(sliders, many=True, context={"request": request})
+            return Response(
+                {
+                    "status": True,
+                    "data": serializer.data
+                }, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class CategoryAPIViews(views.APIView):
     permission_classes = [permissions.AllowAny]
