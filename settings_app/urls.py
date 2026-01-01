@@ -7,5 +7,5 @@ handler500 = custom_404_view
 app_name = "settings_app"
 
 urlpatterns = [
-    path("", home, name="home"),
+    # path("", home, name="home"),
 ]
