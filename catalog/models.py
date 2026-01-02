@@ -108,6 +108,10 @@ class Product(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def active_variante(self):
+        return self.variants.filter(is_active=True)
 
     def save(self, *args, **kwargs):
         old_slug = Category.objects.get(pk=self.pk) if self.pk else None
