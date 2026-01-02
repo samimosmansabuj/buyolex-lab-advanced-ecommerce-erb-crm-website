@@ -5,12 +5,12 @@
             <button class="close-btn" id="closeModalBtn">✕</button>
         </div>
 
-        <div class="modal-body">
-            <form id="orderForm">
+        <div class="modal-body" id="formDivContainer">
+            <form id="placeOrderForm" method="post">
                 <div class="form-grid">
                     <div class="input-group">
                         <label>আপনার নাম</label>
-                        <input type="text" name="customerName" placeholder="পূর্ণ নাম" required>
+                        <input type="text" name="name" placeholder="পূর্ণ নাম" required>
                     </div>
                     <div class="input-group">
                         <label>মোবাইল নাম্বার</label>
@@ -26,6 +26,7 @@
                 </div>
 
                 <div id="dynamicFields" style="margin-bottom: 15px;"></div>
+                <div id="hiddenFields" style="margin-bottom: 15px;"></div>
 
                 <div class="form-grid">
                     <div class="input-group full-width">
@@ -78,13 +79,207 @@
         <div class="modal-footer">
             <div class="checkbox-wrapper">
                 <input type="checkbox" id="agreeCheck">
-                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ
-                    করবেন।</label>
+                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ করবেন।</label>
             </div>
-            <button class="btn-confirm" id="confirmOrderBtn">WhatsApp এ অর্ডার পাঠান</button>
+            <button class="btn-confirm" id="confirmOrderBtn" type="submit">WhatsApp এ অর্ডার পাঠান</button>
         </div>
     </div>
 </div>
+
+<script>
+    // Processing Card Show Script============== 
+    function showProcessingCard() {
+        const formDivContainer = document.getElementById("formDivContainer");
+
+        const card = document.createElement("div");
+        card.className = "status-card";
+        card.id = "orderProcessingCard"
+        card.innerHTML = `
+            <div class="loader"></div>
+            <h3>আপনার অর্ডার প্রসেস করা হচ্ছে...</h3>
+            <p>একটু অপেক্ষা করুন।</p>
+        `;
+
+        formDivContainer.appendChild(card);
+    }
+    function deleteProcessingCard() {
+        const card = document.getElementById("orderProcessingCard");
+        if (card) {
+            card.remove();
+        }
+    }
+
+
+    // Success Card Show Script============== 
+    function showSuccessCard() {
+        const formDivContainer = document.getElementById("formDivContainer");
+
+        const card = document.createElement("div");
+        card.className = "status-card success";
+        card.id = "orderSuccessCard"
+        card.innerHTML = `
+            <div class="icon">✔</div>
+            <h3>অর্ডার সফলভাবে সম্পন্ন হয়েছে!</h3>
+            <p>ধন্যবাদ! আমরা খুব দ্রুতই আপনার সাথে যোগাযোগ করব।</p>
+            <button onclick="closeOrderSuccess()" class="cta-btn">ঠিক আছে</button>
+        `;
+        formDivContainer.appendChild(card);
+    }
+    function deleteSuccessCard() {
+        const card = document.getElementById("orderSuccessCard");
+        if (card) {
+            card.remove();
+        }
+    }
+
+    // Failed Card Show Script==============    
+    function showFailedCard() {
+        const formDivContainer = document.getElementById("formDivContainer");
+
+        const card = document.createElement("div");
+        card.className = "status-card failed";
+        card.style.display = "none"
+        card.id = "orderFailedCard"
+        card.innerHTML = `
+            <div class="icon">✖</div>
+            <h3>অর্ডার সম্পন্ন হয়নি!</h3>
+            <p id="failedMessage">কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন।</p>
+            <button onclick="retryOrder()" class="cta-btn danger">পুনরায় চেষ্টা করুন</button>
+        `;
+        formDivContainer.appendChild(card);
+    }
+    function deleteFailedCard() {
+        const card = document.getElementById("orderFailedCard");
+        if (card) {
+            card.remove();
+        }
+    }
+
+    const orderForm = document.getElementById("placeOrderForm");
+    const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+    confirmOrderBtn.addEventListener("click", async function (event) {
+        event.preventDefault()
+
+        // product id 
+        const inputProductId = document.createElement("input");
+        inputProductId.type = "hidden";
+        inputProductId.name = "product_id";
+        inputProductId.value = "{{ landing_page_product.product.id }}";
+        orderForm.appendChild(inputProductId);
+        // product price 
+        const inputProductPrice = document.createElement("input");
+        inputProductPrice.type = "hidden";
+        inputProductPrice.name = "product_price";
+        inputProductPrice.value = "{{ landing_page_product.product.discount_price }}";
+        orderForm.appendChild(inputProductPrice);
+
+        orderForm.style.display = "none";
+        showProcessingCard();
+
+        const formData = new FormData(orderForm);
+
+        try {
+            const csrftoken = '{{ csrf_token }}';
+            const response = await fetch("{% url 'create_order' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": csrftoken
+                },
+            });
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            const data = await response.json()
+            deleteProcessingCard();
+
+            if (!data.success) {
+                showFailedCard()
+                document.getElementById("failedMessage").innerHTML = data.message || "অজানা ত্রুটি হয়েছে!";
+                orderFailedCard.style.display = "block"
+                console.log("Failed Message: ", data.message)
+            } else {
+                showSuccessCard()
+                console.log("Success Message: ", data.message)
+            }
+
+        } catch (error) {
+            deleteProcessingCard();
+            showFailedCard()
+            document.getElementById("failedMessage").innerHTML = error || "নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।";
+            orderFailedCard.style.display = "block"
+            console.log("Fetch Error: ", error)
+        }
+    })
+    // orderForm.addEventListener("submit", async function (event) {
+    //     event.preventDefault()
+
+    //     // product id 
+    //     const inputProductId = document.createElement("input");
+    //     inputProductId.type = "hidden";
+    //     inputProductId.name = "product_id";
+    //     inputProductId.value = "{{ landing_page_product.product.id }}";
+    //     orderForm.appendChild(inputProductId);
+    //     // product price 
+    //     const inputProductPrice = document.createElement("input");
+    //     inputProductPrice.type = "hidden";
+    //     inputProductPrice.name = "product_price";
+    //     inputProductPrice.value = "{{ landing_page_product.product.discount_price }}";
+    //     orderForm.appendChild(inputProductPrice);
+
+    //     orderForm.style.display = "none";
+    //     showProcessingCard();
+
+    //     const formData = new FormData(orderForm);
+
+    //     try {
+    //         const csrftoken = '{{ csrf_token }}';
+    //         const response = await fetch("{% url 'create_order' %}", {
+    //             method: "POST",
+    //             body: formData,
+    //             headers: {
+    //                 "X-Requested-With": "XMLHttpRequest",
+    //                 "X-CSRFToken": csrftoken
+    //             },
+    //         });
+    //         if (!response.ok) {
+    //             throw new Error("HTTP error " + response.status);
+    //         }
+    //         const data = await response.json()
+    //         deleteProcessingCard();
+
+    //         if (!data.success) {
+    //             showFailedCard()
+    //             document.getElementById("failedMessage").innerHTML = data.message || "অজানা ত্রুটি হয়েছে!";
+    //             orderFailedCard.style.display = "block"
+    //             console.log("Failed Message: ", data.message)
+    //         } else {
+    //             showSuccessCard()
+    //             console.log("Success Message: ", data.message)
+    //         }
+
+    //     } catch (error) {
+    //         deleteProcessingCard();
+    //         showFailedCard()
+    //         document.getElementById("failedMessage").innerHTML = error || "নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।";
+    //         orderFailedCard.style.display = "block"
+    //         console.log("Fetch Error: ", error)
+    //     }
+
+    // })
+
+
+    function closeOrderSuccess() {
+        document.getElementById("orderModal").style.display = "none";
+        location.reload();
+    }
+
+    function retryOrder() {
+        deleteFailedCard()
+        orderForm.style.display = "block";
+    }
+</script>
 
 <script>
     const districtSelect = document.getElementById('district');

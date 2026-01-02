@@ -37,7 +37,7 @@
             <span class="selector-label">ডিজাইন নির্বাচন করুন</span>
             <div class="choices-grid">
                 {% for variante in landing_page_product.product.active_variante %}
-                <div class="choice-card" data-type="{{ variante.sku|cut:variante.product.sku|cut:'-' }}" role="button" tabindex="0">
+                <div class="choice-card" data-type="{{ variante.sku|cut:variante.product.sku|cut:'-' }}" data-sku="{{ variante.sku }}" role="button" tabindex="0">
                     {% with img=variante.images.all|first %}
                     {% if img %}
                     <img src="{{ img.image.url }}" alt="Marriage" >
