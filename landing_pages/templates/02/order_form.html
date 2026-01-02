@@ -1,0 +1,156 @@
+<div class="modal-overlay" id="orderModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="modalTitle">অর্ডার ফর্ম</h3>
+            <button class="close-btn" id="closeModalBtn">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="orderForm">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>আপনার নাম</label>
+                        <input type="text" name="customerName" placeholder="পূর্ণ নাম" required>
+                    </div>
+                    <div class="input-group">
+                        <label>মোবাইল নাম্বার</label>
+                        <input type="tel" name="phone" placeholder="01XXXXXXXXX" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group full-width">
+                        <label>WhatsApp (ডিজাইন দেখার জন্য)</label>
+                        <input type="tel" name="whatsapp" placeholder="01XXXXXXXXX" required>
+                    </div>
+                </div>
+
+                <div id="dynamicFields" style="margin-bottom: 15px;"></div>
+
+                <div class="form-grid">
+                    <div class="input-group full-width">
+                        <label>ডেলিভারি ঠিকানা</label>
+                        <input type="text" name="address" placeholder="পূর্ণ ঠিকানা, থানা, জেলা" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="district">জেলা</label>
+                        <select id="district" name="district" required>
+                            <option value="">-- সিলেক্ট করুন --</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="upazila_div" style="display: none;">
+                        <label for="upazila">থানা</label>
+                        <select id="upazila" name="upazila" required>
+                            <option>-- সিলেক্ট করুন --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid" id="area_div" style="display: none;">
+                    <div class="input-group full-width">
+                        <label>ডেলিভারি ঠিকানা</label>
+                        <select id="area" name="area" required>
+                            <option>-- সিলেক্ট করুন --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>ডেলিভারি টাইপ</label>
+                        <select name="deliveryType">
+                            <option value="home">হোম ডেলিভারি</option>
+                            <option value="branch">সুন্দরবন কুরিয়ার (শাখা)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>প্রাপক (যদি গিফট হয়)</label>
+                        <input type="text" name="receiver" placeholder="নাম (ঐচ্ছিক)">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="agreeCheck">
+                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ
+                    করবেন।</label>
+            </div>
+            <button class="btn-confirm" id="confirmOrderBtn">WhatsApp এ অর্ডার পাঠান</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const districtSelect = document.getElementById('district');
+    const upazilaSelect = document.getElementById('upazila');
+    const areaSelect = document.getElementById('area');
+
+    fetch('https://bdapi.vercel.app/api/v.1/district')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 200 && data.success) {
+                data.data.forEach(district => {
+                    const option = document.createElement('option')
+                    option.value = district.name.toLowerCase()
+                    option.setAttribute('district_id', district.id);
+                    option.textContent = district.bn_name
+                    districtSelect.appendChild(option)
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching district:', error))
+
+    districtSelect.addEventListener("change", function () {
+        document.getElementById('upazila_div').style.display = "block";
+        area_div = document.getElementById('area_div').style.display = "none";
+
+
+        const districtId = this.options[this.selectedIndex].getAttribute('district_id');
+        upazilaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
+        if (!districtId) return;
+
+        fetch(`https://bdapi.vercel.app/api/v.1/upazilla/${districtId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 200 && data.success) {
+                    data.data.forEach(upazila => {
+                        const option = document.createElement('option')
+                        option.value = upazila.name.toLowerCase()
+                        option.setAttribute('upazila_id', upazila.id)
+                        option.textContent = upazila.bn_name
+                        upazilaSelect.appendChild(option)
+                    })
+                }
+            })
+            .catch(error => console.error("Error fetching upazila: ", error))
+    })
+
+    upazilaSelect.addEventListener("change", function () {
+        area_div = document.getElementById('area_div').style.display = "block";
+
+        const upazilaId = this.options[this.selectedIndex].getAttribute('upazila_id');
+        areaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
+        if (!upazilaId) return;
+
+        fetch(`https://bdapi.vercel.app/api/v.1/union/${upazilaId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 200 && data.success) {
+                    data.data.forEach(area => {
+                        const option = document.createElement('option')
+                        option.value = area.id
+                        option.textContent = area.bn_name
+                        areaSelect.appendChild(option)
+                    })
+                }
+            })
+            .catch(error => console.error("Error fetching upazila: ", error))
+    })
+
+</script>

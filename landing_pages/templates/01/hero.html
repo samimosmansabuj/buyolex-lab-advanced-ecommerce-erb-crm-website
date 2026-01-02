@@ -12,7 +12,6 @@
             {% else %}
             <img src="{{ primary_hero.image.url }}" alt="{{ primary_hero.image.name }}">
             {% endif %}
-            <!-- <img src="{% static 'assets/images/reading-table.png' %}" alt=""> -->
         </div>
         <div class="hero-content">
             <div>
@@ -34,10 +33,11 @@
     </div>
 
     <div class="hero-bullet-cta-btn">
-        <ul class="hero-bullets">
+        <ul class="hero-bullets" style="padding: 0px;">
             {% with lines=landing_page_product.product.short_description.splitlines %}
             {% for line in lines|slice:"1:" %}
-            <li>{{line}}</li>
+            <p style="font-size: 13px; margin: auto;">{{line}}</p>
+            <!-- <li>{{line}}</li> -->
             {% endfor %}
             {% endwith %}
         </ul>

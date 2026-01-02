@@ -4,13 +4,16 @@
     <div class="section-title">{{landing_page_product.product_details_section_title}}</div>
 
     {% with lines=landing_page_product.product.description_html.splitlines %}
-    <p>
+    <!-- <p>
         {{ lines.0 }} <br>
-    </p>
-    <ul style="font-size:13px;color:var(--text-muted);margin-top:6px;padding-left:18px;">
+    </p> -->
+    {% for line in lines|slice:"1:" %}
+    <p style="font-size: 13px; margin: auto;">{{ line }}</p>
+    {% endfor %}
+    <!-- <ul style="font-size:13px;color:var(--text-muted);margin-top:6px;padding-left:18px;">
         {% for line in lines|slice:"1:" %}
         <li>{{ line }}</li>
         {% endfor %}
-    </ul>
+    </ul> -->
     {% endwith %}
 </section>

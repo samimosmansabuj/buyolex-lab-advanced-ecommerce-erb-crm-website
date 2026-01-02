@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="bn">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <title>BuyolexLab • স্মৃতি স্বরণিকা</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* -------------------- PREMIUM DARK NAVY & GOLD THEME -------------------- */
+        :root {
+            /* Palette: Midnight Navy & Luxury Gold */
+            --bg-body: #05111A;
+            /* Deep Midnight Navy Background */
+            --surface: #0F1E29;
+            /* Slightly lighter navy for cards */
+            --surface-border: rgba(255, 255, 255, 0.1);
+
+            /* Gold Gradient Colors */
+            --gold-start: #D4AF37;
+            --gold-mid: #F3E5AB;
+            --gold-end: #C5A059;
+
+            /* Solid Accents */
+            --accent: #D4AF37;
+            /* Standard Gold */
+            --accent-hover: #F1C40F;
+            /* Bright Gold */
+
+            /* Text Colors */
+            --text-main: #E2E8F0;
+            /* Off-white for readability */
+            --text-muted: #94A3B8;
+            /* Muted Blue-Grey */
+
+            /* Shadows & Radius */
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        /* -------------------- RESET & BASE -------------------- */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            /* Subtle radial gradient for depth */
+            background-image: radial-gradient(circle at 50% 0%, #162a3d 0%, var(--bg-body) 70%);
+            font-family: 'Hind Siliguri', sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Typography with GOLD GRADIENT */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            /* Gold Gradient Text Logic */
+            background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            /* Required for gradient text */
+        }
+
+        h1[lang="bn"],
+        h2[lang="bn"],
+        h3[lang="bn"] {
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* -------------------- LAYOUT CONTAINER -------------------- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* -------------------- HEADER / LOGO AREA -------------------- */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand-header span {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .brand-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            /* Gradient handled by global h1 rule */
+        }
+
+        /* -------------------- MAIN CARD -------------------- */
+        .main-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--surface-border);
+        }
+
+        @media (min-width: 768px) {
+            .main-card {
+                flex-direction: row;
+                align-items: stretch;
+            }
+        }
+
+        /* -------------------- VISUAL SECTION (LEFT) -------------------- */
+        .visual-side {
+            flex: 1;
+            background: #000;
+            /* Dark bg for image area */
+            position: relative;
+            min-height: 300px;
+            overflow: hidden;
+        }
+
+        .visual-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            transition: transform 0.5s ease;
+        }
+
+        /* Dark Overlay */
+        .visual-side::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5, 17, 26, 0.9), transparent);
+            pointer-events: none;
+        }
+
+        .visual-tag {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2;
+            background: rgba(15, 30, 41, 0.8);
+            border: 1px solid var(--accent);
+            backdrop-filter: blur(6px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .visual-tag span {
+            font-weight: 700;
+            color: var(--accent);
+            /* Gold text */
+            font-size: 14px;
+        }
+
+        /* -------------------- CONTENT SECTION (RIGHT) -------------------- */
+        .content-side {
+            flex: 1.2;
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .intro-text h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .intro-text p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* SELECTOR TABS */
+        .selector-area {
+            margin-top: 30px;
+        }
+
+        .selector-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .choice-card {
+            background: rgba(255, 255, 255, 0.03);
+            /* Slight transparent */
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-lg);
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choice-card img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 5px;
+            border: 2px solid transparent;
+        }
+
+        .choice-card span {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Active State */
+        .choice-card.active {
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.1), rgba(0, 0, 0, 0));
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .choice-card.active span {
+            color: var(--accent);
+        }
+
+        .choice-card.active img {
+            border-color: var(--accent);
+        }
+
+        /* ACTION AREA */
+        .action-area {
+            margin-top: auto;
+            padding-top: 30px;
+        }
+
+        .price-tag {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 15px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--surface-border);
+        }
+
+        .price-tag .lbl {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .price-tag .val {
+            font-size: 20px;
+            font-weight: 700;
+            /* Gold Gradient Price */
+            background: linear-gradient(to right, var(--gold-start), var(--gold-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .btn-primary {
+            width: 100%;
+            /* Gold Button Gradient */
+            background: linear-gradient(135deg, var(--gold-start) 0%, var(--gold-end) 100%);
+            color: #05111A;
+            /* Dark Text on Gold Button */
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shiny effect */
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            opacity: 0;
+        }
+
+        .btn-primary:hover::after {
+            opacity: 1;
+            left: 100%;
+            transition: 0.7s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .chat-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .chat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .chat-pill:hover {
+            transform: translateY(-2px);
+        }
+
+        .wa-pill {
+            background: rgba(37, 211, 102, 0.15);
+            color: #25D366;
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .ms-pill {
+            background: rgba(0, 120, 255, 0.15);
+            color: #2D9CDB;
+            border: 1px solid rgba(0, 120, 255, 0.3);
+        }
+
+        /* -------------------- MODAL (Dark Mode) -------------------- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            border-radius: var(--radius-xl);
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.open .modal-card {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .modal-overlay {
+                align-items: flex-end;
+            }
+
+            .modal-card {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                max-height: 95vh;
+            }
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--surface-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            z-index: 10;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            /* Gold gradient inherited */
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: var(--surface);
+        }
+
+        /* DARK FORM STYLES */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 5px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            /* Dark Input Fields */
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--surface-border);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        .input-group select {
+            color: #fff;
+        }
+
+        .input-group select option {
+            background: #05111A;
+        }
+
+        /* Dropdown options dark */
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid var(--surface-border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .checkbox-wrapper input {
+            margin-top: 3px;
+            accent-color: var(--accent);
+        }
+
+        .btn-confirm {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-start), var(--gold-end));
+            color: #05111A;
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius-lg);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            transition: 0.2s;
+        }
+
+        .btn-confirm:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        {% block body_container %}
+        {% endblock body_container %}
+    </div>
+
+    {% include "02/order_form.html" %}
+
+    <script>
+        let currentType;
+
+        const TEXT_CONTENT = {
+            marriage: { title: "বিবাহ স্বরণিকা", desc: "বিয়ে বা বিবাহ বার্ষিকীর জন্য সেরা উপহার। নাম, তারিখ ও বার্তা দিয়ে কাস্টমাইজ করুন।" },
+            birth: { title: "জন্ম স্বরণিকা", desc: "শিশুর আগমনের আনন্দকে ধরে রাখুন। নাম, জন্মতারিখ ও দোয়ার বাণীতে সাজানো।" },
+            remembrance: { title: "স্মৃতি ফলক", desc: "প্রিয়জনের স্মৃতি এবং শ্রদ্ধা ভালোবাসার সাথে সংরক্ষণ করুন।" }
+        };
+
+        const BUSINESS_WHATSAPP = '8801306403604';
+        const MESSENGER_LINK = 'https://m.me/694715503723578';
+
+        // DOM Elements
+        const mainImage = document.getElementById('mainImage');
+        // const visualTagText = document.getElementById('visualTagText');
+        // const mainTitle = document.getElementById('mainTitle');
+        // const mainDesc = document.getElementById('mainDesc');
+
+        const modal = document.getElementById('orderModal');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const dynamicFields = document.getElementById('dynamicFields');
+        const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+        const orderForm = document.getElementById('orderForm');
+
+        document.querySelectorAll('.choice-card').forEach(card => {
+            card.addEventListener('click', () => {
+                currentType = card.dataset.type;
+                document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                const imgSrc = card.querySelector('img')?.src;
+                setTimeout(() => {
+                    mainImage.src = imgSrc;
+                }, 200);
+            });
+        });
+
+        document.getElementById('heroMessenger').href = MESSENGER_LINK;
+        document.getElementById('heroWhatsApp').href = `https://wa.me/${BUSINESS_WHATSAPP}`;
+
+
+        // 2. Modal & Form Logic
+        openModalBtn.addEventListener('click', () => {
+            if (!currentType) {
+                alert('অনুগ্রহ করে প্রথমে একটি ডিজাইন নির্বাচন করুন।');
+                return;
+            }
+            renderDynamicFields(currentType);
+            modalTitle.textContent = `${currentType} - অর্ডার`;
+            // modalTitle.textContent = `${TEXT_CONTENT[currentType].title} - অর্ডার`;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        });
+
+        function renderDynamicFields(type) {
+            let html = '';
+            if (type.toLowerCase() === 'marriage' || type.toLowerCase() === 'wedding') {
+                html = `
+                <div class="form-grid">
+                    <div class="input-group"><label>বরের নাম</label><input name="groomName" type="text" required></div>
+                    <div class="input-group"><label>কনের নাম</label><input name="brideName" type="text" required></div>
+                </div>
+                <div class="form-grid">
+                    <div class="input-group"><label>বিয়ের তারিখ</label><input name="marriageDate" type="text" placeholder="DD-MM-YYYY / বাংলা" required></div>
+                </div>
+                <div class="input-group full-width">
+                    <label>বার্তা / বাণী (ঐচ্ছিক)</label>
+                    <textarea name="marriageNote" placeholder="ছোট কোনো বার্তা যা খোদাই করা হবে..."></textarea>
+                </div>
+                `;
+            } else if (type.toLowerCase() === 'birth') {
+                html = `
+                <div class="form-grid">
+                    <div class="input-group"><label>শিশুর নাম</label><input name="babyName" type="text" required></div>
+                    <div class="input-group"><label>জন্ম তারিখ</label><input name="babyDOB" type="text" placeholder="DD-MM-YYYY" required></div>
+                </div>
+                <div class="form-grid">
+                    <div class="input-group"><label>পিতার নাম</label><input name="fatherName" type="text"></div>
+                    <div class="input-group"><label>মাতার নাম</label><input name="motherName" type="text"></div>
+                </div>
+                <div class="input-group full-width">
+                    <label>দোয়া / বার্তা (ঐচ্ছিক)</label>
+                    <textarea name="birthNote" placeholder="শিশুর জন্য বিশেষ দোয়া..."></textarea>
+                </div>
+                `;
+            } else if (type.toLowerCase() === 'death') {
+                html = `
+                <div class="input-group full-width"><label>মৃত ব্যক্তির নাম</label><input name="deceasedName" type="text" required></div>
+                <div class="form-grid">
+                    <div class="input-group"><label>মৃত্যুর তারিখ</label><input name="deceasedDate" type="text" placeholder="DD-MM-YYYY"></div>
+                    <div class="input-group"><label>পিতা/মাতার নাম</label><input name="parentName" type="text"></div>
+                </div>
+                <div class="input-group full-width">
+                    <label>স্মরণীয় কথা / দোয়া</label>
+                    <textarea name="deceasedNote"></textarea>
+                </div>
+                `;
+            } else {
+                html = `
+                <div class="form-grid">
+                    <div class="input-group"><label>স্মরণীয় তারিখ</label><input name="remeberDate" type="text" placeholder="DD-MM-YYYY"></div>
+                </div>
+                <div class="input-group full-width">
+                    <label>স্মরণীয় কথা / দোয়া</label>
+                    <textarea name="deceasedNote"></textarea>
+                </div>
+                `;
+            }
+            dynamicFields.innerHTML = html;
+        }
+
+        confirmOrderBtn.addEventListener('click', () => {
+            const fd = new FormData(orderForm);
+            const data = {};
+            fd.forEach((v, k) => data[k] = v.toString().trim());
+            data.type = currentType;
+
+            // Basic Validation
+            if (!data.customerName || !data.phone || !data.address) {
+                alert('অনুগ্রহ করে নাম, ফোন নম্বর এবং ঠিকানা পূরণ করুন।');
+                return;
+            }
+            if (!document.getElementById('agreeCheck').checked) {
+                alert('অনুগ্রহ করে চেক বক্সে সম্মতি প্রদান করুন।');
+                return;
+            }
+
+            // Generate WhatsApp Message
+            const lines = [
+                `*New Order: ${TEXT_CONTENT[currentType].title}*`,
+                `------------------`,
+                `Name: ${data.customerName}`,
+                `Phone: ${data.phone}`,
+                `Address: ${data.address}`,
+                `------------------`
+            ];
+
+            if (currentType === 'marriage') {
+                lines.push(`Groom: ${data.groomName}`);
+                lines.push(`Bride: ${data.brideName}`);
+                lines.push(`Date: ${data.marriageDate}`);
+                if (data.marriageNote) lines.push(`Note: ${data.marriageNote}`);
+            } else if (currentType === 'birth') {
+                lines.push(`Baby: ${data.babyName}`);
+                lines.push(`DOB: ${data.babyDOB}`);
+                lines.push(`Parents: ${data.fatherName} & ${data.motherName}`);
+                if (data.birthNote) lines.push(`Note: ${data.birthNote}`);
+            } else {
+                lines.push(`Name: ${data.deceasedName}`);
+                lines.push(`Death: ${data.deceasedDate}`);
+                if (data.deceasedNote) lines.push(`Note: ${data.deceasedNote}`);
+            }
+
+            lines.push(`------------------`);
+            lines.push(`Ref WA: ${data.whatsapp}`);
+            lines.push(`Delivery: ${data.deliveryType}`);
+
+            const finalMsg = encodeURIComponent(lines.join('\n'));
+            const waUrl = `https://wa.me/${BUSINESS_WHATSAPP}?text=${finalMsg}`;
+
+            // Save locally (optional)
+            const stored = JSON.parse(localStorage.getItem('bx_orders') || '[]');
+            stored.push({ ...data, date: new Date().toISOString() });
+            localStorage.setItem('bx_orders', JSON.stringify(stored));
+
+            // Open WA
+            window.open(waUrl, '_blank');
+
+            // Cleanup
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+            alert("ধন্যবাদ! আমরা আপনাকে WhatsApp-এ মেসেজটি পাঠিয়ে দিয়েছি। সেন্ড বাটনে ক্লিক করুন।");
+        });
+
+    </script>
+</body>
+
+</html>
