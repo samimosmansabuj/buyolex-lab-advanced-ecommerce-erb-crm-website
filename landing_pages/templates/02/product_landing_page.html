@@ -1,0 +1,77 @@
+{% extends "./landing_base.html" %}
+{% load static %}
+
+{% block landing_page_title %}
+<title>BuyolexLab • স্মৃতি স্বরণিকা</title>
+{% endblock landing_page_title %}
+
+{% block body_container %}
+<div class="brand-header">
+    <span>BuyolexLab Premium</span>
+    <h1>স্মৃতি চিরন্তন</h1>
+</div>
+
+<div class="main-card">
+    <div class="visual-side">
+        <img id="mainImage" src="{{ primary_hero.image.url }}" alt="{{ primary_hero.image.name }}">
+        <div class="visual-tag">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                </polygon>
+            </svg>
+            <span id="visualTagText">বিবাহ স্বরণিকা</span>
+        </div>
+    </div>
+
+    <div class="content-side">
+
+        <div class="intro-text">
+            <h2 id="mainTitle">আপনার বিশেষ দিনটি খোদাই করুন</h2>
+            <p id="mainDesc">প্রিমিয়াম লেজার-এনগ্রেভড কাঠের উপর আপনার জীবনের সেরা মুহূর্তগুলো আজীবন সংরক্ষণ
+                করুন।</p>
+        </div>
+
+        <div class="selector-area">
+            <span class="selector-label">ডিজাইন নির্বাচন করুন</span>
+            <div class="choices-grid">
+                {% for variante in landing_page_product.product.active_variante %}
+                <div class="choice-card" data-type="{{ variante.sku|cut:variante.product.sku|cut:'-' }}" role="button" tabindex="0">
+                    {% with img=variante.images.all|first %}
+                    {% if img %}
+                    <img src="{{ img.image.url }}" alt="Marriage" >
+                    {% else %}
+                    <img src="{% static 'assets/images/reading-table.png' %}">
+                    {% endif %}
+                    {% endwith %}
+                    <span>{{ variante.sku|cut:variante.product.sku|cut:'-' }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="action-area">
+            <div class="price-tag">
+                <span class="lbl">মূল্য (ডেলিভারি চার্জ প্রযোজ্য)</span>
+                <span class="val">{{landing_page_product.product.discount_price}} BDT</span>
+            </div>
+
+            <button class="btn-primary" id="openModalBtn">
+                <span>অর্ডার করুন</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+
+            <div class="chat-links">
+                <a href="#" id="heroMessenger" target="_blank" class="chat-pill ms-pill">Messenger</a>
+                <a href="#" id="heroWhatsApp" target="_blank" class="chat-pill wa-pill">WhatsApp</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock body_container %}
