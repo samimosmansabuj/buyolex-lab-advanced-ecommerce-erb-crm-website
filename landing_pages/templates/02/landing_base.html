@@ -441,7 +441,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--surface);
+            /* background: var(--surface); */
             z-index: 10;
         }
 
@@ -587,18 +587,18 @@
     <script>
         let currentType;
 
-        const TEXT_CONTENT = {
-            marriage: { title: "বিবাহ স্বরণিকা", desc: "বিয়ে বা বিবাহ বার্ষিকীর জন্য সেরা উপহার। নাম, তারিখ ও বার্তা দিয়ে কাস্টমাইজ করুন।" },
-            birth: { title: "জন্ম স্বরণিকা", desc: "শিশুর আগমনের আনন্দকে ধরে রাখুন। নাম, জন্মতারিখ ও দোয়ার বাণীতে সাজানো।" },
-            remembrance: { title: "স্মৃতি ফলক", desc: "প্রিয়জনের স্মৃতি এবং শ্রদ্ধা ভালোবাসার সাথে সংরক্ষণ করুন।" }
-        };
+        // const TEXT_CONTENT = {
+        //     marriage: { title: "বিবাহ স্বরণিকা", desc: "বিয়ে বা বিবাহ বার্ষিকীর জন্য সেরা উপহার। নাম, তারিখ ও বার্তা দিয়ে কাস্টমাইজ করুন।" },
+        //     birth: { title: "জন্ম স্বরণিকা", desc: "শিশুর আগমনের আনন্দকে ধরে রাখুন। নাম, জন্মতারিখ ও দোয়ার বাণীতে সাজানো।" },
+        //     remembrance: { title: "স্মৃতি ফলক", desc: "প্রিয়জনের স্মৃতি এবং শ্রদ্ধা ভালোবাসার সাথে সংরক্ষণ করুন।" }
+        // };
 
         const BUSINESS_WHATSAPP = '8801306403604';
         const MESSENGER_LINK = 'https://m.me/694715503723578';
 
         // DOM Elements
         const mainImage = document.getElementById('mainImage');
-        // const visualTagText = document.getElementById('visualTagText');
+        const visualTagText = document.getElementById('visualTagText');
         // const mainTitle = document.getElementById('mainTitle');
         // const mainDesc = document.getElementById('mainDesc');
 
@@ -607,8 +607,9 @@
         const closeModalBtn = document.getElementById('closeModalBtn');
         const modalTitle = document.getElementById('modalTitle');
         const dynamicFields = document.getElementById('dynamicFields');
-        const confirmOrderBtn = document.getElementById('confirmOrderBtn');
-        const orderForm = document.getElementById('orderForm');
+        const hiddenFields = document.getElementById('hiddenFields');
+        // const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+        // const orderForm = document.getElementById('placeOrderForm');
 
         document.querySelectorAll('.choice-card').forEach(card => {
             card.addEventListener('click', () => {
@@ -616,9 +617,13 @@
                 document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
                 const imgSrc = card.querySelector('img')?.src;
+
+                openModalBtn.setAttribute('data-sku', card.dataset.sku);
                 setTimeout(() => {
                     mainImage.src = imgSrc;
                 }, 200);
+
+                visualTagText.innerText = currentType
             });
         });
 
@@ -628,16 +633,28 @@
 
         // 2. Modal & Form Logic
         openModalBtn.addEventListener('click', () => {
-            if (!currentType) {
+            const sku = openModalBtn.getAttribute('data-sku');
+
+            if (!currentType && !this.dataset.sku) {
                 alert('অনুগ্রহ করে প্রথমে একটি ডিজাইন নির্বাচন করুন।');
                 return;
             }
             renderDynamicFields(currentType);
+            addProductSku(sku);
+            
             modalTitle.textContent = `${currentType} - অর্ডার`;
             // modalTitle.textContent = `${TEXT_CONTENT[currentType].title} - অর্ডার`;
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
         });
+
+        function addProductSku(sku) {
+            html = `
+            <input name="variante" type="text" value="${sku}" hidden>
+            <input name="qty" type="number" value="1" hidden>
+            `;
+            hiddenFields.innerHTML = html;
+        }
 
         closeModalBtn.addEventListener('click', () => {
             modal.classList.remove('open');
@@ -661,7 +678,7 @@
                     <div class="input-group"><label>কনের নাম</label><input name="brideName" type="text" required></div>
                 </div>
                 <div class="form-grid">
-                    <div class="input-group"><label>বিয়ের তারিখ</label><input name="marriageDate" type="text" placeholder="DD-MM-YYYY / বাংলা" required></div>
+                    <div class="input-group"><label>বিয়ের তারিখ</label><input name="marriageDate" type="date" placeholder="DD-MM-YYYY / বাংলা" required></div>
                 </div>
                 <div class="input-group full-width">
                     <label>বার্তা / বাণী (ঐচ্ছিক)</label>
@@ -672,7 +689,7 @@
                 html = `
                 <div class="form-grid">
                     <div class="input-group"><label>শিশুর নাম</label><input name="babyName" type="text" required></div>
-                    <div class="input-group"><label>জন্ম তারিখ</label><input name="babyDOB" type="text" placeholder="DD-MM-YYYY" required></div>
+                    <div class="input-group"><label>জন্ম তারিখ</label><input name="babyDOB" type="date" placeholder="DD-MM-YYYY" required></div>
                 </div>
                 <div class="form-grid">
                     <div class="input-group"><label>পিতার নাম</label><input name="fatherName" type="text"></div>
@@ -687,7 +704,7 @@
                 html = `
                 <div class="input-group full-width"><label>মৃত ব্যক্তির নাম</label><input name="deceasedName" type="text" required></div>
                 <div class="form-grid">
-                    <div class="input-group"><label>মৃত্যুর তারিখ</label><input name="deceasedDate" type="text" placeholder="DD-MM-YYYY"></div>
+                    <div class="input-group"><label>মৃত্যুর তারিখ</label><input name="deceasedDate" type="date" placeholder="DD-MM-YYYY"></div>
                     <div class="input-group"><label>পিতা/মাতার নাম</label><input name="parentName" type="text"></div>
                 </div>
                 <div class="input-group full-width">
@@ -698,7 +715,7 @@
             } else {
                 html = `
                 <div class="form-grid">
-                    <div class="input-group"><label>স্মরণীয় তারিখ</label><input name="remeberDate" type="text" placeholder="DD-MM-YYYY"></div>
+                    <div class="input-group"><label>স্মরণীয় তারিখ</label><input name="remeberDate" type="date" placeholder="DD-MM-YYYY"></div>
                 </div>
                 <div class="input-group full-width">
                     <label>স্মরণীয় কথা / দোয়া</label>
@@ -708,70 +725,6 @@
             }
             dynamicFields.innerHTML = html;
         }
-
-        confirmOrderBtn.addEventListener('click', () => {
-            const fd = new FormData(orderForm);
-            const data = {};
-            fd.forEach((v, k) => data[k] = v.toString().trim());
-            data.type = currentType;
-
-            // Basic Validation
-            if (!data.customerName || !data.phone || !data.address) {
-                alert('অনুগ্রহ করে নাম, ফোন নম্বর এবং ঠিকানা পূরণ করুন।');
-                return;
-            }
-            if (!document.getElementById('agreeCheck').checked) {
-                alert('অনুগ্রহ করে চেক বক্সে সম্মতি প্রদান করুন।');
-                return;
-            }
-
-            // Generate WhatsApp Message
-            const lines = [
-                `*New Order: ${TEXT_CONTENT[currentType].title}*`,
-                `------------------`,
-                `Name: ${data.customerName}`,
-                `Phone: ${data.phone}`,
-                `Address: ${data.address}`,
-                `------------------`
-            ];
-
-            if (currentType === 'marriage') {
-                lines.push(`Groom: ${data.groomName}`);
-                lines.push(`Bride: ${data.brideName}`);
-                lines.push(`Date: ${data.marriageDate}`);
-                if (data.marriageNote) lines.push(`Note: ${data.marriageNote}`);
-            } else if (currentType === 'birth') {
-                lines.push(`Baby: ${data.babyName}`);
-                lines.push(`DOB: ${data.babyDOB}`);
-                lines.push(`Parents: ${data.fatherName} & ${data.motherName}`);
-                if (data.birthNote) lines.push(`Note: ${data.birthNote}`);
-            } else {
-                lines.push(`Name: ${data.deceasedName}`);
-                lines.push(`Death: ${data.deceasedDate}`);
-                if (data.deceasedNote) lines.push(`Note: ${data.deceasedNote}`);
-            }
-
-            lines.push(`------------------`);
-            lines.push(`Ref WA: ${data.whatsapp}`);
-            lines.push(`Delivery: ${data.deliveryType}`);
-
-            const finalMsg = encodeURIComponent(lines.join('\n'));
-            const waUrl = `https://wa.me/${BUSINESS_WHATSAPP}?text=${finalMsg}`;
-
-            // Save locally (optional)
-            const stored = JSON.parse(localStorage.getItem('bx_orders') || '[]');
-            stored.push({ ...data, date: new Date().toISOString() });
-            localStorage.setItem('bx_orders', JSON.stringify(stored));
-
-            // Open WA
-            window.open(waUrl, '_blank');
-
-            // Cleanup
-            modal.classList.remove('open');
-            document.body.style.overflow = '';
-            alert("ধন্যবাদ! আমরা আপনাকে WhatsApp-এ মেসেজটি পাঠিয়ে দিয়েছি। সেন্ড বাটনে ক্লিক করুন।");
-        });
-
     </script>
 </body>
 

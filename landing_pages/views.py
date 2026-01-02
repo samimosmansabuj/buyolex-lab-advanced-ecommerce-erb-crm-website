@@ -112,18 +112,19 @@ class CreateOrderView(View):
                 
                 qty = data.get("qty")
                 metadata = {"note": data.get("notes")}
-
                 order = Order.objects.create(
                     customer = customer,
                     billing_address = address,
                     shipping_address = address,
                     metadata=metadata
                 )
+                print("product.price: ", product.price)
+                print("product.discount_price: ", product.discount_price)
                 OrderItem.objects.create(
                     order= order,
                     product= product,
                     variant= variante,
-                    quantity= int(qty),
+                    quantity= 1,
                     c_unit_price= product.price,
                     d_unit_price= product.discount_price,
                 )
