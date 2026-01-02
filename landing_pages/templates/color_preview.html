@@ -4,7 +4,7 @@
     <div class="color-preview-title">{{landing_page_product.product_details_section_title}}</div>
 
     <div class="color-grid">
-        {% for variante in landing_page_product.product.variants.all %}
+        {% for variante in landing_page_product.product.active_variante %}
         <div class="color-item">
             
             {% with img=variante.images.all|first %}
