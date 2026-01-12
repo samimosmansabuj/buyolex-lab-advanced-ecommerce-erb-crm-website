@@ -8,7 +8,34 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Meta Pixel Code -->
+    {% if FACEBOOK_PIXEL_ID %}
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '{{ FACEBOOK_PIXEL_ID }}');
+        fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id={{ FACEBOOK_PIXEL_ID }}&ev=PageView&noscript=1" />
+    </noscript>
+    {% endif %}
+    <!-- End Meta Pixel Code -->
+
 
     <style>
         /* -------------------- PREMIUM DARK NAVY & GOLD THEME -------------------- */
@@ -587,12 +614,6 @@
     <script>
         let currentType;
 
-        // const TEXT_CONTENT = {
-        //     marriage: { title: "বিবাহ স্বরণিকা", desc: "বিয়ে বা বিবাহ বার্ষিকীর জন্য সেরা উপহার। নাম, তারিখ ও বার্তা দিয়ে কাস্টমাইজ করুন।" },
-        //     birth: { title: "জন্ম স্বরণিকা", desc: "শিশুর আগমনের আনন্দকে ধরে রাখুন। নাম, জন্মতারিখ ও দোয়ার বাণীতে সাজানো।" },
-        //     remembrance: { title: "স্মৃতি ফলক", desc: "প্রিয়জনের স্মৃতি এবং শ্রদ্ধা ভালোবাসার সাথে সংরক্ষণ করুন।" }
-        // };
-
         const BUSINESS_WHATSAPP = '8801306403604';
         const MESSENGER_LINK = 'https://m.me/694715503723578';
 
@@ -611,6 +632,31 @@
         // const confirmOrderBtn = document.getElementById('confirmOrderBtn');
         // const orderForm = document.getElementById('placeOrderForm');
 
+        // View Content Event Tracking Function ========== 
+        function ViewContentEvent(content_ids, content_name, value) {
+            if (typeof fbq !== 'function') return;
+
+            fbq('track', 'ViewContent', {
+                content_ids: content_ids,
+                content_name: content_name,
+                content_type: 'product',
+                value: value,
+                currency: 'BDT'
+            });
+        }
+        function AddToCartEvent(content_ids, content_name, value) {
+            if (typeof fbq !== 'function') return;
+
+            fbq('track', 'AddToCart', {
+                content_ids: content_ids,
+                content_name: content_name,
+                content_type: 'product',
+                value: value,
+                currency: 'BDT'
+            });
+        }
+
+        let lastViewedSku = null;
         document.querySelectorAll('.choice-card').forEach(card => {
             card.addEventListener('click', () => {
                 currentType = card.dataset.type;
@@ -618,7 +664,19 @@
                 card.classList.add('active');
                 const imgSrc = card.querySelector('img')?.src;
 
+                // Facebook Pixel ContentView Event Tracking========= 
+                if (lastViewedSku === card.dataset.sku) return;
+                lastViewedSku = card.dataset.sku;
+                const content_ids = [String(card.dataset.sku)];
+                const content_name = card.querySelector('span').textContent + " Soronika";
+                const value = Number("{{ landing_page_product.product.discount_price|default:'0' }}");
+                ViewContentEvent(content_ids, content_name, value);
+
+
                 openModalBtn.setAttribute('data-sku', card.dataset.sku);
+                // openModalBtn.setAttribute('data-sku', card.dataset.sku, 'data-content-name', content_name, 'data-value', value);
+                openModalBtn.setAttribute('data-content-name', content_name)
+                openModalBtn.setAttribute('data-value', value)
                 setTimeout(() => {
                     mainImage.src = imgSrc;
                 }, 200);
@@ -639,9 +697,17 @@
                 alert('অনুগ্রহ করে প্রথমে একটি ডিজাইন নির্বাচন করুন।');
                 return;
             }
+
+            const content_ids = [String(sku)];
+            const content_name = openModalBtn.getAttribute('data-content-name');
+            const value = openModalBtn.getAttribute('data-value');
+            console.log("content_name:", content_name)
+            console.log("value:", value)
+            AddToCartEvent(content_ids, content_name, value);
+
             renderDynamicFields(currentType);
             addProductSku(sku);
-            
+
             modalTitle.textContent = `${currentType} - অর্ডার`;
             // modalTitle.textContent = `${TEXT_CONTENT[currentType].title} - অর্ডার`;
             modal.classList.add('open');
