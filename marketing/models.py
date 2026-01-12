@@ -1,16 +1,10 @@
 from django.db import models
-from .utix import EmailConfigServerType, EmailConfigMailType
+from .utix import EmailConfigServerType, EmailConfigMailType, MarketingIntegrationProviderChoices, MarketingIntegrationStatusChoices
 
 class MarketingIntegration(models.Model):
-    PROVIDER_CHOICES = [
-        ('facebook_pixel', 'Facebook Pixel'),
-        ('facebook_capi', 'Facebook Conversion API'),
-        ('gtm', 'Google Tag Manager'),
-        ('ga4', 'Google Analytics 4'),
-    ]
-    provider = models.CharField(max_length=64, choices=PROVIDER_CHOICES)
+    provider = models.CharField(max_length=64, choices=MarketingIntegrationProviderChoices.choices)
     config = models.JSONField(default=dict, blank=True)
-    status = models.CharField(max_length=32, default='inactive')
+    status = models.CharField(max_length=32, choices=MarketingIntegrationStatusChoices.choices, default=MarketingIntegrationStatusChoices.ACTIVE)
     last_tested_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
