@@ -96,10 +96,30 @@ class CreateOrderView(View):
         )
         return address.get_address
     
+    def verify_input(self, data):
+        required_fields = [
+            "product_id", "product_price", "name", "phone",
+            "address", "district", "upazila", "area", "qty",
+            # "notes"
+        ]
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        return missing_fields
+        
+    
     def post(self, request, *args, **kwargs):
         try:
+            data = request.POST
+            
+            missing_fields = self.verify_input(data)
+            if missing_fields:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": f"The following fields must be filled: {', '.join(missing_fields)}"
+                    },
+                    status=HTTPStatus.BAD_REQUEST
+                )
             with transaction.atomic():
-                data = request.POST
                 product = self.get_product(data.get("product_id"))
                 variante = None
                 if data.get("variante"):
@@ -145,6 +165,102 @@ class CreateOrderView(View):
                     "message": str(e)
                 }, status=HTTPStatus.BAD_REQUEST
             )
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #         data = request.POST
+    #         data_copy = data.copy()
+            
+    #         required_fields = [
+    #             "product_id", "product_price", "name", "phone",
+    #             "address", "district", "upazila", "area", "qty", "notes"
+    #         ]
+
+    #         # 🔒 Required field validation
+    #         missing_fields = [
+    #             field for field in required_fields
+    #             if not data_copy.get(field) or str(data_copy.get(field)).strip() == ""
+    #         ]
+    #         print("missing_fields: ", missing_fields)
+    #         if missing_fields:
+                
+    #             return JsonResponse(
+    #                 {
+    #                     "success": False,
+    #                     "message": "All fields are required!",
+    #                     "errors": {
+    #                         field: "This field is required."
+    #                         for field in missing_fields
+    #                     }
+    #                 },
+    #                 status=HTTPStatus.BAD_REQUEST
+    #             )
+
+    #         with transaction.atomic():
+    #             product = self.get_product(data.get("product_id"))
+
+    #             variante = None
+    #             price = product.discount_price
+    #             if data.get("variante"):
+    #                 variante, price = self.get_product_variante(
+    #                     product, data.get("variante")
+    #                 )
+
+    #             self.price_verify___(
+    #                 data.get("product_price"),
+    #                 price
+    #             )
+
+    #             customer = self.get_user_profile(
+    #                 data.get("name"),
+    #                 data.get("phone"),
+    #                 data.get("email") or None
+    #             )
+
+    #             address = self.get_make_address(
+    #                 customer,
+    #                 data.get("address"),
+    #                 data.get("district"),
+    #                 data.get("upazila"),
+    #                 data.get("area")
+    #             )
+
+    #             order = Order.objects.create(
+    #                 customer=customer,
+    #                 billing_address=address,
+    #                 shipping_address=address,
+    #                 metadata={"note": data.get("notes")}
+    #             )
+
+    #             OrderItem.objects.create(
+    #                 order=order,
+    #                 product=product,
+    #                 variant=variante,
+    #                 quantity=int(data.get("qty")),
+    #                 c_unit_price=product.price,
+    #                 d_unit_price=product.discount_price,
+    #             )
+
+    #             if data.get("email"):
+    #                 send_mail = OrderConfirmatinoEmailSend(order, data.get("email"))
+    #                 send_mail.order_confirmation_mail_send()
+
+    #             return JsonResponse(
+    #                 {
+    #                     "success": True,
+    #                     "message": "Order Successfully Created!"
+    #                 },
+    #                 status=HTTPStatus.CREATED
+    #             )
+
+    #     except Exception as e:
+    #         return JsonResponse(
+    #             {
+    #                 "success": False,
+    #                 "message": str(e)
+    #             },
+    #             status=HTTPStatus.BAD_REQUEST
+    #         )
+
 
 
 def get_order(request, id):

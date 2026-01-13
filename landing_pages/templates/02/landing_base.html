@@ -629,7 +629,7 @@
         // ==================================================================================================
         // *********//////////====Facebook Pixel and Event Tracking Function=====/////////////***************
         // View Content Event Tracking Function ========== 
-        function ViewContentEvent(content_ids, content_name, value) {
+        function FacebookViewContentEvent(content_ids, content_name, value) {
             if (typeof fbq !== 'function') return;
 
             fbq('track', 'ViewContent', {
@@ -640,7 +640,7 @@
                 currency: 'BDT'
             });
         }
-        function AddToCartEvent(content_ids, content_name, value) {
+        function FacebookAddToCartEvent(content_ids, content_name, value) {
             if (typeof fbq !== 'function') return;
 
             fbq('track', 'AddToCart', {
@@ -651,7 +651,7 @@
                 currency: 'BDT'
             });
         }
-        function InitiateCheckEvent(content_ids, content_name, value) {
+        function FacebookInitiateCheckEvent(content_ids, content_name, value) {
             if (typeof fbq !== 'function') return;
 
             fbq('track', 'InitiateCheckout', {
@@ -662,7 +662,7 @@
                 currency: 'BDT'
             });
         }
-        function PurchaseEvent(content_ids, content_name, value) {
+        function FacebookPurchaseEvent(content_ids, content_name, value) {
             if (typeof fbq !== 'function') return;
 
             fbq('track', 'Purchase', {
@@ -693,7 +693,7 @@
                 const content_ids = [String(card.dataset.sku)];
                 const content_name = card.querySelector('span').textContent + " Soronika";
                 const value = Number("{{ landing_page_product.product.discount_price|default:'0' }}");
-                // ViewContentEvent(content_ids, content_name, value);
+                FacebookViewContentEvent(content_ids, content_name, value);
 
 
                 openModalBtn.setAttribute('data-sku', card.dataset.sku);
@@ -731,7 +731,7 @@
             const content_ids = [String(sku)];
             const content_name = openModalBtn.getAttribute('data-content-name');
             const value = openModalBtn.getAttribute('data-value');
-            // AddToCartEvent(content_ids, content_name, value);
+            FacebookAddToCartEvent(content_ids, content_name, value);
 
             renderDynamicFields(currentType);
             addProductSku(sku);
