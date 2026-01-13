@@ -118,15 +118,14 @@ class CreateOrderView(View):
                     shipping_address = address,
                     metadata=metadata
                 )
-                print("product.price: ", product.price)
-                print("product.discount_price: ", product.discount_price)
+                
                 OrderItem.objects.create(
-                    order= order,
-                    product= product,
-                    variant= variante,
-                    quantity= 1,
-                    c_unit_price= product.price,
-                    d_unit_price= product.discount_price,
+                    order=order,
+                    product=product,
+                    variant=variante,
+                    quantity=1,
+                    c_unit_price=product.price,
+                    d_unit_price=product.discount_price,
                 )
                 if data.get("email"):
                     send_mail = OrderConfirmatinoEmailSend(order, data.get("email"))

@@ -79,7 +79,8 @@
         <div class="modal-footer">
             <div class="checkbox-wrapper">
                 <input type="checkbox" id="agreeCheck">
-                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ করবেন।</label>
+                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ
+                    করবেন।</label>
             </div>
             <button class="btn-confirm" id="confirmOrderBtn" type="submit">WhatsApp এ অর্ডার পাঠান</button>
         </div>
@@ -102,14 +103,13 @@
 
         formDivContainer.appendChild(card);
     }
+    // Delete Processing Card Show Script============== 
     function deleteProcessingCard() {
         const card = document.getElementById("orderProcessingCard");
         if (card) {
             card.remove();
         }
     }
-
-
     // Success Card Show Script============== 
     function showSuccessCard() {
         const formDivContainer = document.getElementById("formDivContainer");
@@ -125,13 +125,13 @@
         `;
         formDivContainer.appendChild(card);
     }
+    // Delete Success Card Show Script============== 
     function deleteSuccessCard() {
         const card = document.getElementById("orderSuccessCard");
         if (card) {
             card.remove();
         }
     }
-
     // Failed Card Show Script==============    
     function showFailedCard() {
         const formDivContainer = document.getElementById("formDivContainer");
@@ -148,6 +148,7 @@
         `;
         formDivContainer.appendChild(card);
     }
+    // Delete Failed Card Script============== 
     function deleteFailedCard() {
         const card = document.getElementById("orderFailedCard");
         if (card) {
@@ -155,22 +156,57 @@
         }
     }
 
+    function createTag(tag, type, name, tag_value = null) {
+        const create_element = document.createElement(tag);
+        create_element.type = type;
+        create_element.name = name;
+        create_element.value = tag_value;
+        return create_element
+    }
+
+    async function getProduct(id = null) {
+        let uRL = id ? `/api/v1/product/${id}/` : "/api/v1/product/";
+        try {
+            const response = await fetch(uRL, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+            });
+            const data = await response.json();
+            if (data.status) {
+                return data.data;
+            } else {
+                console.log("Error product fetching: ", data)
+                return null;
+            }
+        } catch (error) {
+            console.error("Error product fetching by id: ", error)
+            return null;
+        }
+    }
+    // (async () => {
+    //     const p = await getProduct("{{ landing_page_product.product.id }}");
+    //     console.log("product:", p);
+    // })();
+    // // const p = await getProduct("{{ landing_page_product.product.id }}");
+    // console.log("product:", p);
+
     const orderForm = document.getElementById("placeOrderForm");
     const confirmOrderBtn = document.getElementById('confirmOrderBtn');
     confirmOrderBtn.addEventListener("click", async function (event) {
         event.preventDefault()
 
-        // product id 
-        const inputProductId = document.createElement("input");
-        inputProductId.type = "hidden";
-        inputProductId.name = "product_id";
-        inputProductId.value = "{{ landing_page_product.product.id }}";
+        inputProductId = createTag("input", "hidden", "product_id", "{{ landing_page_product.product.id }}") // product price 
+        const orderProductFetch = await getProduct("{{ landing_page_product.product.id }}"); // Fetch Selected Product
+        inputProductPrice = createTag("input", "hidden", "product_price", "{{ landing_page_product.product.discount_price }}") // product price 
+        if (!inputProductId && !inputProductPrice) {
+            deleteProcessingCard();
+            showFailedCard();
+            document.getElementById("failedMessage").innerHTML = "Create Tag Issues";
+            orderFailedCard.style.display = "block"
+        }
         orderForm.appendChild(inputProductId);
-        // product price 
-        const inputProductPrice = document.createElement("input");
-        inputProductPrice.type = "hidden";
-        inputProductPrice.name = "product_price";
-        inputProductPrice.value = "{{ landing_page_product.product.discount_price }}";
         orderForm.appendChild(inputProductPrice);
 
         orderForm.style.display = "none";
@@ -206,68 +242,12 @@
 
         } catch (error) {
             deleteProcessingCard();
-            showFailedCard()
+            showFailedCard();
             document.getElementById("failedMessage").innerHTML = error || "নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।";
             orderFailedCard.style.display = "block"
             console.log("Fetch Error: ", error)
         }
     })
-    // orderForm.addEventListener("submit", async function (event) {
-    //     event.preventDefault()
-
-    //     // product id 
-    //     const inputProductId = document.createElement("input");
-    //     inputProductId.type = "hidden";
-    //     inputProductId.name = "product_id";
-    //     inputProductId.value = "{{ landing_page_product.product.id }}";
-    //     orderForm.appendChild(inputProductId);
-    //     // product price 
-    //     const inputProductPrice = document.createElement("input");
-    //     inputProductPrice.type = "hidden";
-    //     inputProductPrice.name = "product_price";
-    //     inputProductPrice.value = "{{ landing_page_product.product.discount_price }}";
-    //     orderForm.appendChild(inputProductPrice);
-
-    //     orderForm.style.display = "none";
-    //     showProcessingCard();
-
-    //     const formData = new FormData(orderForm);
-
-    //     try {
-    //         const csrftoken = '{{ csrf_token }}';
-    //         const response = await fetch("{% url 'create_order' %}", {
-    //             method: "POST",
-    //             body: formData,
-    //             headers: {
-    //                 "X-Requested-With": "XMLHttpRequest",
-    //                 "X-CSRFToken": csrftoken
-    //             },
-    //         });
-    //         if (!response.ok) {
-    //             throw new Error("HTTP error " + response.status);
-    //         }
-    //         const data = await response.json()
-    //         deleteProcessingCard();
-
-    //         if (!data.success) {
-    //             showFailedCard()
-    //             document.getElementById("failedMessage").innerHTML = data.message || "অজানা ত্রুটি হয়েছে!";
-    //             orderFailedCard.style.display = "block"
-    //             console.log("Failed Message: ", data.message)
-    //         } else {
-    //             showSuccessCard()
-    //             console.log("Success Message: ", data.message)
-    //         }
-
-    //     } catch (error) {
-    //         deleteProcessingCard();
-    //         showFailedCard()
-    //         document.getElementById("failedMessage").innerHTML = error || "নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।";
-    //         orderFailedCard.style.display = "block"
-    //         console.log("Fetch Error: ", error)
-    //     }
-
-    // })
 
 
     function closeOrderSuccess() {

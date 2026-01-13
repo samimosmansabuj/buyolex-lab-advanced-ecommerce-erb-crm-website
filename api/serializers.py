@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from settings_app.models import SiteSettings
-from catalog.models import Category
+from catalog.models import Category, Product
 from settings_app.models import Tag, MainSlider
 from catalog.models import Attribute, AttributeValue
 
@@ -66,4 +66,19 @@ class AttributeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attribute
         fields = ["name", "slug", "type", "values"]
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = "__all__"
+    
+    def get_images(self, obj):
+        pic = getattr(obj, "images", None)
+        if not pic or getattr(pic, "url", None):
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(pic.url)
+        return pic.url
 

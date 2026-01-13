@@ -1,9 +1,9 @@
 from django.http import JsonResponse
 from rest_framework import views, status, permissions, viewsets
 from rest_framework.response import Response
-from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer, MainSliderSerializer
+from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer, MainSliderSerializer, ProductSerializer
 from settings_app.models import SiteSettings, Tag, MainSlider
-from catalog.models import Category, Attribute
+from catalog.models import Category, Attribute, Product
 
 
 def api_welcome_message(request):
@@ -165,5 +165,48 @@ class AttributeAPIViews(viewsets.ModelViewSet):
                 {
                     "status": False,
                     "message": str(e)
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                }, status=status.HTTP_400_BAD_REQUEST
             )
+
+class ProductAPIViews(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        # return super().list(request, *args, **kwargs)
+        try:
+            products = self.get_queryset()
+            print("products: ===========", products)
+            return Response(
+                {
+                    "status": True,
+                    "data": ProductSerializer(products, many=True, context={"request": request}).data
+                }, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            product = self.get_object()
+            return Response(
+                {
+                    "status": True,
+                    "data": ProductSerializer(product, context={"request": request}).data
+                }, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+
+

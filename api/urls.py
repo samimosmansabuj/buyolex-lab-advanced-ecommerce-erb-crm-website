@@ -1,11 +1,12 @@
 from django.urls import path
-from .views import api_welcome_message, SiteSettingsAPIViews, CategoryAPIViews, TagAPIViews, AttributeAPIViews, MainSliderAPIViews
+from .views import api_welcome_message, SiteSettingsAPIViews, CategoryAPIViews, TagAPIViews, AttributeAPIViews, MainSliderAPIViews, ProductAPIViews
 from rest_framework.routers import DefaultRouter
 
 app_name = "api"
 
 router = DefaultRouter()
 router.register(r"attribute", AttributeAPIViews, basename="attribute_api")
+router.register(r"product", ProductAPIViews, basename="product_api")
 
 urlpatterns = [
     path("", api_welcome_message, name="api_welcome_message"),
