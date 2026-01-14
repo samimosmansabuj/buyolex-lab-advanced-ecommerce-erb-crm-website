@@ -4,8 +4,8 @@
             <div
                 class="d-flex flex-lg-row flex-column align-items-start align-items-lg-center justify-content-between gap-3">
                 <div class="flex-grow-1">
-                    <h4 class="fw-bold">Order #849</h4>
-                    <p class="mb-0">Customer ID : <a href="javascript:;">6589743</a></p>
+                    <h4 class="fw-bold">Order #{{order.order_id}}</h4>
+                    <p class="mb-0">Customer ID : <a href="javascript:;">{{order.customer.full_name}}</a></p>
                 </div>
                 <div class="overflow-auto">
                     <div class="btn-group position-static">
@@ -51,48 +51,54 @@
         <div class="col-12 col-lg-8 d-flex">
             <div class="card w-100">
                 <div class="card-body">
-                    <h5 class="mb-3 fw-bold">Wishlist<span class="fw-light ms-2">(46)</span></h5>
+                    <h5 class="mb-3 fw-bold">Order Items<span class="fw-light ms-2">({{order.items.count}})</span></h5>
                     <div class="product-table">
                         <div class="table-responsive white-space-nowrap">
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Product Name</th>
-                                        <th>Color</th>
-                                        <th>Size</th>
+                                        <th>Meta Data</th>
                                         <th>Quantity</th>
                                         <th>Price</th>
                                         <th>Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for item in order.items.all %}
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 <div class="product-box">
-                                                    <img src="https://placehold.co/200x150/png" width="70"
-                                                        class="rounded-3" alt="">
+                                                    <img src="{{ item.getPrimaryImage.image.url }}" width="70" class="rounded-3" alt="">
                                                 </div>
                                                 <div class="product-info">
-                                                    <a href="javascript:;" class="product-title">Women Pink Floral
-                                                        Printed</a>
-                                                    <p class="mb-0 product-category">Category : Fashion</p>
+                                                    <a href="javascript:;" class="product-title">
+                                                        {{ item.product.title }}
+                                                    </a>
+                                                    <p class="mb-0 product-category">Category : {{ item.product.category_path }}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>Blue</td>
-                                        <td>Large</td>
-                                        <td>2</td>
-                                        <td>$59</td>
-                                        <td>189</td>
+                                        <td>
+                                            {% if item.variant and item.variant.attributes %}
+                                                {% for key, value in item.variant.attributes.items %}
+                                                    <div>{{ key|capfirst }}: {{ value|capfirst }}</div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>${{ item.d_unit_price }}</td>
+                                        <td class="item_total_price">{{ item.discount_total_price }}</td>
                                     </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
                         <p class="mb-0 fw-bold">Items subtotal :</p>
-                        <p class="mb-0 fw-bold">$8495</p>
+                        <p class="mb-0 fw-bold items_subtotal">$0</p>
                     </div>
                 </div>
             </div>
@@ -105,28 +111,28 @@
                         <div>
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Items subtotal :</p>
-                                <p class="fw-semi-bold">$891</p>
+                                <p class="fw-semi-bold items_subtotal">$0</p>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Discount :</p>
-                                <p class="text-danger fw-semi-bold">-$48</p>
+                                <p class="text-danger fw-semi-bold" id="discount">-$10</p>
                             </div>
-                            <div class="d-flex justify-content-between">
+                            <!-- <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Tax :</p>
-                                <p class="fw-semi-bold">$156.70</p>
-                            </div>
+                                <p class="fw-semi-bold" id="tax">$0</p>
+                            </div> -->
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Subtotal :</p>
-                                <p class="fw-semi-bold">$756</p>
+                                <p class="fw-semi-bold" id="subtotal">$0</p>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Shipping Cost :</p>
-                                <p class="fw-semi-bold">$50</p>
+                                <p class="fw-semi-bold" id="shipping_cost">$50</p>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between border-top pt-4">
                             <h5 class="mb-0 fw-bold">Total :</h5>
-                            <h5 class="mb-0 fw-bold">$925.44</h5>
+                            <h5 class="mb-0 fw-bold" id="total_amount_of_order">$0</h5>
                         </div>
                     </div>
                 </div>
@@ -150,6 +156,39 @@
                 </div>
             </div>
         </div>
+        <script>
+            function calculateTotals(){
+                let itemCells = document.querySelectorAll(".item_total_price");
+                let itemsSubtotal = 0;
+                itemCells.forEach(cell => {
+                    let value = parseFloat(cell.textContent.replace(/[$,]/g, '')) || 0;
+                    itemsSubtotal += value;
+                });
+
+                let discountEl = document.getElementById("discount");
+                let shippingEl = document.getElementById("shipping_cost");
+
+                let discount = parseFloat(discountEl.textContent.replace(/[$,-]/g, '')) || 0;
+                let shipping = parseFloat(shippingEl.textContent.replace(/[$,]/g, '')) || 0;
+
+                let subtotal = itemsSubtotal - discount;
+                let total = subtotal + shipping;
+                
+                document.querySelectorAll(".items_subtotal").forEach(place => {
+                    place.textContent = "$" + itemsSubtotal.toFixed(2);
+                });
+                document.getElementById("subtotal").textContent = "$" + subtotal.toFixed(2);
+                document.getElementById("total_amount_of_order").textContent = "$" + total.toFixed(2);
+            };
+            document.addEventListener("DOMContentLoaded", calculateTotals);
+            document.addEventListener("htmx:afterSwap", function (e) {
+                if (e.target.id === "content-area" || e.target.closest("#content-area")) {
+                    calculateTotals();
+                }
+            });
+
+        </script>
+
     </div><!--end row-->
 
 

@@ -24,6 +24,22 @@ class Category(models.Model):
         self.slug = generate_unique_slug(Category, self.name, old_slug.slug if old_slug else None)
 
         return super().save(*args, **kwargs)
+    
+    @property
+    def get_category_path(self):
+        path = []
+        category = self
+        while category:
+            path.append(category)
+            category = category.parent
+        path_string = None
+        for p in path:
+            if path_string is None:
+                path_string = f"{p.name}"
+            else:
+                path_string += f" -> {p.name}"
+        # return list(reversed(path))
+        return path_string
 
     def __str__(self):
         return self.name
@@ -112,6 +128,13 @@ class Product(models.Model):
     @property
     def active_variante(self):
         return self.variants.filter(is_active=True)
+    
+    @property
+    def category_path(self):
+        if not self.category:
+            return []
+        return self.category.get_category_path
+
 
     def save(self, *args, **kwargs):
         old_slug = Category.objects.get(pk=self.pk) if self.pk else None

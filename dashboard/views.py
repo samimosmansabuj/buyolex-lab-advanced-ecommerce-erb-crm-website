@@ -179,6 +179,8 @@ class OrderView(View):
 class OrderDetailView(View):
     def get(self, request, id):
         order = Order.objects.get(id=id)
+        # for item in order.items.all():
+        #     print("product category path: ", item.product.category_path)
         if request.htmx:
             return render(request, "db_order/partial/partial_order_detail.html", {"order": order})
         return render(request, "db_order/order_detail.html", {"order": order})

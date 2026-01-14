@@ -10,7 +10,8 @@
         <div class="logo-name flex-grow-1">
             <a href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#content-area"
                 hx-push-url="true">
-                <h5 class="mb-0">PencilwoodBD</h5>
+                <h5 class="mb-0">Demo</h5>
+                <!-- <h5 class="mb-0">PencilwoodBD</h5> -->
             </a>
         </div>
         <div class="sidebar-close">
@@ -21,8 +22,7 @@
         <!--navigation-->
         <ul class="metismenu" id="sidenav">
             <li>
-                <a href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#content-area"
-                    hx-push-url="true">
+                <a href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#content-area" hx-push-url="true">
                     <div class="parent-icon"><i class="material-icons-outlined">home</i>
                     </div>
                     <div class="menu-title">Dashboard</div>
@@ -30,6 +30,7 @@
             </li>
 
             <li class="menu-label">Catalog</li>
+            <!-- Product Section------- -->
             <li>
                 <a href="javascript:;" class="has-arrow">
                     <div class="parent-icon"><i class="material-icons-outlined">shopping_bag</i>
@@ -38,14 +39,12 @@
                 </a>
                 <ul>
                     <li>
-                        <a href="{% url 'product_list' %}" hx-get="{% url 'product_list' %}" hx-target="#content-area"
-                            hx-push-url="true">
+                        <a href="{% url 'product_list' %}" hx-get="{% url 'product_list' %}" hx-target="#content-area" hx-push-url="true">
                             <i class="material-icons-outlined">arrow_right</i>Products
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'product_add' %}" hx-get="{% url 'product_add' %}" hx-target="#content-area"
-                            hx-push-url="true">
+                        <a href="{% url 'product_add' %}" hx-get="{% url 'product_add' %}" hx-target="#content-area" hx-push-url="true">
                             <i class="material-icons-outlined">arrow_right</i>Add Product
                         </a>
                     </li>
@@ -57,6 +56,7 @@
                     </li>
                 </ul>
             </li>
+            <!-- Category Section------- -->
             <li>
                 <a href="javascript:;" class="has-arrow">
                     <div class="parent-icon"><i class="material-icons-outlined">shopping_bag</i>
@@ -75,6 +75,7 @@
                     </li>
                 </ul>
             </li>
+            <!-- Order Section------- -->
             <li>
                 <a class="has-arrow" href="javascript:;">
                     <div class="parent-icon"><i class="material-icons-outlined">card_giftcard</i>

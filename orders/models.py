@@ -102,6 +102,7 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.order_id}"
 
+from catalog.utix import PRODUCT_MEDIA_ROLE
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -116,6 +117,13 @@ class OrderItem(models.Model):
     discount_total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     # fulfillment_status = models.CharField(max_length=50, default='pending')
+
+    @property
+    def getPrimaryImage(self):
+        image = self.variant.images.all().first() if self.variant else self.product.images.filter(role=PRODUCT_MEDIA_ROLE.PRIMARY)
+        if image:
+            return image
+        return self.product.images.first()
 
     def save(self, *args, **kwargs):
         if not self.total_price:
