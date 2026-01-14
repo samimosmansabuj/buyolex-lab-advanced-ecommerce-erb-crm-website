@@ -693,7 +693,7 @@
                 const content_ids = [String(card.dataset.sku)];
                 const content_name = card.querySelector('span').textContent + " Soronika";
                 const value = Number("{{ landing_page_product.product.discount_price|default:'0' }}");
-                FacebookViewContentEvent(content_ids, content_name, value);
+                // FacebookViewContentEvent(content_ids, content_name, value);
 
 
                 openModalBtn.setAttribute('data-sku', card.dataset.sku);
@@ -731,7 +731,7 @@
             const content_ids = [String(sku)];
             const content_name = openModalBtn.getAttribute('data-content-name');
             const value = openModalBtn.getAttribute('data-value');
-            FacebookAddToCartEvent(content_ids, content_name, value);
+            // FacebookAddToCartEvent(content_ids, content_name, value);
 
             renderDynamicFields(currentType);
             addProductSku(sku);
@@ -796,7 +796,10 @@
                 `;
             } else if (type.toLowerCase() === 'death') {
                 html = `
-                <div class="input-group full-width"><label>মৃত ব্যক্তির নাম</label><input name="deceasedName" type="text" required></div>
+                <div class="input-group full-width">
+                    <label>মৃত ব্যক্তির নাম</label>
+                    <input name="deceasedName" type="text" required>
+                </div>
                 <div class="form-grid">
                     <div class="input-group"><label>মৃত্যুর তারিখ</label><input name="deceasedDate" type="date" placeholder="DD-MM-YYYY"></div>
                     <div class="input-group"><label>পিতা/মাতার নাম</label><input name="parentName" type="text"></div>
@@ -813,7 +816,7 @@
                 </div>
                 <div class="input-group full-width">
                     <label>স্মরণীয় কথা / দোয়া</label>
-                    <textarea name="deceasedNote"></textarea>
+                    <textarea name="varianteNote"></textarea>
                 </div>
                 `;
             }

@@ -17,11 +17,18 @@
                         <input type="tel" name="phone" placeholder="01XXXXXXXXX" required>
                     </div>
                 </div>
-
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 15px; margin-top: 3px;">
+                    <input type="checkbox" name="have_email" id="have_email" style="margin: 0; width: 5%; height: 18px;">
+                    <label for="have_email" style="margin: 0; cursor: pointer; font-size: 17px;">Have you any email?</label>
+                </div>
                 <div class="form-grid">
-                    <div class="input-group full-width">
+                    <div class="input-group" id="email_group" style="display: none;">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" placeholder="samim@gmail.com">
+                    </div>
+                    <div class="input-group">
                         <label>WhatsApp (ডিজাইন দেখার জন্য)</label>
-                        <input type="tel" name="whatsapp" placeholder="01XXXXXXXXX" required>
+                        <input type="tel" name="whatsapp" placeholder="01XXXXXXXXX">
                     </div>
                 </div>
 
@@ -63,7 +70,7 @@
                 <div class="form-grid">
                     <div class="input-group">
                         <label>ডেলিভারি টাইপ</label>
-                        <select name="deliveryType">
+                        <select name="deliveryType" required>
                             <option value="home">হোম ডেলিভারি</option>
                             <option value="branch">সুন্দরবন কুরিয়ার (শাখা)</option>
                         </select>
@@ -78,8 +85,8 @@
 
         <div class="modal-footer">
             <div class="checkbox-wrapper" id="order-modal-footer-tag-line">
-                <input type="checkbox" id="agreeCheck">
-                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ করবেন।</label>
+                <!-- <input type="checkbox" id="agreeCheck">
+                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ করবেন।</label> -->
             </div>
             <button class="btn-confirm" id="confirmOrderBtn" type="submit">কনফার্ম অর্ডার</button>
         </div>
@@ -123,7 +130,7 @@
         formDivContainer.appendChild(card);
 
 
-        let second = 5
+        let second = 3
         orderModelFooterTagLine.innerHTML = ""
         confirmOrderBtn.innerHTML = ""
         orderModelFooterTagLine.outerHTML = `
@@ -176,15 +183,15 @@
         }
     }
 
+
     function retryOrder() {
         deleteFailedCard();
         modalStyleDisplayHanlde("block");
     }
-
     function closeOrderSuccess() {
-        // document.getElementById("orderModal").style.display = "none";
-        // location.reload();
-        alert("Ok")
+        document.getElementById("orderModal").style.display = "none";
+        location.reload();
+        // alert("Ok")
     }
 
     function modalStyleDisplayHanlde(value){
@@ -192,7 +199,6 @@
         orderModelFooterTagLine.style.display = value;
         confirmOrderBtn.style.display = value;
     }
-
     function createTag(tag, type, name, tag_value = null) {
         const create_element = document.createElement(tag);
         create_element.type = type;
@@ -200,7 +206,6 @@
         create_element.value = tag_value;
         return create_element
     }
-
     async function getProduct(id = null) {
         let uRL = id ? `/api/v1/product/${id}/` : "/api/v1/product/";
         try {
@@ -221,11 +226,31 @@
         }
     }
 
+
+    function validateOrderForm(form) {
+        const elements = form.querySelectorAll("input, select, textarea");
+        for (let el of elements) {
+            if (el.disabled || el.type === "hidden" || el.type === "button" || el.type === "submit") {
+                continue;
+            }
+            if (el.hasAttribute("required") && !el.value.trim()) {
+                const label = el.closest(".input-group")?.querySelector("label")?.innerText || el.name;
+                alert(`${label} ফিল্ড পূরণ করা বাধ্যতামূলক`);
+                el.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
     const orderForm = document.getElementById("placeOrderForm");
     const confirmOrderBtn = document.getElementById('confirmOrderBtn');
     const orderModelFooterTagLine = document.getElementById('order-modal-footer-tag-line');
     confirmOrderBtn.addEventListener("click", async function (event) {
-        event.preventDefault()
+        event.preventDefault();
+        if (!validateOrderForm(orderForm)){
+            return;
+        }
 
         inputProductId = createTag("input", "hidden", "product_id", "{{ landing_page_product.product.id }}") // product price 
         inputProductPrice = createTag("input", "hidden", "product_price", "{{ landing_page_product.product.discount_price }}") // product price 
@@ -245,7 +270,7 @@
 
         const orderProductFetch = await getProduct("{{ landing_page_product.product.id }}"); // Fetch Selected Product
         const content_ids = [String(formData.get("variante"))];
-        FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
+        // FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
 
         try {
             const csrftoken = '{{ csrf_token }}';
@@ -267,6 +292,7 @@
             } else {
                 showSuccessCard()
                 document.getElementById("closeModalBtn").style.display = "none"
+                // FacebookPurchaseEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
             }
 
         } catch (error) {
@@ -283,21 +309,21 @@
     const upazilaSelect = document.getElementById('upazila');
     const areaSelect = document.getElementById('area');
 
-    fetch('https://bdapi.vercel.app/api/v.1/district')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 200 && data.success) {
-                data.data.forEach(district => {
-                    const option = document.createElement('option')
-                    option.value = district.name.toLowerCase()
-                    option.setAttribute('district_id', district.id);
-                    option.textContent = district.bn_name
-                    districtSelect.appendChild(option)
-                });
-            }
-        })
-        .catch(error => console.error('Error fetching district:', error))
+    // *** District List Fetch ***
+    fetch('https://bdapi.vercel.app/api/v.1/district').then(response => response.json()).then(data => {
+        if (data.status === 200 && data.success) {
+            data.data.forEach(district => {
+                const option = document.createElement('option')
+                option.value = district.name.toLowerCase()
+                option.setAttribute('district_id', district.id);
+                option.textContent = district.bn_name
+                districtSelect.appendChild(option)
+            });
+        }
+    })
+    .catch(error => console.error('Error fetching district:', error))
 
+    // *** Upazila Based on District List Fetch ***
     districtSelect.addEventListener("change", function () {
         document.getElementById('upazila_div').style.display = "block";
         area_div = document.getElementById('area_div').style.display = "none";
@@ -323,6 +349,7 @@
             .catch(error => console.error("Error fetching upazila: ", error))
     })
 
+    // *** Area Based on Upazila List Fetch ***
     upazilaSelect.addEventListener("change", function () {
         area_div = document.getElementById('area_div').style.display = "block";
 
@@ -336,7 +363,7 @@
                 if (data.status === 200 && data.success) {
                     data.data.forEach(area => {
                         const option = document.createElement('option')
-                        option.value = area.id
+                        option.value = area.name.toLowerCase()
                         option.textContent = area.bn_name
                         areaSelect.appendChild(option)
                     })
@@ -345,4 +372,13 @@
             .catch(error => console.error("Error fetching upazila: ", error))
     })
 
+    // *** Check If you have email ***
+    function haveEmailCheckboxFunction(){
+        const haveEmailCheckbox = document.getElementById("have_email")
+        const emailField = document.getElementById('email_group');
+        haveEmailCheckbox.addEventListener('change', function() {
+            emailField.style.display = this.checked ? "block" : "none";
+        })
+    }
+    haveEmailCheckboxFunction() 
 </script>

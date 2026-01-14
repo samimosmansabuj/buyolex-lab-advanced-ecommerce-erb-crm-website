@@ -13,6 +13,7 @@ from orders.models import Order, OrderItem
 from accounts.models import CustomUser, CustomerProfile, CustomerAddress
 from .utils import OrderConfirmatinoEmailSend
 from django.db import transaction
+from django.utils.text import slugify
 
 
 def product_landing_page(request):
@@ -68,23 +69,34 @@ class CreateOrderView(View):
             raise Exception("Input Price and Product Price not Same!")
         return True
 
+    def generate_unique_username(self, name):
+        base = slugify(name) or "user"
+        username = base
+        counter = 1
+        while CustomUser.objects.filter(username=username).exists():
+            username = f"{username}-{counter}"
+            counter += 1
+        return username
+
     def get_user_profile(self, name, phone, email=None):
-        if CustomUser.objects.filter(email=email).exists():
-            return CustomUser.objects.get(email=email).customer_profile
-        else:
-            if email:
-                user = CustomUser.objects.create(
-                    email=email, full_name=name
-                )
-                customer = user.customer_profile
-                customer.phone = phone
-                customer.save()
-            else:
-                customer, created = CustomerProfile.objects.get_or_create(
-                    phone = phone,
-                    full_name = name
-                )
+        if email:
+            user = CustomUser.objects.filter(email=email).first()
+            if user:
+                return user.customer_profile
+            
+            user = CustomUser.objects.create(
+                email=email, full_name=name, username=self.generate_unique_username(name)
+            )
+            customer = user.customer_profile
+            customer.phone = phone
+            customer.save()
             return customer
+        else:
+            customer, created = CustomerProfile.objects.get_or_create(
+                phone=phone,
+                defaults={"full_name": name}
+            )
+        return customer
     
     def get_make_address(self, customer, address, district, upazila, area):
         address = CustomerAddress.objects.create(
@@ -104,12 +116,23 @@ class CreateOrderView(View):
         ]
         missing_fields = [field for field in required_fields if not data.get(field)]
         return missing_fields
-        
     
+    def get_metadata(self, data):
+        EXTRA_PERSONAL_FIELDS = [
+            "babyName", "babyDOB", "fatherName", "motherName", "birthNote", "groomName", "brideName", "marriageDate", "marriageNote", "deceasedName", "deceasedDate", "parentName", "deceasedNote", "rememberDate", "varianteNote", "receiver",
+        ]
+
+        extra_personal_info = {
+            field: data.get(field)
+            for field in EXTRA_PERSONAL_FIELDS
+            if data.get(field) not in [None, ""]
+        }
+        return extra_personal_info
+
     def post(self, request, *args, **kwargs):
         try:
             data = request.POST
-            
+            extra_personal_info = self.get_metadata(data)
             missing_fields = self.verify_input(data)
             if missing_fields:
                 return JsonResponse(
@@ -119,6 +142,7 @@ class CreateOrderView(View):
                     },
                     status=HTTPStatus.BAD_REQUEST
                 )
+
             with transaction.atomic():
                 product = self.get_product(data.get("product_id"))
                 variante = None
@@ -131,7 +155,7 @@ class CreateOrderView(View):
                 address = self.get_make_address(customer, data.get("address"), data.get("district"), data.get("upazila"), data.get("area"))
                 
                 qty = data.get("qty")
-                metadata = {"note": data.get("notes")}
+                metadata = {"note": data.get("notes"), "extra_personal_info": extra_personal_info}
                 order = Order.objects.create(
                     customer = customer,
                     billing_address = address,
@@ -165,101 +189,7 @@ class CreateOrderView(View):
                     "message": str(e)
                 }, status=HTTPStatus.BAD_REQUEST
             )
-    # def post(self, request, *args, **kwargs):
-    #     try:
-    #         data = request.POST
-    #         data_copy = data.copy()
-            
-    #         required_fields = [
-    #             "product_id", "product_price", "name", "phone",
-    #             "address", "district", "upazila", "area", "qty", "notes"
-    #         ]
 
-    #         # 🔒 Required field validation
-    #         missing_fields = [
-    #             field for field in required_fields
-    #             if not data_copy.get(field) or str(data_copy.get(field)).strip() == ""
-    #         ]
-    #         print("missing_fields: ", missing_fields)
-    #         if missing_fields:
-                
-    #             return JsonResponse(
-    #                 {
-    #                     "success": False,
-    #                     "message": "All fields are required!",
-    #                     "errors": {
-    #                         field: "This field is required."
-    #                         for field in missing_fields
-    #                     }
-    #                 },
-    #                 status=HTTPStatus.BAD_REQUEST
-    #             )
-
-    #         with transaction.atomic():
-    #             product = self.get_product(data.get("product_id"))
-
-    #             variante = None
-    #             price = product.discount_price
-    #             if data.get("variante"):
-    #                 variante, price = self.get_product_variante(
-    #                     product, data.get("variante")
-    #                 )
-
-    #             self.price_verify___(
-    #                 data.get("product_price"),
-    #                 price
-    #             )
-
-    #             customer = self.get_user_profile(
-    #                 data.get("name"),
-    #                 data.get("phone"),
-    #                 data.get("email") or None
-    #             )
-
-    #             address = self.get_make_address(
-    #                 customer,
-    #                 data.get("address"),
-    #                 data.get("district"),
-    #                 data.get("upazila"),
-    #                 data.get("area")
-    #             )
-
-    #             order = Order.objects.create(
-    #                 customer=customer,
-    #                 billing_address=address,
-    #                 shipping_address=address,
-    #                 metadata={"note": data.get("notes")}
-    #             )
-
-    #             OrderItem.objects.create(
-    #                 order=order,
-    #                 product=product,
-    #                 variant=variante,
-    #                 quantity=int(data.get("qty")),
-    #                 c_unit_price=product.price,
-    #                 d_unit_price=product.discount_price,
-    #             )
-
-    #             if data.get("email"):
-    #                 send_mail = OrderConfirmatinoEmailSend(order, data.get("email"))
-    #                 send_mail.order_confirmation_mail_send()
-
-    #             return JsonResponse(
-    #                 {
-    #                     "success": True,
-    #                     "message": "Order Successfully Created!"
-    #                 },
-    #                 status=HTTPStatus.CREATED
-    #             )
-
-    #     except Exception as e:
-    #         return JsonResponse(
-    #             {
-    #                 "success": False,
-    #                 "message": str(e)
-    #             },
-    #             status=HTTPStatus.BAD_REQUEST
-    #         )
 
 
 
