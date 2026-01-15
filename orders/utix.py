@@ -25,7 +25,7 @@ class REVIEW_STATUS(models.TextChoices):
 
 
 class DELIVERY_TYPE(models.TextChoices):
-    COD = "cod"
+    COD = "COD"
     ONLINE_PAYMENT = "online_payment"
     DELIVERY = "delivery"
     PICKUP = "pickup"

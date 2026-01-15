@@ -7,6 +7,9 @@ from django.db import transaction
 from http import HTTPStatus
 from orders.models import Order
 from orders.utix import ORDER_STATUS
+import json
+from django.db import transaction
+from django.http import QueryDict
 
 def dashboard(request):
     if request.htmx:
@@ -127,6 +130,8 @@ def delete_category(request, id):
 
 
 
+from accounts.models import CustomUser
+from django.utils.text import slugify
 
 class OrderView(View):
     def get(self, request):
@@ -178,11 +183,83 @@ class OrderView(View):
 
 class OrderDetailView(View):
     def get(self, request, id):
-        order = Order.objects.get(id=id)
-        # for item in order.items.all():
-        #     print("product category path: ", item.product.category_path)
+        order = self.get_order(id)
         if request.htmx:
             return render(request, "db_order/partial/partial_order_detail.html", {"order": order})
         return render(request, "db_order/order_detail.html", {"order": order})
 
+    def get_order(self, id):
+        return get_object_or_404(Order, id=id)
+
+    def generate_unique_username(self, name):
+        base = slugify(name) or "user"
+        username = base
+        counter = 1
+        while CustomUser.objects.filter(username=username).exists():
+            username = f"{username}-{counter}"
+            counter += 1
+        return username
+
+    def update_customer_profile(self, data, profile):
+        profile.full_name = data.get("full_name", profile.full_name)
+        profile.phone = data.get("phone", profile.phone)
+        if data.get("email"):
+            if profile.user:
+                profile.user.email = data.get("email", profile.user.email)
+                profile.user.save()
+            else:
+                user = CustomUser.objects.create(
+                    email=data.get("email"),
+                    full_name=profile.full_name,
+                    username=self.generate_unique_username(profile.full_name)
+                )
+                profile.user = user
+        profile.save()
+        return True
+    
+    def update_order_object(self, data, order):
+        order.delivery_date = data.get("delivery_date", order.delivery_date)
+        order.shipping_address = data.get("shipping_address", order.shipping_address)
+        order.payment_status = data.get("payment_status", order.payment_status)
+        order.order_status = data.get("order_status", order.order_status)
+        order.save()
+        return True
+
+    def post(self, request, id):
+        if request.POST.get("_method") == "PATCH":
+            return self.patch(request, id)
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+    def patch(self, request, id):
+        order = self.get_order(id)
+        # data = json.loads(request.body)
+        data = request.POST
+        print("data: ", data)
+        if order:
+            try:
+                with transaction.atomic():
+                    profile = order.customer
+                    self.update_customer_profile(data, profile)
+                    self.update_order_object(data, order)
+                    return JsonResponse(
+                        {
+                            "success": True,
+                            "message": "Order updated successfully"
+                        }, status=200
+                    )
+                
+            except Exception as e:
+                print("error: ", e)
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": str(e)
+                    }
+                )
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method.lower() == "patch":
+            return self.patch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 

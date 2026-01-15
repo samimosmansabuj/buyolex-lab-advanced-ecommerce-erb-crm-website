@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import CustomUser, CustomerProfile
 from catalog.models import Product, ProductVariant
 from .utix import *
+from catalog.utix import PRODUCT_MEDIA_ROLE
 import random, string
 import uuid
 
@@ -54,6 +55,12 @@ class Order(models.Model):
     delivery_date = models.DateField(null=True, blank=True)
     delivery_type = models.CharField(max_length=50, choices=DELIVERY_TYPE.choices, default=DELIVERY_TYPE.COD)
 
+    def get_order_status_choise(self):
+        return ORDER_STATUS.choices
+    
+    def get_payment_status_choise(self):
+        return ORDER_PAYMENT_STATUS.choices
+
     @property
     def get_items_total(self):
         product_item = len(self.items.all())
@@ -102,7 +109,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.order_id}"
 
-from catalog.utix import PRODUCT_MEDIA_ROLE
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
