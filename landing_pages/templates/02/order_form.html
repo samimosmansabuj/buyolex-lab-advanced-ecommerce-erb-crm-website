@@ -270,7 +270,7 @@
 
         const orderProductFetch = await getProduct("{{ landing_page_product.product.id }}"); // Fetch Selected Product
         const content_ids = [String(formData.get("variante"))];
-        // FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
+        FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
 
         try {
             const csrftoken = '{{ csrf_token }}';
@@ -292,7 +292,7 @@
             } else {
                 showSuccessCard()
                 document.getElementById("closeModalBtn").style.display = "none"
-                // FacebookPurchaseEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
+                FacebookPurchaseEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
             }
 
         } catch (error) {

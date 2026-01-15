@@ -184,6 +184,7 @@ class OrderView(View):
 class OrderDetailView(View):
     def get(self, request, id):
         order = self.get_order(id)
+        print("order.delivery_date: ", order.delivery_date)
         if request.htmx:
             return render(request, "db_order/partial/partial_order_detail.html", {"order": order})
         return render(request, "db_order/order_detail.html", {"order": order})
@@ -218,7 +219,8 @@ class OrderDetailView(View):
         return True
     
     def update_order_object(self, data, order):
-        order.delivery_date = data.get("delivery_date", order.delivery_date)
+        if data.get("delivery_date"):
+            order.delivery_date = data.get("delivery_date", order.delivery_date)
         order.shipping_address = data.get("shipping_address", order.shipping_address)
         order.payment_status = data.get("payment_status", order.payment_status)
         order.order_status = data.get("order_status", order.order_status)
@@ -230,10 +232,9 @@ class OrderDetailView(View):
             return self.patch(request, id)
         return JsonResponse({"error": "Invalid request"}, status=400)
 
-
     def patch(self, request, id):
         order = self.get_order(id)
-        # data = json.loads(request.body)
+        
         data = request.POST
         print("data: ", data)
         if order:

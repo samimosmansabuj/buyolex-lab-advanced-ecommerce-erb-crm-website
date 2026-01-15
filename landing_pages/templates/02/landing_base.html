@@ -693,7 +693,7 @@
                 const content_ids = [String(card.dataset.sku)];
                 const content_name = card.querySelector('span').textContent + " Soronika";
                 const value = Number("{{ landing_page_product.product.discount_price|default:'0' }}");
-                // FacebookViewContentEvent(content_ids, content_name, value);
+                FacebookViewContentEvent(content_ids, content_name, value);
 
 
                 openModalBtn.setAttribute('data-sku', card.dataset.sku);
@@ -731,7 +731,7 @@
             const content_ids = [String(sku)];
             const content_name = openModalBtn.getAttribute('data-content-name');
             const value = openModalBtn.getAttribute('data-value');
-            // FacebookAddToCartEvent(content_ids, content_name, value);
+            FacebookAddToCartEvent(content_ids, content_name, value);
 
             renderDynamicFields(currentType);
             addProductSku(sku);
