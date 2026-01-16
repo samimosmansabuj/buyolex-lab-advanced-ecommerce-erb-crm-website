@@ -304,9 +304,9 @@
 
         const formData = new FormData(orderForm);
 
-        const orderProductFetch = await getProduct("{{ landing_page_product.product.id }}"); // Fetch Selected Product
+        const orderProductFetch = await getProduct("{{ landing_page_product.product.id }}");
         const content_ids = [String(formData.get("variante"))];
-        // FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
+        FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
 
         try {
             const csrftoken = '{{ csrf_token }}';
