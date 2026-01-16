@@ -119,8 +119,12 @@ class CreateOrderView(View):
     
     def get_metadata(self, data):
         EXTRA_PERSONAL_FIELDS = [
-            "babyName", "babyDOB", "fatherName", "motherName", "birthNote", "groomName", "brideName", "marriageDate", "marriageNote", "deceasedName", "deceasedDate", "parentName", "deceasedNote", "rememberDate", "varianteNote", "receiver",
+            "babyName", "babyBirthPlace", "babyDOB", "babyBirthTime", "fatherName", "motherName", "birthNote",
+            "groomName", "brideName", "groomFatherName", "brideFatherName", "groomMotherName", "brideMotherName", "marriageDate", "marriageNote",
+            "deceasedName", "deceasedDate", "parentName", "deceasedNote",
+            "remeberName", "rememberDate", "remeberTime", "varianteNote", "receiver",
         ]
+        
 
         extra_personal_info = {
             field: data.get(field)
@@ -160,7 +164,8 @@ class CreateOrderView(View):
                     customer = customer,
                     billing_address = address,
                     shipping_address = address,
-                    metadata=metadata
+                    metadata=metadata,
+                    shipping_total=data.get("delivery_charge")
                 )
                 
                 OrderItem.objects.create(
@@ -189,8 +194,6 @@ class CreateOrderView(View):
                     "message": str(e)
                 }, status=HTTPStatus.BAD_REQUEST
             )
-
-
 
 
 def get_order(request, id):

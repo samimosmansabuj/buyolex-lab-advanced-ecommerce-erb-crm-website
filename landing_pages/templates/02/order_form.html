@@ -53,7 +53,7 @@
                     <div class="input-group" id="upazila_div" style="display: none;">
                         <label for="upazila">থানা</label>
                         <select id="upazila" name="upazila" required>
-                            <option>-- সিলেক্ট করুন --</option>
+                            <option value="">-- সিলেক্ট করুন --</option>
                         </select>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                     <div class="input-group full-width">
                         <label>ডেলিভারি ঠিকানা</label>
                         <select id="area" name="area" required>
-                            <option>-- সিলেক্ট করুন --</option>
+                            <option value="">-- সিলেক্ট করুন --</option>
                         </select>
                     </div>
                 </div>
@@ -83,13 +83,49 @@
             </form>
         </div>
 
+        <style>
+            .modal-footer {
+                padding: 10px 16px;
+            }
+
+            .price-summary {
+                width: 100%;
+                margin-bottom: 4px;
+                padding-top: 4px;
+                border-top: 1px solid #eee;
+            }
+
+            .price-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 13.5px;
+                margin-bottom: 2px;
+                line-height: 1.2;
+            }
+
+            .btn-confirm {
+                margin-top: 4px;
+            }
+        </style>
+
         <div class="modal-footer">
-            <div class="checkbox-wrapper" id="order-modal-footer-tag-line">
-                <!-- <input type="checkbox" id="agreeCheck">
-                <label for="agreeCheck">আমি নিশ্চিত করছি যে উপরের তথ্য সঠিক। ডিজাইনার আমার WhatsApp এ যোগাযোগ করবেন।</label> -->
+            <!-- Price Summary -->
+            <div class="price-summary">
+                <div class="price-row">
+                    <span>ডেলিভারি চার্জ</span>
+                    <strong>৳<span id="deliveryChargeText">0.00</span></strong>
+                </div>
             </div>
-            <button class="btn-confirm" id="confirmOrderBtn" type="submit">কনফার্ম অর্ডার</button>
+            <div class="checkbox-wrapper" id="order-modal-footer-tag-line">
+
+            </div>
+            <!-- Confirm Button -->
+            <button class="btn-confirm" id="confirmOrderBtn" type="submit">
+                কনফার্ম অর্ডার (৳<span id="totalPriceText">0.00</span>)
+            </button>
         </div>
+
+
     </div>
 </div>
 
@@ -194,10 +230,10 @@
         // alert("Ok")
     }
 
-    function modalStyleDisplayHanlde(value){
-        orderForm.style.display = value;
-        orderModelFooterTagLine.style.display = value;
-        confirmOrderBtn.style.display = value;
+    function modalStyleDisplayHanlde(value__){
+        orderForm.style.display = value__;
+        orderModelFooterTagLine.style.display = value__;
+        confirmOrderBtn.style.display = value__;
     }
     function createTag(tag, type, name, tag_value = null) {
         const create_element = document.createElement(tag);
@@ -270,7 +306,7 @@
 
         const orderProductFetch = await getProduct("{{ landing_page_product.product.id }}"); // Fetch Selected Product
         const content_ids = [String(formData.get("variante"))];
-        FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
+        // FacebookInitiateCheckEvent(content_ids, orderProductFetch.title, "{{ landing_page_product.product.discount_price }}")
 
         try {
             const csrftoken = '{{ csrf_token }}';
@@ -305,6 +341,51 @@
 </script>
 
 <script>
+    const productPrice = parseFloat('{{landing_page_product.product.discount_price}}');
+    let deliveryCharge = parseFloat(0);
+    updatePriceUI();
+
+    function setDeliveryChargeInput(value) {
+        let input = document.querySelector('input[name="delivery_charge"]');
+
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'delivery_charge';
+            document.getElementById('placeOrderForm').appendChild(input);
+        }
+        input.value = value;
+    }
+    
+    function updatePriceUI() {
+        const total = productPrice + deliveryCharge
+        document.getElementById('deliveryChargeText').innerText = deliveryCharge.toFixed(2);
+        document.getElementById('totalPriceText').innerText = total.toFixed(2);
+    }
+
+    function fetchDeliveryCharge({ district, upazila = null, union = null }) {
+        const params = new URLSearchParams({
+            district: district
+        });
+
+        if (upazila) params.append("upazilla", upazila);
+        if (union) params.append("union", union);
+
+        fetch(`/api/v1/get-delivery-charge?${params.toString()}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status) {
+                    deliveryCharge = parseFloat(data.delivery_charge);
+                    setDeliveryChargeInput(deliveryCharge);
+                    updatePriceUI();
+                }
+            })
+            .catch(err => console.error("Delivery charge error:", err));
+    }
+
+
+
+
     const districtSelect = document.getElementById('district');
     const upazilaSelect = document.getElementById('upazila');
     const areaSelect = document.getElementById('area');
@@ -327,6 +408,10 @@
     districtSelect.addEventListener("change", function () {
         document.getElementById('upazila_div').style.display = "block";
         area_div = document.getElementById('area_div').style.display = "none";
+
+        const district = this.value;
+        if (!district) return;
+        fetchDeliveryCharge({ district });
 
 
         const districtId = this.options[this.selectedIndex].getAttribute('district_id');

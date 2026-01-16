@@ -693,7 +693,7 @@
                 const content_ids = [String(card.dataset.sku)];
                 const content_name = card.querySelector('span').textContent + " Soronika";
                 const value = Number("{{ landing_page_product.product.discount_price|default:'0' }}");
-                FacebookViewContentEvent(content_ids, content_name, value);
+                // FacebookViewContentEvent(content_ids, content_name, value);
 
 
                 openModalBtn.setAttribute('data-sku', card.dataset.sku);
@@ -723,7 +723,7 @@
         openModalBtn.addEventListener('click', () => {
             const sku = openModalBtn.getAttribute('data-sku');
 
-            if (!currentType && !this.dataset.sku) {
+            if (!currentType) {
                 alert('অনুগ্রহ করে প্রথমে একটি ডিজাইন নির্বাচন করুন।');
                 return;
             }
@@ -731,7 +731,7 @@
             const content_ids = [String(sku)];
             const content_name = openModalBtn.getAttribute('data-content-name');
             const value = openModalBtn.getAttribute('data-value');
-            FacebookAddToCartEvent(content_ids, content_name, value);
+            // FacebookAddToCartEvent(content_ids, content_name, value);
 
             renderDynamicFields(currentType);
             addProductSku(sku);
@@ -746,6 +746,7 @@
             html = `
             <input name="variante" type="text" value="${sku}" hidden>
             <input name="qty" type="number" value="1" hidden>
+            <input name="product_price" type="number" value="${'{{landing_page_product.product.discount_price}}'}" hidden>
             `;
             hiddenFields.innerHTML = html;
         }
@@ -772,6 +773,14 @@
                     <div class="input-group"><label>কনের নাম</label><input name="brideName" type="text" required></div>
                 </div>
                 <div class="form-grid">
+                    <div class="input-group"><label>বরের পিতার নাম</label><input name="groomFatherName" type="text" required></div>
+                    <div class="input-group"><label>কনের পিতার নাম</label><input name="brideFatherName" type="text" required></div>
+                </div>
+                <div class="form-grid">
+                    <div class="input-group"><label>বরের মাতার নাম</label><input name="groomMotherName" type="text" required></div>
+                    <div class="input-group"><label>কনের মাতার নাম</label><input name="brideMotherName" type="text" required></div>
+                </div>
+                <div class="form-grid">
                     <div class="input-group"><label>বিয়ের তারিখ</label><input name="marriageDate" type="date" placeholder="DD-MM-YYYY / বাংলা" required></div>
                 </div>
                 <div class="input-group full-width">
@@ -783,7 +792,11 @@
                 html = `
                 <div class="form-grid">
                     <div class="input-group"><label>শিশুর নাম</label><input name="babyName" type="text" required></div>
+                    <div class="input-group"><label>জন্মস্থান</label><input name="babyBirthPlace" type="text" required></div>
+                </div>
+                <div class="form-grid">
                     <div class="input-group"><label>জন্ম তারিখ</label><input name="babyDOB" type="date" placeholder="DD-MM-YYYY" required></div>
+                    <div class="input-group"><label>জন্ম সময়</label><input name="babyBirthTime" type="time" required></div>
                 </div>
                 <div class="form-grid">
                     <div class="input-group"><label>পিতার নাম</label><input name="fatherName" type="text"></div>
@@ -809,10 +822,16 @@
                     <textarea name="deceasedNote"></textarea>
                 </div>
                 `;
-            } else {
+            } 
+            else {
                 html = `
+                <div class="input-group full-width">
+                    <label>স্মরণীয় নাম</label>
+                    <input name="remeberName" type="text" placeholder="Memoriable Name" required>
+                </div>
                 <div class="form-grid">
                     <div class="input-group"><label>স্মরণীয় তারিখ</label><input name="remeberDate" type="date" placeholder="DD-MM-YYYY"></div>
+                    <div class="input-group"><label>স্মরণীয় সময়</label><input name="remeberTime" type="time"></div>
                 </div>
                 <div class="input-group full-width">
                     <label>স্মরণীয় কথা / দোয়া</label>

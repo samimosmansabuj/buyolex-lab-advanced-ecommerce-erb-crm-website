@@ -11,7 +11,7 @@
 </button>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    function orderPageScript(){
         const editCardBtn = document.getElementById("edit-card-btn");
         const cancelCardBtn = document.getElementById("cancel-card-btn");
         const updateBtn = document.getElementById("update-card-btn");
@@ -108,5 +108,16 @@
                 alert(`Something went wrong! ${data.message}`);
             });
         });
+    
+    }
+
+    document.addEventListener("DOMContentLoaded", orderPageScript);
+    document.addEventListener("htmx:afterSwap", function (e) {
+        if (e.target.id === "content-area" || e.target.closest("#content-area")) {
+            orderPageScript();
+        }
     });
+
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     });
 </script>

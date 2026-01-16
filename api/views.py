@@ -1,7 +1,7 @@
 from django.http import JsonResponse
-from rest_framework import views, status, permissions, viewsets
+from rest_framework import views, status, permissions, viewsets, exceptions
 from rest_framework.response import Response
-from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer, MainSliderSerializer, ProductSerializer
+from .serializers import SiteSettingsSerializer, CategorySerializer, TagSerializer, AttributeSerializer, MainSliderSerializer, ProductSerializer, DeliveryChargeCalculateSerializer
 from settings_app.models import SiteSettings, Tag, MainSlider
 from catalog.models import Category, Attribute, Product
 
@@ -209,4 +209,46 @@ class ProductAPIViews(viewsets.ModelViewSet):
                 }, status=status.HTTP_400_BAD_REQUEST
             )
 
-
+class DeliveryChargeCalculate(views.APIView):
+    permission_classes = []
+    def calculate_charge(self, district: str, upazilla=None, union=None):
+        if district.lower() == "dhaka":
+            delivery_charge = 80
+        else:
+            delivery_charge = 120
+        return delivery_charge
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            # serializer = DeliveryChargeCalculateSerializer(data=request.data)
+            serializer = DeliveryChargeCalculateSerializer(
+                data=request.query_params
+            )
+            serializer.is_valid(raise_exception=True)
+            
+            district = serializer.validated_data.get("district")
+            upazilla = serializer.validated_data.get("upazilla", None)
+            union = serializer.validated_data.get("union", None)
+            delivery_charge = self.calculate_charge(district, upazilla, union)
+            
+            return Response(
+                {
+                    "status": True,
+                    "delivery_charge": delivery_charge
+                }, status=status.HTTP_200_OK
+            )
+        except exceptions.ValidationError:
+            error = {key: str(value[0]) for key, value in serializer.errors.items()}
+            return Response(
+                {
+                    "status": False,
+                    "message": error
+                }
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": str(e)
+                }
+            )
