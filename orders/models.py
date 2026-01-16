@@ -89,6 +89,10 @@ class Order(models.Model):
         discount_amount = self.get_current_total - self.get_discount_total
         discount_percentage = (discount_amount / self.get_current_total) * 100
         return round(discount_percentage, 2)
+    
+    @property
+    def get_total_order_amount(self):
+        return self.get_discount_total() + self.shipping_total
 
     def generate_order_id(self):
         while True:

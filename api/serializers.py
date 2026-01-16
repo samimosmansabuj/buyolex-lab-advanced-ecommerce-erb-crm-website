@@ -82,3 +82,8 @@ class ProductSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(pic.url)
         return pic.url
 
+
+class DeliveryChargeCalculateSerializer(serializers.Serializer):
+    district = serializers.CharField()
+    upazilla = serializers.CharField(required=False)
+    union = serializers.CharField(required=False)

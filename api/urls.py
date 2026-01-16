@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import api_welcome_message, SiteSettingsAPIViews, CategoryAPIViews, TagAPIViews, AttributeAPIViews, MainSliderAPIViews, ProductAPIViews
+from .views import api_welcome_message, SiteSettingsAPIViews, CategoryAPIViews, TagAPIViews, AttributeAPIViews, MainSliderAPIViews, ProductAPIViews, DeliveryChargeCalculate
 from rest_framework.routers import DefaultRouter
 
 app_name = "api"
@@ -14,7 +14,9 @@ urlpatterns = [
     path("main-slider/", MainSliderAPIViews.as_view(), name="main_slider_api"),
 
     path("category/", CategoryAPIViews.as_view(), name="category_api"),
-    path("tag/", TagAPIViews.as_view(), name="tag_api")
+    path("tag/", TagAPIViews.as_view(), name="tag_api"),
+    
+    path("get-delivery-charge", DeliveryChargeCalculate.as_view(), name="delivery_charge_api")
 ]
 
 urlpatterns += router.urls
