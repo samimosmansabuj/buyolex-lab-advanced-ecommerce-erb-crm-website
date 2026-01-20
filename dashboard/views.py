@@ -143,7 +143,7 @@ class OrderView(View):
     def get(self, request):
         if not request.user.is_authenticated:
             return redirect('product_landing_page')
-        elif request.user.user_type != USER_TYPE.ADMIN:
+        elif request.user.user_type not in [USER_TYPE.ADMIN, USER_TYPE.STAFF, USER_TYPE.SUPER_ADMIN]:
             return redirect('product_landing_page')
         
         orders = Order.objects.all()
@@ -154,7 +154,7 @@ class OrderView(View):
     def post(self, request):
         if not request.user.is_authenticated:
             return redirect('product_landing_page')
-        elif request.user.user_type != USER_TYPE.ADMIN:
+        elif request.user.user_type not in [USER_TYPE.ADMIN, USER_TYPE.STAFF, USER_TYPE.SUPER_ADMIN]:
             return redirect('product_landing_page')
         
         try:
@@ -199,8 +199,12 @@ class OrderView(View):
 
 class OrderDetailView(View):
     def get(self, request, id):
+        if not request.user.is_authenticated:
+            return redirect('product_landing_page')
+        elif request.user.user_type not in [USER_TYPE.ADMIN, USER_TYPE.STAFF, USER_TYPE.SUPER_ADMIN]:
+            return redirect('product_landing_page')
+        
         order = self.get_order(id)
-        print("order.delivery_date: ", order.delivery_date)
         if request.htmx:
             return render(request, "db_order/partial/partial_order_detail.html", {"order": order})
         return render(request, "db_order/order_detail.html", {"order": order})
@@ -244,6 +248,11 @@ class OrderDetailView(View):
         return True
 
     def post(self, request, id):
+        if not request.user.is_authenticated:
+            return redirect('product_landing_page')
+        elif request.user.user_type not in [USER_TYPE.ADMIN, USER_TYPE.STAFF, USER_TYPE.SUPER_ADMIN]:
+            return redirect('product_landing_page')
+        
         if request.POST.get("_method") == "PATCH":
             return self.patch(request, id)
         return JsonResponse({"error": "Invalid request"}, status=400)
