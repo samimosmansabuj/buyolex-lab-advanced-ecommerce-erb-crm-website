@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from catalog.models import Product, Category
 from catalog.utix import CATEGORY_STATUS
 from django.views import View
@@ -10,23 +10,30 @@ from orders.utix import ORDER_STATUS
 import json
 from django.db import transaction
 from django.http import QueryDict
+from accounts.models import CustomUser
+from django.utils.text import slugify
+from django.contrib.auth.decorators import login_required
+from accounts.utix import USER_TYPE
 
+@login_required(login_url='admin_login')
 def dashboard(request):
     if request.htmx:
         return render(request, "db_home/main_wrapper.html")
     return render(request, "dashboard.html")
 
+@login_required(login_url='admin_login')
 def product_list(request):
     if request.htmx:
         return render(request, "db_product/partial/partial_product_list.html")
     return render(request, "db_product/product_list.html")
 
+@login_required(login_url='admin_login')
 def add_product(request):
     if request.htmx:
         return render(request, "db_product/partial/partial_add_product.html")
     return render(request, "db_product/add_product.html")
 
-
+@login_required(login_url='admin_login')
 def add_category(request):
     if request.method == "POST":
         Category.objects.create(
@@ -41,6 +48,7 @@ def add_category(request):
         return render(request, "db_category/partial/partial_add_category.html")
     return render(request, "db_category/add_category.html")
 
+# @login_required(login_url='admin_login')
 class CategoryView(View):
     def get(self, request):
         categories = Category.objects.all()
@@ -89,6 +97,7 @@ class CategoryView(View):
                 "message": str(e)
             }, status=HTTPStatus.BAD_REQUEST)
 
+@login_required(login_url='admin_login')
 def get_category(request, id):
     try:
         category = get_object_or_404(Category, id=id)
@@ -108,6 +117,7 @@ def get_category(request, id):
             "message": str(e)
         }, status=HTTPStatus.BAD_REQUEST)
 
+@login_required(login_url='admin_login')
 def delete_category(request, id):
     if request.method == "DELETE":
         try:
@@ -129,18 +139,24 @@ def delete_category(request, id):
     }, status=HTTPStatus.BAD_REQUEST)
 
 
-
-from accounts.models import CustomUser
-from django.utils.text import slugify
-
 class OrderView(View):
     def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('product_landing_page')
+        elif request.user.user_type != USER_TYPE.ADMIN:
+            return redirect('product_landing_page')
+        
         orders = Order.objects.all()
         if request.htmx:
             return render(request, "db_order/partial/partial_order_list.html", {"orders": orders})
         return render(request, "db_order/order_list.html", {"orders": orders})
     
     def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect('product_landing_page')
+        elif request.user.user_type != USER_TYPE.ADMIN:
+            return redirect('product_landing_page')
+        
         try:
             with transaction.atomic():
                 data = request.POST
