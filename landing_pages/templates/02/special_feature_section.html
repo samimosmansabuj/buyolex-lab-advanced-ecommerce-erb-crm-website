@@ -1,0 +1,63 @@
+<style>
+    .feature-section {
+        margin-top: 80px;
+        text-align: center;
+    }
+
+    .feature-section h2 {
+        margin-bottom: 40px;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .feature-card {
+        background: var(--surface);
+        border: 1px solid var(--surface-border);
+        border-radius: var(--radius-lg);
+        padding: 25px;
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-6px);
+    }
+
+    .feature-card h4 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+</style>
+<section class="feature-section">
+    <h2>কেন স্মৃতি স্বরণিকা আলাদা?</h2>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h4>🎨 কাস্টম ডিজাইন</h4>
+            <p>আপনার তথ্য অনুযায়ী ইউনিক ডিজাইন তৈরি</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>🔥 লেজার এনগ্রেভিং</h4>
+            <p>দীর্ঘস্থায়ী ও নিখুঁত খোদাই</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>🌳 প্রিমিয়াম কাঠ</h4>
+            <p>উচ্চ মানের কাঠ ব্যবহার</p>
+        </div>
+
+        <div class="feature-card">
+            <h4>📦 সেফ ডেলিভারি</h4>
+            <p>বাংলাদেশের যেকোনো স্থানে</p>
+        </div>
+    </div>
+</section>

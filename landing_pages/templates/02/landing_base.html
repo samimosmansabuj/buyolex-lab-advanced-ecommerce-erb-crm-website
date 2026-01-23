@@ -607,6 +607,13 @@
     <div class="container">
         {% block body_container %}
         {% endblock body_container %}
+
+        <div style="text-align:center; margin-top:60px;">
+            <button class="btn-primary" onclick="document.getElementById('openModalBtn').click()">
+                এখনই অর্ডার করুন
+            </button>
+        </div>
+
     </div>
 
     {% include "02/order_form.html" %}
@@ -822,7 +829,7 @@
                     <textarea name="deceasedNote"></textarea>
                 </div>
                 `;
-            } 
+            }
             else {
                 html = `
                 <div class="input-group full-width">

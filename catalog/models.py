@@ -134,6 +134,16 @@ class Product(models.Model):
         if not self.category:
             return []
         return self.category.get_category_path
+    
+    @property
+    def primary_image(self):
+        primary_image = self.images.filter(role=PRODUCT_MEDIA_ROLE.PRIMARY).first()
+        if primary_image:
+            return primary_image.image.url
+        first_image = self.images.first()
+        if first_image:
+            return first_image.image.url
+        return None
 
 
     def save(self, *args, **kwargs):

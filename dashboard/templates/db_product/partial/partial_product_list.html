@@ -15,7 +15,7 @@
     <!--end breadcrumb-->
 
     <div class="product-count d-flex align-items-center gap-3 gap-lg-4 mb-4 fw-medium flex-wrap font-text1">
-        <a href="javascript:;"><span class="me-1">All</span><span class="text-secondary">(88754)</span></a>
+        <a href="javascript:;"><span class="me-1">All</span><span class="text-secondary">({{products.count}})</span></a>
         <a href="javascript:;"><span class="me-1">Published</span><span class="text-secondary">(56242)</span></a>
         <a href="javascript:;"><span class="me-1">Drafts</span><span class="text-secondary">(17)</span></a>
         <a href="javascript:;"><span class="me-1">On Discount</span><span class="text-secondary">(88754)</span></a>
@@ -99,15 +99,13 @@
                                 </th>
                                 <th>Product Name</th>
                                 <th>Price</th>
-                                <th>Category</th>
-                                <th>Tags</th>
                                 <th>Rating</th>
-                                <th>Vendor</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for product in products %}
                             <tr>
                                 <td>
                                     <input class="form-check-input" type="checkbox">
@@ -115,34 +113,28 @@
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="product-box">
-                                            <img src="https://placehold.co/200x150/png" width="70" class="rounded-3"
-                                                alt="">
+                                            <img src="{{ product.primary_image }}" width="70" class="rounded-3"
+                                                alt="{{ product.primary_image }}">
                                         </div>
                                         <div class="product-info">
-                                            <a href="javascript:;" class="product-title">Women Pink Floral
-                                                Printed</a>
-                                            <p class="mb-0 product-category">Category : Fashion</p>
+                                            <a href="javascript:;" class="product-title">
+                                                {{ product.title|truncatechars:30 }}
+                                            </a>
+                                            <p class="mb-0 product-category">
+                                                Category: {{ product.category_path }}
+                                            </p>
+                                            <!-- <p class="mb-0 product-category">Category : Fashion</p> -->
                                         </div>
                                     </div>
                                 </td>
-                                <td>$49</td>
-                                <td>Palazzos</td>
-                                <td>
-                                    <div class="product-tags">
-                                        <a href="javascript:;" class="btn-tags">Jeans</a>
-                                        <a href="javascript:;" class="btn-tags">iPhone</a>
-                                    </div>
-                                </td>
+                                <td>৳{{ product.price }}</td>
                                 <td>
                                     <div class="product-rating">
                                         <i class="bi bi-star-fill text-warning me-2"></i><span>5.0</span>
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="javascript:;">Michle Shoes England</a>
-                                </td>
-                                <td>
-                                    Nov 12, 10:45 PM
+                                    {{ products.created_at|date:"M d, Y" }}
                                 </td>
                                 <td>
                                     <div class="dropdown">
@@ -161,7 +153,7 @@
                                     </div>
                                 </td>
                             </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

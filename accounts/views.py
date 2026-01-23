@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from accounts.models import CustomUser
 from .utix import USER_TYPE
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 class UserLoginView(View):
     def get(self, request):
@@ -22,3 +22,8 @@ class UserLoginView(View):
                 return render(request, 'db_auth/login.html', {'error': 'Invalid credentials or insufficient permissions.'})
         except CustomUser.DoesNotExist:
             return render(request, 'db_auth/login.html', {'error': 'User does not exist.'})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('admin_login')

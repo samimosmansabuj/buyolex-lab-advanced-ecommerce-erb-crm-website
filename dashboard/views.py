@@ -23,9 +23,10 @@ def dashboard(request):
 
 @login_required(login_url='admin_login')
 def product_list(request):
+    products = Product.objects.all()
     if request.htmx:
-        return render(request, "db_product/partial/partial_product_list.html")
-    return render(request, "db_product/product_list.html")
+        return render(request, "db_product/partial/partial_product_list.html", {"products": products})
+    return render(request, "db_product/product_list.html", {"products": products})
 
 @login_required(login_url='admin_login')
 def add_product(request):

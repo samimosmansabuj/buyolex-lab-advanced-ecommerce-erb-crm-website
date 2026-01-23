@@ -76,7 +76,7 @@
             </li>
 
             <!-- Language Section ======================= -->
-            <li class="nav-item dropdown">
+            <!-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="avascript:;"
                     data-bs-toggle="dropdown"><img src="{% static 'dashboard_assets/images/county/02.png' %}" width="22"
                         alt="">
@@ -91,10 +91,10 @@
                                 class="ms-2">Catalan</span></a>
                     </li>
                 </ul>
-            </li>
+            </li> -->
 
             <!-- all Done Section =============== -->
-            <li class="nav-item dropdown position-static  d-md-flex d-none">
+            <!-- <li class="nav-item dropdown position-static  d-md-flex d-none">
                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-auto-close="outside"
                     data-bs-toggle="dropdown" href="javascript:;"><i class="material-icons-outlined">done_all</i></a>
                 <div class="dropdown-menu dropdown-menu-end mega-menu shadow-lg p-4 p-lg-5">
@@ -118,13 +118,13 @@
                                     </div>
                                 </div>
                             </div>
-                        </div><!--end row-->
+                        </div>
                     </div>
                 </div>
-            </li>
+            </li> -->
 
             <!-- Important Application List============= -->
-            <li class="nav-item dropdown">
+            <!-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-auto-close="outside"
                     data-bs-toggle="dropdown" href="javascript:;"><i class="material-icons-outlined">apps</i></a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-apps shadow-lg p-3">
@@ -161,11 +161,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div><!--end row-->
+                        </div>
 
                     </div>
                 </div>
-            </li>
+            </li> -->
 
             <!-- Notification Section ====================== -->
             <li class="nav-item dropdown">
@@ -216,12 +216,12 @@
             </li>
 
             <!-- Shopping Cart Section ========================= -->
-            <li class="nav-item d-md-flex d-none">
+            <!-- <li class="nav-item d-md-flex d-none">
                 <a class="nav-link position-relative" data-bs-toggle="offcanvas" href="#offcanvasCart"><i
                         class="material-icons-outlined">shopping_cart</i>
                     <span class="badge-notify">8</span>
                 </a>
-            </li>
+            </li> -->
 
             <li class="nav-item dropdown">
                 <a href="javascrpt:;" class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
@@ -236,13 +236,13 @@
                             <h5 class="user-name mb-0 fw-bold">Hello, Jhon</h5>
                         </div>
                     </a>
-                    <hr class="dropdown-divider">
+                    <!-- <hr class="dropdown-divider">
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:;"><i
                             class="material-icons-outlined">person_outline</i>Profile</a>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:;"><i
-                            class="material-icons-outlined">local_bar</i>Setting</a>
+                            class="material-icons-outlined">local_bar</i>Setting</a> -->
                     <hr class="dropdown-divider">
-                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:;"><i
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{% url 'admin_logout' %}"><i
                             class="material-icons-outlined">power_settings_new</i>Logout</a>
                 </div>
             </li>
