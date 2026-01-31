@@ -98,12 +98,12 @@ class CreateOrderView(View):
             )
         return customer
     
-    def get_make_address(self, customer, address, district, upazila, area):
+    def get_make_address(self, customer, district, upazila, area, address):
         address = CustomerAddress.objects.create(
             customer=customer,
             address= address,
-            area= area,
-            upazila= upazila,
+            # area= area,
+            # upazila= upazila,
             district= district,
         )
         return address.get_address
@@ -111,7 +111,7 @@ class CreateOrderView(View):
     def verify_input(self, data):
         required_fields = [
             "product_id", "product_price", "name", "phone",
-            "address", "district", "upazila", "area", "qty",
+            "address", "district", "qty",
             # "notes"
         ]
         missing_fields = [field for field in required_fields if not data.get(field)]
@@ -156,7 +156,7 @@ class CreateOrderView(View):
                 self.price_verify___(data.get("product_price"), product.discount_price)
                 customer = self.get_user_profile(data.get("name"), data.get("phone"), data.get("email") or None)
 
-                address = self.get_make_address(customer, data.get("address"), data.get("district"), data.get("upazila"), data.get("area"))
+                address = self.get_make_address(customer, data.get("district"), data.get("upazila", None), data.get("area", None), data.get("address", None))
                 
                 qty = data.get("qty")
                 metadata = {"note": data.get("notes"), "extra_personal_info": extra_personal_info}

@@ -50,22 +50,22 @@
                         </select>
                     </div>
 
-                    <div class="input-group" id="upazila_div" style="display: none;">
+                    <!-- <div class="input-group" id="upazila_div" style="display: none;">
                         <label for="upazila">থানা</label>
                         <select id="upazila" name="upazila" required>
                             <option value="">-- সিলেক্ট করুন --</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
 
-                <div class="form-grid" id="area_div" style="display: none;">
+                <!-- <div class="form-grid" id="area_div" style="display: none;">
                     <div class="input-group full-width">
                         <label>ডেলিভারি ঠিকানা</label>
                         <select id="area" name="area" required>
                             <option value="">-- সিলেক্ট করুন --</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="form-grid">
                     <div class="input-group">
@@ -166,7 +166,7 @@
         formDivContainer.appendChild(card);
 
 
-        let second = 3
+        let second = 5
         orderModelFooterTagLine.innerHTML = ""
         confirmOrderBtn.innerHTML = ""
         orderModelFooterTagLine.outerHTML = `
@@ -387,8 +387,8 @@
 
 
     const districtSelect = document.getElementById('district');
-    const upazilaSelect = document.getElementById('upazila');
-    const areaSelect = document.getElementById('area');
+    // const upazilaSelect = document.getElementById('upazila');
+    // const areaSelect = document.getElementById('area');
 
     // *** District List Fetch ***
     fetch('https://bdapi.vercel.app/api/v.1/district').then(response => response.json()).then(data => {
@@ -403,61 +403,67 @@
         }
     })
     .catch(error => console.error('Error fetching district:', error))
-
-    // *** Upazila Based on District List Fetch ***
-    districtSelect.addEventListener("change", function () {
-        document.getElementById('upazila_div').style.display = "block";
-        area_div = document.getElementById('area_div').style.display = "none";
-
+    districtSelect.addEventListener("change", function(){
         const district = this.value;
         if (!district) return;
         fetchDeliveryCharge({ district });
-
-
-        const districtId = this.options[this.selectedIndex].getAttribute('district_id');
-        upazilaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
-        if (!districtId) return;
-
-        fetch(`https://bdapi.vercel.app/api/v.1/upazilla/${districtId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 200 && data.success) {
-                    data.data.forEach(upazila => {
-                        const option = document.createElement('option')
-                        option.value = upazila.name.toLowerCase()
-                        option.setAttribute('upazila_id', upazila.id)
-                        option.textContent = upazila.bn_name
-                        upazilaSelect.appendChild(option)
-                    })
-                }
-            })
-            .catch(error => console.error("Error fetching upazila: ", error))
     })
 
-    // *** Area Based on Upazila List Fetch ***
-    upazilaSelect.addEventListener("change", function () {
-        area_div = document.getElementById('area_div').style.display = "block";
+    // // *** Upazila Based on District List Fetch ***
+    // districtSelect.addEventListener("change", function () {
+    //     document.getElementById('upazila_div').style.display = "block";
+    //     area_div = document.getElementById('area_div').style.display = "none";
 
-        const upazilaId = this.options[this.selectedIndex].getAttribute('upazila_id');
-        areaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
-        if (!upazilaId) return;
+    //     const district = this.value;
+    //     if (!district) return;
+    //     fetchDeliveryCharge({ district });
 
-        fetch(`https://bdapi.vercel.app/api/v.1/union/${upazilaId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 200 && data.success) {
-                    data.data.forEach(area => {
-                        const option = document.createElement('option')
-                        option.value = area.name.toLowerCase()
-                        option.textContent = area.bn_name
-                        areaSelect.appendChild(option)
-                    })
-                }
-            })
-            .catch(error => console.error("Error fetching upazila: ", error))
-    })
+
+    //     const districtId = this.options[this.selectedIndex].getAttribute('district_id');
+    //     upazilaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
+    //     if (!districtId) return;
+
+    //     fetch(`https://bdapi.vercel.app/api/v.1/upazilla/${districtId}`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.status === 200 && data.success) {
+    //                 data.data.forEach(upazila => {
+    //                     const option = document.createElement('option')
+    //                     option.value = upazila.name.toLowerCase()
+    //                     option.setAttribute('upazila_id', upazila.id)
+    //                     option.textContent = upazila.bn_name
+    //                     upazilaSelect.appendChild(option)
+    //                 })
+    //             }
+    //         })
+    //         .catch(error => console.error("Error fetching upazila: ", error))
+    // })
+
+    // // *** Area Based on Upazila List Fetch ***
+    // upazilaSelect.addEventListener("change", function () {
+    //     area_div = document.getElementById('area_div').style.display = "block";
+
+    //     const upazilaId = this.options[this.selectedIndex].getAttribute('upazila_id');
+    //     areaSelect.innerHTML = "<option>-- সিলেক্ট করুন --</option>";
+    //     if (!upazilaId) return;
+
+    //     fetch(`https://bdapi.vercel.app/api/v.1/union/${upazilaId}`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.status === 200 && data.success) {
+    //                 data.data.forEach(area => {
+    //                     const option = document.createElement('option')
+    //                     option.value = area.name.toLowerCase()
+    //                     option.textContent = area.bn_name
+    //                     areaSelect.appendChild(option)
+    //                 })
+    //             }
+    //         })
+    //         .catch(error => console.error("Error fetching upazila: ", error))
+    // })
 
     // *** Check If you have email ***
+
     function haveEmailCheckboxFunction(){
         const haveEmailCheckbox = document.getElementById("have_email")
         const emailField = document.getElementById('email_group');
