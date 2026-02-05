@@ -78,22 +78,28 @@ class CreateOrderView(View):
             counter += 1
         return username
 
-    def get_user_profile(self, name, phone, email=None):
+    def get_user_profile(self, name, phone, whatsapp=None, email=None):
         if email:
             user = CustomUser.objects.filter(email=email).first()
             if user:
-                return user.customer_profile
+                customer_profile = user.customer_profile
+                if whatsapp:
+                    customer_profile.whatsapp = whatsapp
+                customer_profile.save()
+                return customer_profile
             
             user = CustomUser.objects.create(
                 email=email, full_name=name, username=self.generate_unique_username(name)
             )
             customer = user.customer_profile
             customer.phone = phone
+            if whatsapp:
+                customer.whatsapp = whatsapp
             customer.save()
             return customer
         else:
             customer, created = CustomerProfile.objects.get_or_create(
-                phone=phone,
+                phone=phone, whatsapp=whatsapp,
                 defaults={"full_name": name}
             )
         return customer
@@ -154,7 +160,7 @@ class CreateOrderView(View):
                     variante, price = self.get_product_variante(product, data.get("variante"))
                 
                 self.price_verify___(data.get("product_price"), product.discount_price)
-                customer = self.get_user_profile(data.get("name"), data.get("phone"), data.get("email") or None)
+                customer = self.get_user_profile(data.get("name"), data.get("phone"), data.get("whatsapp"), data.get("email") or None)
 
                 address = self.get_make_address(customer, data.get("district"), data.get("upazila", None), data.get("area", None), data.get("address", None))
                 
@@ -172,7 +178,7 @@ class CreateOrderView(View):
                     order=order,
                     product=product,
                     variant=variante,
-                    quantity=1,
+                    quantity=qty,
                     c_unit_price=product.price,
                     d_unit_price=product.discount_price,
                 )
@@ -187,7 +193,6 @@ class CreateOrderView(View):
                     }, status=HTTPStatus.CREATED
                 )
         except Exception as e:
-            print("error: ", str(e))
             return JsonResponse(
                 {
                     "success": False,

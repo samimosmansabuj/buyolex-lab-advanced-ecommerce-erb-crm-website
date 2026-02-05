@@ -139,18 +139,38 @@ def delete_category(request, id):
         "message": "Invalid request"
     }, status=HTTPStatus.BAD_REQUEST)
 
-
+from django.db.models import Count
 class OrderView(View):
+    def status_wise_order_count(self):
+        qs = (
+            Order.objects
+            .values('order_status')
+            .annotate(total=Count('id'))
+        )
+        order_count = {status: 0 for status, _ in ORDER_STATUS.choices}
+        for row in qs:
+            order_count[row['order_status']] = row['total']
+        return order_count
+    
+    def get_order_queryset(self, request):
+        status = request.GET.get('status')
+        if status and status in ORDER_STATUS.values:
+            return Order.objects.filter(order_status=status)
+        return Order.objects.all()
+    
     def get(self, request):
         if not request.user.is_authenticated:
             return redirect('product_landing_page')
         elif request.user.user_type not in [USER_TYPE.ADMIN, USER_TYPE.STAFF, USER_TYPE.SUPER_ADMIN]:
             return redirect('product_landing_page')
         
-        orders = Order.objects.all()
+        context = {
+            "orders": self.get_order_queryset(request),
+            "order_count": self.status_wise_order_count(),
+        }
         if request.htmx:
-            return render(request, "db_order/partial/partial_order_list.html", {"orders": orders})
-        return render(request, "db_order/order_list.html", {"orders": orders})
+            return render(request, "db_order/partial/partial_order_list.html", context)
+        return render(request, "db_order/order_list.html", context)
     
     def post(self, request):
         if not request.user.is_authenticated:
@@ -225,6 +245,7 @@ class OrderDetailView(View):
     def update_customer_profile(self, data, profile):
         profile.full_name = data.get("full_name", profile.full_name)
         profile.phone = data.get("phone", profile.phone)
+        profile.whatsapp = data.get("whatsapp", profile.whatsapp)
         if data.get("email"):
             if profile.user:
                 profile.user.email = data.get("email", profile.user.email)
@@ -262,7 +283,6 @@ class OrderDetailView(View):
         order = self.get_order(id)
         
         data = request.POST
-        print("data: ", data)
         if order:
             try:
                 with transaction.atomic():

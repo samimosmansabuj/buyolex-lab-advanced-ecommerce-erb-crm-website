@@ -77,6 +77,7 @@ class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, blank=True, null=True, related_name="customer_profile")
     profile_uuid = models.CharField(max_length=255, unique=True, editable=False)
     phone = models.CharField(max_length=14, blank=True, null=True)
+    whatsapp = models.CharField(max_length=14, blank=True, null=True)
     full_name = models.CharField(max_length=50, blank=True)
     profile_photo = models.ImageField(upload_to="user/profile_picture/", blank=True, null=True)
     

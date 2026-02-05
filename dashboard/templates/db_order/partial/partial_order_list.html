@@ -15,12 +15,36 @@
     <!--end breadcrumb-->
 
     <div class="product-count d-flex align-items-center gap-3 gap-lg-4 mb-4 fw-medium flex-wrap font-text1">
-        <a href="javascript:;"><span class="me-1">All</span><span class="text-secondary">(85472)</span></a>
-        <a href="javascript:;"><span class="me-1">Pending Payment</span><span class="text-secondary">(86)</span></a>
-        <a href="javascript:;"><span class="me-1">Incomplete</span><span class="text-secondary">(76)</span></a>
-        <a href="javascript:;"><span class="me-1">Completed</span><span class="text-secondary">(8759)</span></a>
-        <a href="javascript:;"><span class="me-1">Refunded</span><span class="text-secondary">(769)</span></a>
-        <a href="javascript:;"><span class="me-1">Failed</span><span class="text-secondary">(42)</span></a>
+        <a href="{% url 'order_list' %}?status=new" hx-get="{% url 'order_list' %}?status=all" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'all' %}active{% endif %}">
+            <span class="me-1">All</span>
+            <span class="text-secondary">({{ orders.count }})</span>
+        </a>
+        <a href="{% url 'order_list' %}?status=new" hx-get="{% url 'order_list' %}?status=new" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'new' %}active{% endif %}">
+            <span class="me-1">NEW</span>
+            <span class="text-secondary">({{ order_count.new }})</span>
+        </a>
+        <a href="{% url 'order_list' %}?status=confirmed" hx-get="{% url 'order_list' %}?status=confirmed" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'confirmed' %}active{% endif %}">
+            <span class="me-1">CONFIRMED</span>
+            <span class="text-secondary">({{ order_count.confirmed }})</span>
+        </a>
+        <a href="{% url 'order_list' %}?status=shipped" hx-get="{% url 'order_list' %}?status=shipped" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'shipped' %}active{% endif %}">
+            <span class="me-1">SHIPPED</span>
+            <span class="text-secondary">({{ order_count.shipped }})</span>
+        </a>
+        <a href="{% url 'order_list' %}?status=delivered" hx-get="{% url 'order_list' %}?status=delivered" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'delivered' %}active{% endif %}">
+            <span class="me-1">DELIVERED</span>
+            <span class="text-secondary">({{ order_count.delivered }})</span>
+        </a>
+        <a href="{% url 'order_list' %}?status=cancelled" hx-get="{% url 'order_list' %}?status=cancelled" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'cancelled' %}active{% endif %}">
+            <span class="me-1">CANCELLED</span>
+            <span class="text-secondary">({{ order_count.cancelled }})</span>
+        </a>
     </div>
 
     <div class="row g-3">
@@ -31,7 +55,7 @@
                     class="material-icons-outlined position-absolute ms-3 translate-middle-y start-0 top-50 fs-5">search</span>
             </div>
         </div>
-        <div class="col-auto flex-grow-1 overflow-auto">
+        <!-- <div class="col-auto flex-grow-1 overflow-auto">
             <div class="btn-group position-static">
                 <div class="btn-group position-static">
                     <button type="button" class="btn border btn-filter dropdown-toggle px-4" data-bs-toggle="dropdown"
@@ -76,7 +100,7 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-filter px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
@@ -87,8 +111,10 @@
                 {% include 'db_order/modal/order_form_modal.html' %}
             </div>
         </div>
-    </div><!--end row-->
+    </div>
+    <!--end row-->
 
+    <!-- Order List Table Div------- -->
     <div class="card mt-4">
         <div class="card-body">
             <div class="customer-table">
@@ -100,8 +126,8 @@
                                     <input class="form-check-input" type="checkbox">
                                 </th>
                                 <th>Order Id</th>
-                                <th>Price</th>
                                 <th>Customer</th>
+                                <th>Price</th>
                                 <th>Payment Status</th>
                                 <th>Completed Payment</th>
                                 <th>Delivery Type</th>
@@ -116,9 +142,6 @@
                                     <input class="form-check-input" type="checkbox">
                                 </td>
                                 <td>
-                                    <!-- <a href="{% url 'order_list' %}" hx-get="{% url 'order_list' %}" hx-target="#content-area"
-                            hx-push-url="true" hx-trigger="click, refreshOrderList from:body" hx-swap="innerHTML"><i
-                                class="material-icons-outlined">arrow_right</i>Order</a> -->
                                     <a href="{% url 'order_detail' order.id %}"
                                         hx-get="{% url 'order_detail' order.id %}" hx-target="#content-area"
                                         hx-push-url="true" hx-trigger="click, refreshReturnOrderDetailView from:body"
@@ -126,7 +149,6 @@
                                         #{{ order.order_id }}
                                     </a>
                                 </td>
-                                <td>${{ order.get_discount_total }}</td>
                                 <td>
                                     <a class="d-flex align-items-center gap-3" href="javascript:;">
                                         <div class="customer-pic">
@@ -136,6 +158,7 @@
                                         <p class="mb-0 customer-name fw-bold">{{ order.customer.full_name }}</p>
                                     </a>
                                 </td>
+                                <td>৳{{ order.get_discount_total }}</td>
                                 <td><span
                                         class="lable-table bg-success-subtle text-success rounded border border-success-subtle font-text2 fw-bold">
                                         {{ order.order_status }}
@@ -148,10 +171,10 @@
                                 </td>
                                 <td>
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-filter edit-order-btn" data-id="{{ order.id }}"
+                                        <!-- <button class="btn btn-sm btn-filter edit-order-btn" data-id="{{ order.id }}"
                                             data-bs-toggle="modal" data-bs-target="#OrderFormModal">
                                             <i class="bi bi-pencil"></i>
-                                        </button>
+                                        </button> -->
                                         <button class="btn btn-sm btn-filter delete-order-btn" data-id="{{ order.id }}"
                                             data-bs-toggle="modal" data-bs-target="#deleteOrderModal">
                                             <i class="bi bi-trash"></i>
