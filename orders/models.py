@@ -92,7 +92,7 @@ class Order(models.Model):
     
     @property
     def get_total_order_amount(self):
-        return self.get_discount_total() + self.shipping_total
+        return self.get_discount_total + self.shipping_total
 
     def generate_order_id(self):
         while True:

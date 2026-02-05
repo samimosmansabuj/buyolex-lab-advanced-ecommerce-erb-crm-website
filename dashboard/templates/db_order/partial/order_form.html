@@ -29,20 +29,6 @@
                                 <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
                             </ul>
                         </div>
-                        <div class="btn-group position-static">
-                            <button type="button" class="btn btn-outline-primary dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                More Actions
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                                <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -95,8 +81,8 @@
                                             {% endif %}
                                         </td>
                                         <td>{{ item.quantity }}</td>
-                                        <td>${{ item.d_unit_price }}</td>
-                                        <td class="item_total_price">{{ item.discount_total_price }}</td>
+                                        <td>৳{{ item.d_unit_price }}</td>
+                                        <td class="item_total_price">৳{{ item.discount_total_price }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -105,7 +91,7 @@
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
                         <p class="mb-0 fw-bold">Items subtotal :</p>
-                        <p class="mb-0 fw-bold items_subtotal">$0</p>
+                        <p class="mb-0 fw-bold items_subtotal">৳0</p>
                     </div>
                 </div>
             </div>
@@ -118,28 +104,28 @@
                         <div>
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Items subtotal :</p>
-                                <p class="fw-semi-bold items_subtotal">$0</p>
+                                <p class="fw-semi-bold items_subtotal">৳0</p>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Discount :</p>
-                                <p class="text-danger fw-semi-bold" id="discount">-$0</p>
+                                <p class="text-danger fw-semi-bold" id="discount">-৳0</p>
                             </div>
                             <!-- <div class="d-flex justify-content-between">
                                     <p class="fw-semi-bold">Tax :</p>
-                                    <p class="fw-semi-bold" id="tax">$0</p>
+                                    <p class="fw-semi-bold" id="tax">৳0</p>
                                 </div> -->
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Subtotal :</p>
-                                <p class="fw-semi-bold" id="subtotal">$0</p>
+                                <p class="fw-semi-bold" id="subtotal">৳0</p>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <p class="fw-semi-bold">Shipping Cost :</p>
-                                <p class="fw-semi-bold" id="shipping_cost">${{order.shipping_total}}</p>
+                                <p class="fw-semi-bold" id="shipping_cost">৳{{order.shipping_total}}</p>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between border-top pt-4">
                             <h5 class="mb-0 fw-bold">Total :</h5>
-                            <h5 class="mb-0 fw-bold" id="total_amount_of_order">$0</h5>
+                            <h5 class="mb-0 fw-bold" id="total_amount_of_order">৳{{order.get_total_order_amount}}</h5>
                         </div>
                     </div>
                 </div>
@@ -172,24 +158,24 @@
                 let itemCells = document.querySelectorAll(".item_total_price");
                 let itemsSubtotal = 0;
                 itemCells.forEach(cell => {
-                    let value = parseFloat(cell.textContent.replace(/[$,]/g, '')) || 0;
+                    let value = parseFloat(cell.textContent.replace(/[৳,]/g, '')) || 0;
                     itemsSubtotal += value;
                 });
 
                 let discountEl = document.getElementById("discount");
                 let shippingEl = document.getElementById("shipping_cost");
 
-                let discount = parseFloat(discountEl.textContent.replace(/[$,-]/g, '')) || 0;
-                let shipping = parseFloat(shippingEl.textContent.replace(/[$,]/g, '')) || 0;
+                let discount = parseFloat(discountEl.textContent.replace(/[৳,-]/g, '')) || 0;
+                let shipping = parseFloat(shippingEl.textContent.replace(/[৳,]/g, '')) || 0;
 
                 let subtotal = itemsSubtotal - discount;
                 let total = subtotal + shipping;
 
                 document.querySelectorAll(".items_subtotal").forEach(place => {
-                    place.textContent = "$" + itemsSubtotal.toFixed(2);
+                    place.textContent = "৳" + itemsSubtotal.toFixed(2);
                 });
-                document.getElementById("subtotal").textContent = "$" + subtotal.toFixed(2);
-                document.getElementById("total_amount_of_order").textContent = "$" + total.toFixed(2);
+                document.getElementById("subtotal").textContent = "৳" + subtotal.toFixed(2);
+                document.getElementById("total_amount_of_order").textContent = "৳" + total.toFixed(2);
             };
             document.addEventListener("DOMContentLoaded", calculateTotals);
             document.addEventListener("htmx:afterSwap", function (e) {
@@ -234,10 +220,8 @@
                             <i class="bi bi-envelope-fill"></i>
                         </div>
                         <div class="detail-info">
-                            <h6 class="fw-bold mb-1">Email</h6>
-                            <span class="editable-text" data-field="email">
-                                {% if customer_profile.user %}{{ customer_profile.user.email }}{% endif %}
-                            </span>
+                            <h6 class="fw-bold mb-1">Whatsapp</h6>
+                            <span class="editable-text" data-field="whatsapp">{% if customer_profile.whatsapp %}{{ customer_profile.whatsapp }}{% endif %}</span>
                         </div>
                     </div>
                 </div>
@@ -263,6 +247,20 @@
                             <h6 class="fw-bold mb-1">Shipping Date</h6>
                             <span class="editable-text" data-field="delivery_date" data-raw="{{ order.delivery_date|date:'Y-m-d' }}">
                                 {% if order.delivery_date %}{{ order.delivery_date|date:"M. d, Y" }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="d-flex align-items-start gap-3 border p-3 rounded">
+                        <div class="detail-icon fs-5">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+                        <div class="detail-info">
+                            <h6 class="fw-bold mb-1">Email</h6>
+                            <span class="editable-text" data-field="email">
+                                {% if customer_profile.user %}{{ customer_profile.user.email }}{% endif %}
                             </span>
                         </div>
                     </div>
@@ -432,9 +430,6 @@
                 cancelBtn.onclick();
             });
         });
-
-
-
 
     </script>
 
