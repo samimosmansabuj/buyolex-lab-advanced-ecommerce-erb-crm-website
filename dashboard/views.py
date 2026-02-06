@@ -14,12 +14,44 @@ from accounts.models import CustomUser
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from accounts.utix import USER_TYPE
+from django.core.paginator import Paginator
+from django.db.models import Count, Q, Sum, F, Value, DecimalField
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
+from django.db.models.functions import Coalesce
 
-@login_required(login_url='admin_login')
-def dashboard(request):
-    if request.htmx:
-        return render(request, "db_home/main_wrapper.html")
-    return render(request, "dashboard.html")
+
+class DashboardView(LoginRequiredMixin, View):
+    login_url = 'admin_login'
+    
+    def get_today_order_count(self, orders):
+        today = timezone.now().date()
+        return orders.filter(placed_at__date=today).count()
+    
+    def new_orders_count (self, orders):
+        return orders.filter(order_status=ORDER_STATUS.NEW).count()
+    
+    def get_total_order_amount(self, orders):
+        return orders.aggregate(
+            total_amount=Coalesce(
+                Sum('items__discount_total_price') + Sum('shipping_total'),
+                Value(0),
+                output_field=DecimalField(max_digits=12, decimal_places=2)
+            )
+        )['total_amount']
+    
+    def get(self, request):
+        orders = Order.objects.all().order_by("-placed_at")
+        context = {
+            "orders": orders[:10],
+            "total_order_amount": self.get_total_order_amount(orders),
+            "total_orders": orders.count(),
+            "today_order_count": self.get_today_order_count(orders),
+            "new_orders_count": self.new_orders_count(orders),
+        }
+        if request.htmx:
+            return render(request, "db_home/main_wrapper.html", context)
+        return render(request, "dashboard.html", context)
 
 @login_required(login_url='admin_login')
 def product_list(request):
@@ -139,8 +171,11 @@ def delete_category(request, id):
         "message": "Invalid request"
     }, status=HTTPStatus.BAD_REQUEST)
 
-from django.db.models import Count
-class OrderView(View):
+
+
+class OrderView(LoginRequiredMixin, View):
+    login_url = 'admin_login'
+    
     def status_wise_order_count(self):
         qs = (
             Order.objects
@@ -150,23 +185,51 @@ class OrderView(View):
         order_count = {status: 0 for status, _ in ORDER_STATUS.choices}
         for row in qs:
             order_count[row['order_status']] = row['total']
+        order_count['all'] = sum(order_count.values())
         return order_count
     
     def get_order_queryset(self, request):
         status = request.GET.get('status')
+        search = request.GET.get('q', '')
+        orders = Order.objects.all().order_by("-placed_at")
+        
         if status and status in ORDER_STATUS.values:
-            return Order.objects.filter(order_status=status)
-        return Order.objects.all()
+            orders = orders.filter(order_status=status)
+        
+        if search:
+            orders = orders.filter(
+                Q(order_id__icontains=search) |
+                Q(customer__full_name__icontains=search) |
+                Q(customer__phone__icontains=search) |
+                Q(order_status__icontains=search) |
+                Q(payment_status__icontains=search) |
+                Q(delivery_type__icontains=search) |
+                Q(shipping_address__icontains=search)
+            )
+        
+        page_number = request.GET.get('page', 1)
+        per_page = int(request.GET.get('per_page', 10))
+        paginator = Paginator(orders, per_page)
+        orders = paginator.get_page(page_number)
+        
+        return orders, paginator, per_page, page_number
     
-    def get(self, request):
+    def permission_denied(self, request):
         if not request.user.is_authenticated:
             return redirect('product_landing_page')
         elif request.user.user_type not in [USER_TYPE.ADMIN, USER_TYPE.STAFF, USER_TYPE.SUPER_ADMIN]:
             return redirect('product_landing_page')
-        
+    
+    def get(self, request):
+        orders, paginator, per_page, page_number = self.get_order_queryset(request)
         context = {
-            "orders": self.get_order_queryset(request),
+            "orders": orders,
+            "paginator": paginator,
+            "per_page": per_page,
+            "page_number": page_number,
             "order_count": self.status_wise_order_count(),
+            "current_status": request.GET.get('status', 'all'),
+            "current_search": request.GET.get('q', ''),
         }
         if request.htmx:
             return render(request, "db_order/partial/partial_order_list.html", context)
@@ -205,7 +268,7 @@ class OrderView(View):
                 Order.objects.create(
                     name=data.get("order_title"),
                     description=data.get("order_description"),
-                    status=ORDER_STATUS.ACTIVE,
+                    status=STATUS.Pending,
                 )
                 return JsonResponse({
                     "status": True,
@@ -217,6 +280,8 @@ class OrderView(View):
                 "status": False,
                 "message": str(e)
             }, status=HTTPStatus.BAD_REQUEST)
+
+
 
 class OrderDetailView(View):
     def get(self, request, id):

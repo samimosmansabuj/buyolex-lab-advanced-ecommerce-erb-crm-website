@@ -14,6 +14,7 @@ from accounts.models import CustomUser, CustomerProfile, CustomerAddress
 from .utils import OrderConfirmatinoEmailSend
 from django.db import transaction
 from django.utils.text import slugify
+from decimal import Decimal
 
 
 def product_landing_page(request):
@@ -65,7 +66,7 @@ class CreateOrderView(View):
             raise ObjectDoesNotExist("Product Variante Not Found or Wrong Product ID")
     
     def price_verify___(self, input_price, price):
-        if float(price) != float(input_price):
+        if Decimal(price) != Decimal(input_price):
             raise Exception("Input Price and Product Price not Same!")
         return True
 
