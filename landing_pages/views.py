@@ -178,7 +178,7 @@ class CreateOrderView(View):
                     order=order,
                     product=product,
                     variant=variante,
-                    quantity=qty,
+                    quantity=int(qty),
                     c_unit_price=product.price,
                     d_unit_price=product.discount_price,
                 )
@@ -193,6 +193,7 @@ class CreateOrderView(View):
                     }, status=HTTPStatus.CREATED
                 )
         except Exception as e:
+            print("Error in CreateOrderView: ", e)
             return JsonResponse(
                 {
                     "success": False,
