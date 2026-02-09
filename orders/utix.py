@@ -2,7 +2,7 @@ from django.db import models
 
 class ORDER_STATUS(models.TextChoices):
     NEW = "new"
-    FOLLOW_UP = "Follow Up"
+    FOLLOW_UP = "follow_up"
     CONFIRMED = "confirmed"
     SHIPPED = "shipped"
     DELIVERED = "delivered"

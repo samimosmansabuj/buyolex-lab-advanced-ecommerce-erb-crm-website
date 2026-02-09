@@ -141,7 +141,6 @@ class CreateOrderView(View):
             time_obj = datetime.strptime(extra_personal_info["babyBirthTime"], "%H:%M")
             time_str = time_obj.strftime("%I:%M %p")
             extra_personal_info["babyBirthTime"] = time_str
-        print("Extra Personal Info: ", extra_personal_info)
         return extra_personal_info
 
     def post(self, request, *args, **kwargs):

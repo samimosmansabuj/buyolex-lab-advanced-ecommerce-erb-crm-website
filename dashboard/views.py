@@ -183,6 +183,7 @@ class OrderView(LoginRequiredMixin, View):
             .annotate(total=Count('id'))
         )
         order_count = {status: 0 for status, _ in ORDER_STATUS.choices}
+        print("ORDER_STATUS: ", ORDER_STATUS.values)
         for row in qs:
             order_count[row['order_status']] = row['total']
         order_count['all'] = sum(order_count.values())
