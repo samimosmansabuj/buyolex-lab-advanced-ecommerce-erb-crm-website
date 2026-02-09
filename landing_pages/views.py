@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import HomePageLandingPage
@@ -131,13 +132,16 @@ class CreateOrderView(View):
             "deceasedName", "deceasedDate", "parentName", "deceasedNote",
             "remeberName", "rememberDate", "remeberTime", "varianteNote", "receiver",
         ]
-        
-
         extra_personal_info = {
             field: data.get(field)
             for field in EXTRA_PERSONAL_FIELDS
             if data.get(field) not in [None, ""]
         }
+        if extra_personal_info.get("babyBirthTime"):
+            time_obj = datetime.strptime(extra_personal_info["babyBirthTime"], "%H:%M")
+            time_str = time_obj.strftime("%I:%M %p")
+            extra_personal_info["babyBirthTime"] = time_str
+        print("Extra Personal Info: ", extra_personal_info)
         return extra_personal_info
 
     def post(self, request, *args, **kwargs):
