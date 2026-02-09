@@ -2,6 +2,7 @@ from django.db import models
 
 class ORDER_STATUS(models.TextChoices):
     NEW = "new"
+    FOLLOW_UP = "Follow Up"
     CONFIRMED = "confirmed"
     SHIPPED = "shipped"
     DELIVERED = "delivered"
@@ -28,5 +29,11 @@ class DELIVERY_TYPE(models.TextChoices):
     ONLINE_PAYMENT = "online_payment"
     DELIVERY = "delivery"
     PICKUP = "pickup"
+
+
+class LOGISTIC_SERVICE_PROVIDER(models.TextChoices):
+    PATHAO = "PATHAO"
+    REDX = "REDX"
+    STEADFAST = "STEADFAST"
 
 

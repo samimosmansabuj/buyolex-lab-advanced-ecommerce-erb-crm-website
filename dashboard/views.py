@@ -291,6 +291,7 @@ class OrderDetailView(View):
             return redirect('product_landing_page')
         
         order = self.get_order(id)
+
         if request.htmx:
             return render(request, "db_order/partial/partial_order_detail.html", {"order": order})
         return render(request, "db_order/order_detail.html", {"order": order})
@@ -374,4 +375,14 @@ class OrderDetailView(View):
         if request.method.lower() == "patch":
             return self.patch(request, *args, **kwargs)
         return super().dispatch(request, *args, **kwargs)
+
+class OrderInvoiceView(View):
+    def get_order(self, id):
+        return get_object_or_404(Order, id=id)
+
+    def get(self, request, id):
+        order = self.get_order(id)
+        if order:
+            return render(request, "db_order/invoice.html", {"order": order})
+        return redirect(request.META.get('HTTP_REFERER'))
 

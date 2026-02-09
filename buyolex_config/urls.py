@@ -13,7 +13,6 @@ urlpatterns = [
 
     # Include All App Urls=======
     path('', include("accounts.urls")),
-    path('', include("analytics.urls")),
     path('', include("catalog.urls")),
     path('', include("landing_pages.urls")),
     path('', include("marketing.urls")),

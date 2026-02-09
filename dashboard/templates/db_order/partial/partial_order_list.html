@@ -55,52 +55,6 @@
                     class="material-icons-outlined position-absolute ms-3 translate-middle-y start-0 top-50 fs-5">search</span>
             </div>
         </div>
-        <!-- <div class="col-auto flex-grow-1 overflow-auto">
-            <div class="btn-group position-static">
-                <div class="btn-group position-static">
-                    <button type="button" class="btn border btn-filter dropdown-toggle px-4" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Payment Status
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                        <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-                    </ul>
-                </div>
-                <div class="btn-group position-static">
-                    <button type="button" class="btn border btn-filter dropdown-toggle px-4" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Completed
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                        <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-                    </ul>
-                </div>
-                <div class="btn-group position-static">
-                    <button type="button" class="btn border btn-filter dropdown-toggle px-4" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        More Filters
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                        <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div> -->
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-filter px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
@@ -137,7 +91,8 @@
                         <tbody>
                             {% for order in orders %}
                             <tr>
-                                <td><input class="form-check-input" type="checkbox"></td>
+                                <td><input class="form-check-input" type="checkbox">
+                                </td>
 
                                 <td>
                                     <a href="{% url 'order_detail' order.id %}"
@@ -202,11 +157,31 @@
                                                 data-bs-target="#deleteOrderModal">
                                             <i class="bi bi-trash"></i>
                                         </button>
+
+                                        <button type="button" class="btn btn-sm btn-filter delete-order-btn">
+                                            <i class="material-icons-outlined" onclick="printInvoice({{ order.id }})">print</i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
+                        <script>
+                            function printInvoice(orderId) {
+                                const url = `/dashboard/order/${orderId}/invoice/`;
+                                
+                                const printWindow = window.open(url, '_blank', 'width=900,height=1200');
+
+                                printWindow.onload = function () {
+                                    printWindow.focus();
+                                    printWindow.print();
+                                };
+                                window.onafterprint = function () {
+                                    window.close();
+                                };
+                            }
+                        </script>
+
                     </table>
                 </div>
             </div>

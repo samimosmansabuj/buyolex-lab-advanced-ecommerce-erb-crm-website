@@ -113,7 +113,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.order_id}"
 
-
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -202,4 +201,19 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.rating} stars — {self.product}"
+
+
+
+class LogisticServiceProvider(models.Model):
+    logistic_code = models.CharField(max_length=4, blank=True, null=True)
+    name = models.CharField(max_length=25, choices=LOGISTIC_SERVICE_PROVIDER.choices)
+    account = models.CharField(max_length=25)
+    base_url = models.URLField(max_length=255)
+    api_key = models.CharField(max_length=255)
+    secret_key = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return f"SteadFast API Credential for {self.account}"
+
 

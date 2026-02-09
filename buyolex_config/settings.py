@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'django_htmx',
 
-    'accounts', 'analytics', 'api', 'catalog', 'landing_pages', 'marketing', 'offers', 'orders', 'settings_app', 'dashboard'
+    'accounts', 'api', 'catalog', 'landing_pages', 'marketing', 'offers', 'orders', 'settings_app', 'dashboard'
 ]
 
 

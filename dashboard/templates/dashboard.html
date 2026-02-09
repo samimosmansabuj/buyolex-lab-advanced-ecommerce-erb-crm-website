@@ -13,6 +13,9 @@
   <title>BuyolexLab | Online Shopping</title>
   {% endblock page_title %}
 
+
+
+  {% block header_default_scripts %}
   <!--favicon-->
   <link rel="icon" href="{% static 'dashboard_assets/images/favicon-32x32.png' %}" type="image/png">
 
@@ -51,6 +54,8 @@
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 
+  {% endblock header_default_scripts %}
+
 
 
   {% block db_more_script %}
@@ -60,17 +65,22 @@
 
 </head>
 
+{% block for_invoice %}
 <body id="root" style="background-image: url({% static 'dashboard_assets/images/bg-themes/body-background-1.webp' %});"
   hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
 
+  {% block header %}
   <!--start header-->
   {% include 'header.html' %}
   <!--end top header-->
+  {% endblock header %}
 
+
+  {% block sidebar %}
   <!--start sidebar-->
   {% include 'sidebar.html' %}
   <!--end sidebar-->
-
+  {% endblock sidebar %}
 
   <main class="main-wrapper" id="content-area">
     {% block dashboard_body_content %}
@@ -78,18 +88,23 @@
     {% endblock dashboard_body_content %}
   </main>
 
+  {% block overlay %}
   <!--start overlay-->
   <div class="overlay btn-toggle"></div>
   <!--end overlay-->
+  {% endblock overlay %}
 
-
+  {% block footer %}
   <!--start footer-->
   <footer class="page-footer"
     style="position: fixed; bottom: 0; left: 0; width: 100%; backdrop-filter: blur(2.625rem);">
     <p class="mb-0">Copyright © 2024. All right reserved.</p>
   </footer>
   <!--end footer-->
+  {% endblock footer %}
 
+
+  {% block cart %}
   <!--start cart-->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCart">
     <div class="offcanvas-header border-bottom h-70">
@@ -122,7 +137,7 @@
     </div>
   </div>
   <!--end cart-->
-
+  {% endblock cart %}
 
   <!--start switcher-->
   {% block display_bottom_button %}
@@ -182,7 +197,7 @@
     });
   </script>
 
-
 </body>
+{% endblock for_invoice %}
 
 </html>
