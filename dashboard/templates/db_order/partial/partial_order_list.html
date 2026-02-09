@@ -159,7 +159,7 @@
                                         </button>
 
                                         <button type="button" class="btn btn-sm btn-filter delete-order-btn">
-                                            <i class="material-icons-outlined" onclick="printInvoice({{ order.id }})">print</i>
+                                            <i class="material-icons-outlined" onclick="printInvoice('{% url 'order_invoice' order.id %}')">print</i>
                                         </button>
                                     </div>
                                 </td>
@@ -167,8 +167,8 @@
                             {% endfor %}
                         </tbody>
                         <script>
-                            function printInvoice(orderId) {
-                                const url = `/dashboard/order/${orderId}/invoice/`;
+                            function printInvoice(url) {
+                                // const url = `/dashboard/order/${orderId}/invoice/`;
                                 
                                 const printWindow = window.open(url, '_blank', 'width=900,height=1200');
 
