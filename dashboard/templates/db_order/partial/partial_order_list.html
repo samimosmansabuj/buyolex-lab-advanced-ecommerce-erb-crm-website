@@ -25,6 +25,11 @@
             <span class="me-1">NEW</span>
             <span class="text-secondary">({{ order_count.new }})</span>
         </a>
+        <a href="{% url 'order_list' %}?status=follow_up" hx-get="{% url 'order_list' %}?status=follow_up" hx-target="#content-area"
+            hx-push-url="true" class="{% if current_status == 'follow_up' %}active{% endif %}">
+            <span class="me-1">FOLLOW UP</span>
+            <span class="text-secondary">({{ order_count.follow_up }})</span>
+        </a>
         <a href="{% url 'order_list' %}?status=confirmed" hx-get="{% url 'order_list' %}?status=confirmed" hx-target="#content-area"
             hx-push-url="true" class="{% if current_status == 'confirmed' %}active{% endif %}">
             <span class="me-1">CONFIRMED</span>
