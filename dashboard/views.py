@@ -202,6 +202,7 @@ class OrderView(LoginRequiredMixin, View):
                 Q(order_id__icontains=search) |
                 Q(customer__full_name__icontains=search) |
                 Q(customer__phone__icontains=search) |
+                Q(customer__whatsapp__icontains=search) |
                 Q(order_status__icontains=search) |
                 Q(payment_status__icontains=search) |
                 Q(delivery_type__icontains=search) |

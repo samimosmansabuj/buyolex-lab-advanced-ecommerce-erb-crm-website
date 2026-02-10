@@ -6,8 +6,8 @@
         </div>
 
         <!-- Search Bar Template ================ -->
-        <div class="search-bar flex-grow-1">
-            <div class="position-relative">
+        <div class="search-bar flex-grow-1" >
+            <div class="position-relative" style="visibility: hidden;">
                 <input class="form-control rounded-5 px-5 search-control d-lg-block d-none" type="text"
                     placeholder="Search">
                 <span
@@ -71,102 +71,10 @@
 
 
         <ul class="navbar-nav gap-1 nav-right-links align-items-center">
-            <li class="nav-item d-lg-none mobile-search-btn">
+            <li class="nav-item d-lg-none mobile-search-btn" style="visibility: hidden;">
                 <a class="nav-link" href="javascript:;"><i class="material-icons-outlined">search</i></a>
             </li>
-
-            <!-- Language Section ======================= -->
-            <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="avascript:;"
-                    data-bs-toggle="dropdown"><img src="{% static 'dashboard_assets/images/county/02.png' %}" width="22"
-                        alt="">
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item d-flex align-items-center py-2" href="javascript:;"><img
-                                src="{% static 'dashboard_assets/images/county/01.png' %}" width="20" alt=""><span
-                                class="ms-2">English</span></a>
-                    </li>
-                    <li><a class="dropdown-item d-flex align-items-center py-2" href="javascript:;"><img
-                                src="{% static 'dashboard_assets/images/county/02.png' %}" width="20" alt=""><span
-                                class="ms-2">Catalan</span></a>
-                    </li>
-                </ul>
-            </li> -->
-
-            <!-- all Done Section =============== -->
-            <!-- <li class="nav-item dropdown position-static  d-md-flex d-none">
-                <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-auto-close="outside"
-                    data-bs-toggle="dropdown" href="javascript:;"><i class="material-icons-outlined">done_all</i></a>
-                <div class="dropdown-menu dropdown-menu-end mega-menu shadow-lg p-4 p-lg-5">
-                    <div class="mega-menu-widgets">
-                        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3 g-4 g-lg-5">
-                            <div class="col">
-                                <div class="card rounded-4 shadow-none border mb-0">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-start gap-3">
-                                            <div class="mega-menu-icon flex-shrink-0 bg-danger">
-                                                <i class="material-icons-outlined">question_answer</i>
-                                            </div>
-                                            <div class="mega-menu-content">
-                                                <h5>Marketing</h5>
-                                                <p class="mb-0 f-14">In publishing and graphic design, Lorem ipsum is a
-                                                    placeholder text
-                                                    commonly used to demonstrate
-                                                    the visual form of a document.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li> -->
-
-            <!-- Important Application List============= -->
-            <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-auto-close="outside"
-                    data-bs-toggle="dropdown" href="javascript:;"><i class="material-icons-outlined">apps</i></a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-apps shadow-lg p-3">
-                    <div class="border rounded-4 overflow-hidden">
-
-                        <div class="row row-cols-3 g-0 border-bottom">
-                            <div class="col border-end">
-                                <div class="app-wrapper d-flex flex-column gap-2 text-center">
-                                    <div class="app-icon">
-                                        <img src="{% static 'dashboard_assets/images/apps/01.png' %}" width="36" alt="">
-                                    </div>
-                                    <div class="app-name">
-                                        <p class="mb-0">Gmail</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col border-end">
-                                <div class="app-wrapper d-flex flex-column gap-2 text-center">
-                                    <div class="app-icon">
-                                        <img src="{% static 'dashboard_assets/images/apps/02.png' %}" width="36" alt="">
-                                    </div>
-                                    <div class="app-name">
-                                        <p class="mb-0">Skype</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="app-wrapper d-flex flex-column gap-2 text-center">
-                                    <div class="app-icon">
-                                        <img src="{% static 'dashboard_assets/images/apps/03.png' %}" width="36" alt="">
-                                    </div>
-                                    <div class="app-name">
-                                        <p class="mb-0">Slack</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </li> -->
-
+            
             <!-- Notification Section ====================== -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative"
@@ -214,14 +122,6 @@
                     </div>
                 </div>
             </li>
-
-            <!-- Shopping Cart Section ========================= -->
-            <!-- <li class="nav-item d-md-flex d-none">
-                <a class="nav-link position-relative" data-bs-toggle="offcanvas" href="#offcanvasCart"><i
-                        class="material-icons-outlined">shopping_cart</i>
-                    <span class="badge-notify">8</span>
-                </a>
-            </li> -->
 
             <li class="nav-item dropdown">
                 <a href="javascrpt:;" class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
