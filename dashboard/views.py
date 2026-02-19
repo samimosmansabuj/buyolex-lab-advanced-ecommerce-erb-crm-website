@@ -1,3 +1,4 @@
+from itertools import product
 from django.shortcuts import render, get_object_or_404, redirect
 from catalog.models import Product, Category
 from catalog.utix import CATEGORY_STATUS
@@ -194,9 +195,31 @@ class OrderView(LoginRequiredMixin, View):
         search = request.GET.get('q', '')
         orders = Order.objects.all().order_by("-placed_at")
         
+        product_slug = request.GET.get("product")
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+
         if status and status in ORDER_STATUS.values:
             orders = orders.filter(order_status=status)
         
+            # Product filter
+        if product_slug:
+                    orders = orders.filter(
+                        items__variant__product__slug=product_slug
+                    ).distinct()
+                    
+        if start_date and end_date:
+            # Range filter
+            orders = orders.filter(placed_at__date__gte=start_date, placed_at__date__lte=end_date)
+        elif start_date:
+            # Only start_date: orders on that date
+            orders = orders.filter(placed_at__date=start_date)
+        elif end_date:
+            # Only end_date: orders up to that date
+            orders = orders.filter(placed_at__date__lte=end_date)
+
+
         if search:
             orders = orders.filter(
                 Q(order_id__icontains=search) |
@@ -213,8 +236,8 @@ class OrderView(LoginRequiredMixin, View):
         per_page = int(request.GET.get('per_page', 10))
         paginator = Paginator(orders, per_page)
         orders = paginator.get_page(page_number)
-        
-        return orders, paginator, per_page, page_number
+        products = Product.objects.all().distinct()
+        return orders, paginator, per_page, page_number, products
     
     def permission_denied(self, request):
         if not request.user.is_authenticated:
@@ -223,7 +246,7 @@ class OrderView(LoginRequiredMixin, View):
             return redirect('product_landing_page')
     
     def get(self, request):
-        orders, paginator, per_page, page_number = self.get_order_queryset(request)
+        orders, paginator, per_page, page_number, products = self.get_order_queryset(request)
         context = {
             "orders": orders,
             "paginator": paginator,
@@ -232,6 +255,8 @@ class OrderView(LoginRequiredMixin, View):
             "order_count": self.status_wise_order_count(),
             "current_status": request.GET.get('status', 'all'),
             "current_search": request.GET.get('q', ''),
+            "current_product_slug":  request.GET.get("product", ""),
+            "products": products,
         }
         if request.htmx:
             return render(request, "db_order/partial/partial_order_list.html", context)
