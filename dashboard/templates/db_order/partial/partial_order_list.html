@@ -67,17 +67,23 @@
         <!-- Product Filter -->
     <div class="col-auto">
         <div class="btn-group position-static">
-            <select class="form-control" name="product" id="product_slug"
-                    hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}"
-                    hx-target="#content-area" hx-push-url="true">
-                <option value="">All Products</option>
-                <hr class="dropdown-divider">
-                {% for product in products %}
-                <option value="{{ product.slug|urlencode }}" {% if product.slug == current_product_slug %} selected {% endif %}>
-                    {{ product.name }}
-                </option>
-                {% endfor %}
-            </select>
+            <select class="form-control"
+        name="product"
+        id="product_slug"
+        hx-get="{% url 'order_list' %}"
+        hx-trigger="change"
+        hx-target="#content-area"
+        hx-push-url="true">
+
+    <option value="">All Products</option>
+
+    {% for product in products %}
+    <option value="{{ product.slug }}"
+            {% if product.slug == current_product_slug %}selected{% endif %}>
+        {{ product.title }}
+    </option>
+    {% endfor %}
+</select>
         </div>
     </div>
 
@@ -216,6 +222,11 @@
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#OrderFormModal">
                                             <i class="bi bi-pencil"></i>
+                                        </button>
+
+                                        {% include 'db_order/modal/delivery_option_modal.html' %}
+                                        <button class="btn btn-sm btn-filter delivery-option-btn" data-id="{{ order.id }}" data-bs-toggle="modal" data-bs-target="#deliveryOptionModal">
+                                            <i class="bi bi-truck"></i>
                                         </button>
 
                                         <button class="btn btn-sm btn-filter delete-order-btn"
