@@ -123,7 +123,91 @@
         </div>
     </div><!--end row-->
 
+<!-- ORDER STATUS -->
+<div class="row mt-4 g-3">
 
+    <!-- Today Sales -->
+    <div class="col-12 col-lg-2 d-flex">
+        <div class="card rounded-4 w-100">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <span class="material-icons-outlined fs-3 text-primary">today</span>
+                </div>
+                <h4 class="mb-0">৳{{ today_sales_amount|default:0 }}</h4>
+                <p class="mb-0 fs-6 fw-bold">Today's Sales</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Followup -->
+    <div class="col-12 col-lg-2 d-flex">
+        <div class="card rounded-4 w-100">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <span class="material-icons-outlined fs-3 text-info">hourglass_top</span>
+                </div>
+                <h4 class="mb-0">৳{{ status_amounts.follow_up|default:0 }}</h4>
+                <p class="mb-0 fs-6 fw-bold">Followup</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm + Shipped -->
+    <div class="col-12 col-lg-2 d-flex">
+        <div class="card rounded-4 w-100">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <span class="material-icons-outlined fs-3 text-success">local_shipping</span>
+                </div>
+                <h4 class="mb-0">৳{{ status_amounts.confirmed|default:0|add:status_amounts.shipped|default:0 }}</h4>
+                <p class="mb-0 fs-6 fw-bold">Confirm + Shipped</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivered -->
+    <div class="col-12 col-lg-2 d-flex">
+        <div class="card rounded-4 w-100">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <span class="material-icons-outlined fs-3 text-purple">done_all</span>
+                </div>
+                <h4 class="mb-0">৳{{ status_amounts.delivered|default:0 }}</h4>
+                <p class="mb-0 fs-6 fw-bold">Delivered</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancelled -->
+    <div class="col-12 col-lg-2 d-flex">
+        <div class="card rounded-4 w-100">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <span class="material-icons-outlined fs-3 text-danger">cancel</span>
+                </div>
+                <h4 class="mb-0">৳{{ status_amounts.cancelled|default:0 }}</h4>
+                <p class="mb-0 fs-6 fw-bold">Cancelled</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Returned + Refunded -->
+    <div class="col-12 col-lg-2 d-flex">
+        <div class="card rounded-4 w-100">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <span class="material-icons-outlined fs-3 text-warning">undo</span>
+                </div>
+                <h4 class="mb-0">৳{{ status_amounts.returned_refund|default:0 }}</h4>
+                <p class="mb-0 fs-6 fw-bold">Returned + Refunded</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- END ORDER Staus -->
     <!-- <div class="row">
         <div class="col-12 col-xxl-12 d-flex">
             <div class="card rounded-4 w-100">
@@ -265,11 +349,23 @@
 
                                 <td>
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-filter edit-order-btn"
+                                        <a href="{% url 'order_detail' order.id %}"
+                                            class="btn btn-sm btn-filter edit-order-btn"
+                                            data-id="{{ order.id }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#OrderFormModal">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <!-- <button class="btn btn-sm btn-filter edit-order-btn"
                                                 data-id="{{ order.id }}"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#OrderFormModal">
                                             <i class="bi bi-pencil"></i>
+                                        </button> -->
+
+                                        {% include 'db_order/modal/delivery_option_modal.html' %}
+                                        <button class="btn btn-sm btn-filter delivery-option-btn" data-id="{{ order.id }}" data-bs-toggle="modal" data-bs-target="#deliveryOptionModal">
+                                            <i class="bi bi-truck"></i>
                                         </button>
 
                                         <button class="btn btn-sm btn-filter delete-order-btn"

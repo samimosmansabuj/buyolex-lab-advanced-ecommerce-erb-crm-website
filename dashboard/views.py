@@ -1,3 +1,4 @@
+from itertools import product
 from django.shortcuts import render, get_object_or_404, redirect
 from catalog.models import Product, Category
 from catalog.utix import CATEGORY_STATUS
@@ -6,7 +7,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from http import HTTPStatus
 from orders.models import Order
-from orders.utix import ORDER_STATUS
+from orders.utix import ORDER_STATUS, DELIVERY_TYPE
 import json
 from django.db import transaction
 from django.http import QueryDict
@@ -19,18 +20,25 @@ from django.db.models import Count, Q, Sum, F, Value, DecimalField
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.db.models.functions import Coalesce
+from django.db.models import Sum, F, Value, DecimalField
+from django.db.models.functions import Coalesce
+from orders.utils import SteadFastParcelAPI
+from site_app.models import DeliveryOption
 
 
 class DashboardView(LoginRequiredMixin, View):
     login_url = 'admin_login'
-    
+
+         # Today Order Count
     def get_today_order_count(self, orders):
         today = timezone.now().date()
         return orders.filter(placed_at__date=today).count()
     
+        # New Orders Count
     def new_orders_count (self, orders):
         return orders.filter(order_status=ORDER_STATUS.NEW).count()
-    
+
+        # Total Order Amount
     def get_total_order_amount(self, orders):
         return orders.aggregate(
             total_amount=Coalesce(
@@ -40,6 +48,44 @@ class DashboardView(LoginRequiredMixin, View):
             )
         )['total_amount']
     
+
+       # Today Sales Amount
+    def get_today_sales_amount(self, orders):
+        today = timezone.now().date()
+        return orders.filter(
+            placed_at__date=today
+        ).aggregate(
+            total=Coalesce(
+                Sum(F("items__discount_total_price") + F("shipping_total")),
+                Value(0),
+                output_field=DecimalField(max_digits=12, decimal_places=2)
+            )
+        )["total"]
+
+    # Status Wise Amounts
+    def get_status_amounts(self, orders):
+        amounts = {}
+
+        for status_key, _ in ORDER_STATUS.choices:
+            amounts[status_key] = orders.filter(
+                order_status=status_key
+            ).aggregate(
+                total=Coalesce(
+                    Sum(F("items__discount_total_price") + F("shipping_total")),
+                    Value(0),
+                    output_field=DecimalField(max_digits=12, decimal_places=2)
+                )
+            )["total"]
+
+        # Returned + Refunded combine (MODEL CHANGE chara)
+        amounts["returned_refund"] = (
+            amounts.get("returned", 0) +
+            amounts.get("refunded", 0)
+        )
+
+        return amounts
+
+    
     def get(self, request):
         orders = Order.objects.all().order_by("-placed_at")
         context = {
@@ -48,6 +94,8 @@ class DashboardView(LoginRequiredMixin, View):
             "total_orders": orders.count(),
             "today_order_count": self.get_today_order_count(orders),
             "new_orders_count": self.new_orders_count(orders),
+            "today_sales_amount": self.get_today_sales_amount(orders),
+            "status_amounts": self.get_status_amounts(orders),
         }
         if request.htmx:
             return render(request, "db_home/main_wrapper.html", context)
@@ -194,9 +242,32 @@ class OrderView(LoginRequiredMixin, View):
         search = request.GET.get('q', '')
         orders = Order.objects.all().order_by("-placed_at")
         
+        product_slug = request.GET.get("product")
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+
         if status and status in ORDER_STATUS.values:
             orders = orders.filter(order_status=status)
         
+            # Product filter
+        if product_slug:
+            orders = orders.filter(
+                items__product__slug=product_slug
+            )
+            print("COUNT AFTER FILTER:", orders.count())
+                    
+        if start_date and end_date:
+            # Range filter
+            orders = orders.filter(placed_at__date__gte=start_date, placed_at__date__lte=end_date)
+        elif start_date:
+            # Only start_date: orders on that date
+            orders = orders.filter(placed_at__date=start_date)
+        elif end_date:
+            # Only end_date: orders up to that date
+            orders = orders.filter(placed_at__date__lte=end_date)
+
+
         if search:
             orders = orders.filter(
                 Q(order_id__icontains=search) |
@@ -213,8 +284,8 @@ class OrderView(LoginRequiredMixin, View):
         per_page = int(request.GET.get('per_page', 10))
         paginator = Paginator(orders, per_page)
         orders = paginator.get_page(page_number)
-        
-        return orders, paginator, per_page, page_number
+        products = Product.objects.all().distinct()
+        return orders, paginator, per_page, page_number, products
     
     def permission_denied(self, request):
         if not request.user.is_authenticated:
@@ -223,7 +294,7 @@ class OrderView(LoginRequiredMixin, View):
             return redirect('product_landing_page')
     
     def get(self, request):
-        orders, paginator, per_page, page_number = self.get_order_queryset(request)
+        orders, paginator, per_page, page_number, products = self.get_order_queryset(request)
         context = {
             "orders": orders,
             "paginator": paginator,
@@ -232,6 +303,8 @@ class OrderView(LoginRequiredMixin, View):
             "order_count": self.status_wise_order_count(),
             "current_status": request.GET.get('status', 'all'),
             "current_search": request.GET.get('q', ''),
+            "current_product_slug":  request.GET.get("product", ""),
+            "products": products,
         }
         if request.htmx:
             return render(request, "db_order/partial/partial_order_list.html", context)
@@ -388,3 +461,100 @@ class OrderInvoiceView(View):
             return render(request, "db_order/invoice.html", {"order": order})
         return redirect(request.META.get('HTTP_REFERER'))
 
+
+class OrderDeliveryOptionSubmitView(LoginRequiredMixin, View):
+    model = Order
+    login_url = "admin_login"
+
+    def get_order(self, id):
+        try:
+            return get_object_or_404(Order, id=id)
+        except Exception as e:
+            raise Exception(str(e))
+    
+    def get_order_data(self, order):
+        email = (order.customer.email or order.customer.user.email if order.customer.user else None) or None
+        whatsapp = order.customer.whatsapp if order.customer.whatsapp else None
+        data = {
+            "invoice": order.order_id,
+            "recipient_name": order.customer.name,
+            "recipient_phone": order.customer.phone,
+            "recipient_address": order.shipping_address,
+            "cod_amount": float(order.total_cost),
+            "note": order.note,
+            "total_lot": order.order_items.count(),
+            "delivery_type": 1 if order.delivery_type == DELIVERY_TYPE.PICKUP else 0,
+        }
+        if whatsapp:
+            data["alternative_phone"] = whatsapp
+        if email:
+            data["recipient_email"] = email
+        return data
+    
+    def steadfast_response(self, logistics_partner, order):
+        order_data = self.get_order_data(order)
+        steadfast = SteadFastParcelAPI(logistics_partner.id)
+        return steadfast.create_order(order_data)
+        # return {
+        #     "status": 200,
+        #     "message": "Consignment has been created successfully.",
+        #     "consignment": {
+        #         "consignment_id": 1424107,
+        #         "invoice": "Aa12-das4",
+        #         "tracking_code": "15BAEB8A",
+        #         "recipient_name": "John Smith",
+        #         "recipient_phone": "01234567890",
+        #         "recipient_address": "Fla# A1,House# 17/1, Road# 3/A, Dhanmondi,Dhaka-1209",
+        #         "cod_amount": 1060,
+        #         "status": "in_review",
+        #         "note": "Deliver within 3PM",
+        #         "created_at": "2021-03-21T07:05:31.000000Z",
+        #         "updated_at": "2021-03-21T07:05:31.000000Z",
+        #     },
+        # }
+    
+    def get_logistics_partners(self, data):
+        logistics_partner_id = data.get("logistics_partner")
+        return DeliveryOption.objects.get(id=logistics_partner_id)
+    
+    def return_response(self, success, message, data=None, status=None) -> JsonResponse:
+        response = {
+            "success": success,
+            "message": message,
+        }
+        if data:
+            courier_name = data.courier.name if data.courier else None
+            courier_type = data.courier.type if data.courier.type else None
+            courier = f"{courier_name} ({courier_type})" if courier_name and courier_type else courier_name or courier_type or None
+            response["data"] = {
+                "id": data.id,
+                "courier": courier,
+                "tracking_number": data.tracking_number,
+                "status": data.status,
+                "updated_at": data.updated_at,
+                "created_at": data.updated_at
+            }
+        return JsonResponse(
+            response,
+            status=status,
+        )
+    
+    def post(self, request, *args: str, **kwargs):
+        try:
+            with transaction.atomic():
+                data = json.loads(request.body)
+                logistics_partner = self.get_logistics_partners(data)
+                order = self.get_order(kwargs.get("pk"))
+                steadfast_response = self.steadfast_response(logistics_partner, order)
+                print("steadfast_response: ", steadfast_response)
+                if steadfast_response.get("status") == 200:
+                    order_shipped_data = order.shipments.create(
+                        courier=logistics_partner,
+                        tracking_number=steadfast_response["consignment"]["consignment_id"],
+                        status=steadfast_response["consignment"]["status"],
+                    )
+                    return self.return_response(True, steadfast_response.get("message"), data=order_shipped_data, status=HTTPStatus.OK)
+                else:
+                    return self.return_response(False, steadfast_response.get("message"), status=HTTPStatus.BAD_REQUEST)
+        except Exception as e:
+            return self.return_response(False, f"{str(e)}", status=HTTPStatus.BAD_REQUEST)
