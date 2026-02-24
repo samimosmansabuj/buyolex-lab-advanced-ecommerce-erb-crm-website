@@ -5,6 +5,7 @@ from .utix import *
 from catalog.utix import PRODUCT_MEDIA_ROLE
 import random, string
 import uuid
+from django.core.validators import FileExtensionValidator
 
 class Cart(models.Model):
     user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE)
@@ -149,7 +150,6 @@ class OrderItem(models.Model):
 
 class Shipment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='shipments')
-    # shipment_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     courier = models.CharField(max_length=255, blank=True, null=True)
     tracking_number = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, default='pending')
@@ -164,7 +164,6 @@ class Shipment(models.Model):
 
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
-    # payment_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     provider = models.CharField(max_length=128)  # e.g., stripe, bkash
     provider_reference = models.CharField(max_length=255, blank=True, null=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -203,17 +202,18 @@ class Review(models.Model):
         return f"{self.rating} stars — {self.product}"
 
 
-
-class LogisticServiceProvider(models.Model):
-    logistic_code = models.CharField(max_length=4, blank=True, null=True)
-    name = models.CharField(max_length=25, choices=LOGISTIC_SERVICE_PROVIDER.choices)
-    account = models.CharField(max_length=25)
-    base_url = models.URLField(max_length=255)
-    api_key = models.CharField(max_length=255)
-    secret_key = models.CharField(max_length=255)
+class DeliveryOption(models.Model):
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=20, blank=True, null=True)
+    logo = models.FileField(upload_to='delivery_option/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['svg', 'png', 'jpg', 'jpeg', 'webp'])])
+    description = models.TextField(blank=True, null=True)
+    api_url = models.CharField(max_length=255, blank=True, null=True)
+    api_key = models.CharField(max_length=255, blank=True, null=True)
+    secret_key = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
-
-    def __str__(self) -> str:
-        return f"SteadFast API Credential for {self.account}"
-
+    
+    def __str__(self):
+        if self.type:
+            return f'{self.name} - {self.type}'
+        return self.name
 

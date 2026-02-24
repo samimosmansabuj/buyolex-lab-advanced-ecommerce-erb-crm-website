@@ -1,7 +1,5 @@
-from .models import LogisticServiceProvider
-from .utix import LOGISTIC_SERVICE_PROVIDER
 from django.shortcuts import get_object_or_404
-from site_app.models import DeliveryOption
+from .models import DeliveryOption
 import requests
 
 

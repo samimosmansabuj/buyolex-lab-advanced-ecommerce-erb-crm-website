@@ -23,7 +23,7 @@ from django.db.models.functions import Coalesce
 from django.db.models import Sum, F, Value, DecimalField
 from django.db.models.functions import Coalesce
 from orders.utils import SteadFastParcelAPI
-from site_app.models import DeliveryOption
+from orders.models import DeliveryOption
 
 
 class DashboardView(LoginRequiredMixin, View):

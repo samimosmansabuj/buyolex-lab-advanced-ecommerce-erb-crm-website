@@ -19,7 +19,6 @@ urlpatterns = [
     path('', include("offers.urls")),
     path('', include("orders.urls")),
     path('', include("settings_app.urls")),
-    path('site/', include('site_app.urls')),
 
 
     # Include For API Develop URL
