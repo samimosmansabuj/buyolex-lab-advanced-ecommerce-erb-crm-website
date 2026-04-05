@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import api_welcome_message, SiteSettingsAPIViews, CategoryAPIViews, TagAPIViews, AttributeAPIViews, MainSliderAPIViews, ProductAPIViews, DeliveryChargeCalculate
+from .order_api import OrderCreateAPIViews
 from rest_framework.routers import DefaultRouter
 
 app_name = "api"
@@ -16,7 +17,11 @@ urlpatterns = [
     path("category/", CategoryAPIViews.as_view(), name="category_api"),
     path("tag/", TagAPIViews.as_view(), name="tag_api"),
     
-    path("get-delivery-charge", DeliveryChargeCalculate.as_view(), name="delivery_charge_api")
+    path("get-delivery-charge", DeliveryChargeCalculate.as_view(), name="delivery_charge_api"),
+    
+    
+    # Order Create API View
+    path("order-create/", OrderCreateAPIViews.as_view(), name="order_create_api"),
 ]
 
 urlpatterns += router.urls
