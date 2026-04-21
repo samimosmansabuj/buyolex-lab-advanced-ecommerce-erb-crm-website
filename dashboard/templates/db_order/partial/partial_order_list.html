@@ -25,67 +25,83 @@
             <span class="me-1">NEW</span>
             <span class="text-secondary">({{ order_count.new }})</span>
         </a>
-        <a href="{% url 'order_list' %}?status=follow_up" hx-get="{% url 'order_list' %}?status=follow_up" hx-target="#content-area"
-            hx-push-url="true" class="{% if current_status == 'follow_up' %}active{% endif %}">
+        <a href="{% url 'order_list' %}?status=follow_up" hx-get="{% url 'order_list' %}?status=follow_up"
+            hx-target="#content-area" hx-push-url="true"
+            class="{% if current_status == 'follow_up' %}active{% endif %}">
             <span class="me-1">FOLLOW UP</span>
             <span class="text-secondary">({{ order_count.follow_up }})</span>
         </a>
-        <a href="{% url 'order_list' %}?status=confirmed" hx-get="{% url 'order_list' %}?status=confirmed" hx-target="#content-area"
-            hx-push-url="true" class="{% if current_status == 'confirmed' %}active{% endif %}">
+        <a href="{% url 'order_list' %}?status=confirmed" hx-get="{% url 'order_list' %}?status=confirmed"
+            hx-target="#content-area" hx-push-url="true"
+            class="{% if current_status == 'confirmed' %}active{% endif %}">
             <span class="me-1">CONFIRMED</span>
             <span class="text-secondary">({{ order_count.confirmed }})</span>
         </a>
-        <a href="{% url 'order_list' %}?status=shipped" hx-get="{% url 'order_list' %}?status=shipped" hx-target="#content-area"
-            hx-push-url="true" class="{% if current_status == 'shipped' %}active{% endif %}">
+        <a href="{% url 'order_list' %}?status=shipped" hx-get="{% url 'order_list' %}?status=shipped"
+            hx-target="#content-area" hx-push-url="true" class="{% if current_status == 'shipped' %}active{% endif %}">
             <span class="me-1">SHIPPED</span>
             <span class="text-secondary">({{ order_count.shipped }})</span>
         </a>
-        <a href="{% url 'order_list' %}?status=delivered" hx-get="{% url 'order_list' %}?status=delivered" hx-target="#content-area"
-            hx-push-url="true" class="{% if current_status == 'delivered' %}active{% endif %}">
+        <a href="{% url 'order_list' %}?status=delivered" hx-get="{% url 'order_list' %}?status=delivered"
+            hx-target="#content-area" hx-push-url="true"
+            class="{% if current_status == 'delivered' %}active{% endif %}">
             <span class="me-1">DELIVERED</span>
             <span class="text-secondary">({{ order_count.delivered }})</span>
         </a>
-        <a href="{% url 'order_list' %}?status=cancelled" hx-get="{% url 'order_list' %}?status=cancelled" hx-target="#content-area"
-            hx-push-url="true" class="{% if current_status == 'cancelled' %}active{% endif %}">
+        <a href="{% url 'order_list' %}?status=cancelled" hx-get="{% url 'order_list' %}?status=cancelled"
+            hx-target="#content-area" hx-push-url="true"
+            class="{% if current_status == 'cancelled' %}active{% endif %}">
             <span class="me-1">CANCELLED</span>
             <span class="text-secondary">({{ order_count.cancelled }})</span>
         </a>
     </div>
 
-    
+
 
     <div class="row g-3">
-        
+
         <div class="col-auto">
             <div class="position-relative">
-                <input class="form-control px-5" type="search" name="q" placeholder="Search Orders" value="{{ current_search }}" hx-get="{% url 'order_list' %}?status={{ current_status }}" hx-trigger="keyup changed delay:400ms" hx-target="#content-area" hx-push-url="true">
+                <input class="form-control px-5" type="search" name="q" placeholder="Search Orders"
+                    value="{{ current_search }}" hx-get="{% url 'order_list' %}?status={{ current_status }}"
+                    hx-trigger="keyup changed delay:400ms" hx-target="#content-area" hx-push-url="true">
                 <span
                     class="material-icons-outlined position-absolute ms-3 translate-middle-y start-0 top-50 fs-5">search</span>
             </div>
         </div>
 
         <!-- Product Filter -->
-    <div class="col-auto">
-        <div class="btn-group position-static">
-            <select class="form-control"
-        name="product"
-        id="product_slug"
-        hx-get="{% url 'order_list' %}"
-        hx-trigger="change"
-        hx-target="#content-area"
-        hx-push-url="true">
+        <!-- <div class="col-auto">
+            <div class="btn-group position-static">
+                <select class="form-control" name="product" id="product_slug" hx-get="{% url 'order_list' %}"
+                    hx-trigger="change" hx-target="#content-area" hx-push-url="true">
 
-    <option value="">All Products</option>
+                    <option value="">All Products</option>
 
-    {% for product in products %}
-    <option value="{{ product.slug }}"
-            {% if product.slug == current_product_slug %}selected{% endif %}>
-        {{ product.title }}
-    </option>
-    {% endfor %}
-</select>
+                    {% for product in products %}
+                    <option value="{{ product.slug }}" {% if product.slug == current_product_slug %}selected{% endif %}>
+                        {{ product.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div> -->
+        <!-- Product Filter -->
+        <div class="col-auto">
+            <div class="btn-group position-static">
+                <select class="form-control" name="product" id="product_slug"
+                        hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&start_date={{ start_date }}&end_date={{ end_date }}&per_page={{ per_page }}"
+                        hx-target="#content-area" hx-push-url="true">
+                    <option value="">All Products</option>
+                    <hr class="dropdown-divider">
+                    {% for product in products %}
+                    <option value="{{ product.slug|urlencode }}" {% if product.slug == current_product_slug %} selected {% endif %}>
+                        {{ product.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-    </div>
 
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
@@ -98,47 +114,40 @@
             </div>
         </div>
 
-               <!-- Date Range Filter (Right side of row, before buttons) -->
-<div class="col-auto ms-auto d-flex gap-2 align-items-end">
+        <!-- Date Range Filter (Right side of row, before buttons) -->
+        <div class="col-auto ms-auto d-flex gap-2 align-items-end">
 
-    <!-- Start Date -->
-    <div class="d-flex flex-column">
-        <label class="form-label mb-1">Start Date</label>
-        <input type="date" name="start_date" class="form-control"
-               value="{{ request.GET.start_date }}"
-               hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&product={{ current_product_slug }}"
-               hx-trigger="change"
-               hx-target="#content-area"
-               hx-include="[name='end_date'],[name='q'],[name='product']"
-               hx-push-url="true">
+            <!-- Start Date -->
+            <div class="d-flex flex-column">
+                <label class="form-label mb-1">Start Date</label>
+                <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}"
+                    hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&product={{ current_product_slug }}"
+                    hx-trigger="change" hx-target="#content-area"
+                    hx-include="[name='end_date'],[name='q'],[name='product']" hx-push-url="true">
+            </div>
+
+            <!-- End Date -->
+            <div class="d-flex flex-column">
+                <label class="form-label mb-1">End Date</label>
+                <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}"
+                    hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&product={{ current_product_slug }}"
+                    hx-trigger="change" hx-target="#content-area"
+                    hx-include="[name='start_date'],[name='q'],[name='product']" hx-push-url="true">
+            </div>
+
+            <!-- Clear Dates Button -->
+            <div class="d-flex flex-column">
+                <button type="button" class="btn btn-outline-secondary mt-4"
+                    hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&product={{ current_product_slug }}"
+                    hx-target="#content-area" hx-push-url="true"
+                    onclick="this.closest('div').querySelectorAll('input[type=date]').forEach(input => input.value='')">
+                    Clear
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- End Date -->
-    <div class="d-flex flex-column">
-        <label class="form-label mb-1">End Date</label>
-        <input type="date" name="end_date" class="form-control"
-               value="{{ request.GET.end_date }}"
-               hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&product={{ current_product_slug }}"
-               hx-trigger="change"
-               hx-target="#content-area"
-               hx-include="[name='start_date'],[name='q'],[name='product']"
-               hx-push-url="true">
-    </div>
 
-    <!-- Clear Dates Button -->
-    <div class="d-flex flex-column">
-        <button type="button" class="btn btn-outline-secondary mt-4"
-                hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&product={{ current_product_slug }}"
-                hx-target="#content-area"
-                hx-push-url="true"
-                onclick="this.closest('div').querySelectorAll('input[type=date]').forEach(input => input.value='')">
-            Clear
-        </button>
-    </div>
-</div>
-    </div>
-
-    
     <!--end row-->
 
     <!-- Order List Table Div------- -->
@@ -169,19 +178,18 @@
 
                                 <td>
                                     <a href="{% url 'order_detail' order.id %}"
-                                       hx-get="{% url 'order_detail' order.id %}"
-                                       hx-target="#content-area"
-                                       hx-push-url="true"
-                                       hx-trigger="click, refreshReturnOrderDetailView from:body"
-                                       hx-swap="innerHTML">
-                                        #{{ order.order_id  }}
+                                        hx-get="{% url 'order_detail' order.id %}" hx-target="#content-area"
+                                        hx-push-url="true" hx-trigger="click, refreshReturnOrderDetailView from:body"
+                                        hx-swap="innerHTML">
+                                        #{{ order.order_id }}
                                     </a>
                                 </td>
-                                
+
                                 <td>
                                     <a class="d-flex align-items-center gap-3" href="javascript:;">
                                         <div class="customer-pic">
-                                            <img src="https://placehold.co/110x110/png" class="rounded-circle" width="40" height="40">
+                                            <img src="https://placehold.co/110x110/png" class="rounded-circle"
+                                                width="40" height="40">
                                         </div>
                                         <p class="mb-0 customer-name fw-bold">
                                             {{ order.customer.full_name }}
@@ -196,7 +204,8 @@
                                 <td>৳{{ order.get_total_order_amount }}</td>
 
                                 <td>
-                                    <span class="lable-table bg-success-subtle text-success rounded border border-success-subtle font-text2 fw-bold">
+                                    <span
+                                        class="lable-table bg-success-subtle text-success rounded border border-success-subtle font-text2 fw-bold">
                                         {{ order.order_status }}
                                     </span>
                                 </td>
@@ -217,27 +226,26 @@
 
                                 <td>
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-filter edit-order-btn"
-                                                data-id="{{ order.id }}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#OrderFormModal">
+                                        <button class="btn btn-sm btn-filter edit-order-btn" data-id="{{ order.id }}"
+                                            data-bs-toggle="modal" data-bs-target="#OrderFormModal">
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
                                         {% include 'db_order/modal/delivery_option_modal.html' %}
-                                        <button class="btn btn-sm btn-filter delivery-option-btn" data-id="{{ order.id }}" data-bs-toggle="modal" data-bs-target="#deliveryOptionModal">
+                                        <button class="btn btn-sm btn-filter delivery-option-btn"
+                                            data-id="{{ order.id }}" data-bs-toggle="modal"
+                                            data-bs-target="#deliveryOptionModal">
                                             <i class="bi bi-truck"></i>
                                         </button>
 
-                                        <button class="btn btn-sm btn-filter delete-order-btn"
-                                                data-id="{{ order.id }}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteOrderModal">
+                                        <button class="btn btn-sm btn-filter delete-order-btn" data-id="{{ order.id }}"
+                                            data-bs-toggle="modal" data-bs-target="#deleteOrderModal">
                                             <i class="bi bi-trash"></i>
                                         </button>
 
                                         <button type="button" class="btn btn-sm btn-filter delete-order-btn">
-                                            <i class="material-icons-outlined" onclick="printInvoice('{% url 'order_invoice' order.id %}')">print</i>
+                                            <i class="material-icons-outlined"
+                                                onclick="printInvoice('{% url 'order_invoice' order.id %}')">print</i>
                                         </button>
                                     </div>
                                 </td>
@@ -247,7 +255,7 @@
                         <script>
                             function printInvoice(url) {
                                 // const url = `/dashboard/order/${orderId}/invoice/`;
-                                
+
                                 const printWindow = window.open(url, '_blank', 'width=900,height=1200');
 
                                 printWindow.onload = function () {
@@ -268,7 +276,7 @@
 </div>
 
 <div class="btn btn-grd position-fixed bottom-0 end-0 m-3 d-flex align-items-center gap-2 shadow-lg"
-style="z-index: 1050; margin: auto 22px 45px 0px !important; padding: 0px !important;">
+    style="z-index: 1050; margin: auto 22px 45px 0px !important; padding: 0px !important;">
     <!-- Pagination Here -->
     <div class="card-body" style="padding: 0px;">
         <nav aria-label="Page navigation example">
@@ -276,36 +284,33 @@ style="z-index: 1050; margin: auto 22px 45px 0px !important; padding: 0px !impor
                 {# Previous #}
                 <li class="page-item {% if not orders.has_previous %}disabled{% endif %}">
                     <a class="page-link"
-                    hx-get="{% url 'order_list' %}{% if orders.has_previous %}?page={{ orders.previous_page_number }}&status={{ current_status }}&q={{ current_search }}{% endif %}"
-                    hx-target="#content-area"
-                    hx-push-url="true">
+                        hx-get="{% url 'order_list' %}{% if orders.has_previous %}?page={{ orders.previous_page_number }}&status={{ current_status }}&q={{ current_search }}{% endif %}"
+                        hx-target="#content-area" hx-push-url="true">
                         «
                     </a>
                 </li>
 
                 {# ±2 pages around current #}
                 {% for num in paginator.page_range %}
-                    {% if num >= orders.number|add:-2 and num <= orders.number|add:2 %}
-                        <li class="page-item {% if orders.number == num %}active{% endif %}">
-                            <a class="page-link"
-                            hx-get="{% url 'order_list' %}?page={{ num }}&status={{ current_status }}&q={{ current_search }}&per_page={{ per_page }}"
-                            hx-target="#content-area"
-                            hx-push-url="true">
-                                {{ num }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-
-                {# Next #}
-                <li class="page-item {% if not orders.has_next %}disabled{% endif %}">
+                {% if num >= orders.number|add:-2 and num <= orders.number|add:2 %} <li
+                    class="page-item {% if orders.number == num %}active{% endif %}">
                     <a class="page-link"
-                    hx-get="{% url 'order_list' %}{% if orders.has_next %}?page={{ orders.next_page_number }}&status={{ current_status }}&q={{ current_search }}{% endif %}"
-                    hx-target="#content-area"
-                    hx-push-url="true">
-                        »
+                        hx-get="{% url 'order_list' %}?page={{ num }}&status={{ current_status }}&q={{ current_search }}&per_page={{ per_page }}"
+                        hx-target="#content-area" hx-push-url="true">
+                        {{ num }}
                     </a>
-                </li>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {# Next #}
+                    <li class="page-item {% if not orders.has_next %}disabled{% endif %}">
+                        <a class="page-link"
+                            hx-get="{% url 'order_list' %}{% if orders.has_next %}?page={{ orders.next_page_number }}&status={{ current_status }}&q={{ current_search }}{% endif %}"
+                            hx-target="#content-area" hx-push-url="true">
+                            »
+                        </a>
+                    </li>
             </ul>
         </nav>
     </div>
@@ -313,15 +318,12 @@ style="z-index: 1050; margin: auto 22px 45px 0px !important; padding: 0px !impor
     <!-- Page Name: -->
     <div class="col-auto">
         <select class="form-select"
-                hx-get="{% url 'order_list' %}?page={{ page_number }}&status={{ current_status }}&q={{ current_search }}&per_page={{ per_page }}"
-                hx-trigger="change"
-                hx-target="#content-area"
-                hx-push-url="true"
-                name="per_page">
+            hx-get="{% url 'order_list' %}?page={{ page_number }}&status={{ current_status }}&q={{ current_search }}&per_page={{ per_page }}"
+            hx-trigger="change" hx-target="#content-area" hx-push-url="true" name="per_page">
 
-                <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
-                <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
-                <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
         </select>
     </div>
 </div>

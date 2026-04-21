@@ -101,6 +101,18 @@ class DashboardView(LoginRequiredMixin, View):
             return render(request, "db_home/main_wrapper.html", context)
         return render(request, "dashboard.html", context)
 
+
+# ------------------Product--------
+class ProductListView(LoginRequiredMixin, View):
+    login_url = "admin_login"
+
+    def get(self, request, *args, **kwargs):
+        # products = Product.objects.annotate(variant_count=Count("variants"))
+        products = Product.objects.all()
+        if request.htmx:
+            return render(request, "db_product/partial/partial_product_list.html", {"products": products})
+        return render(request, "db_product/product_list.html", {"products": products})
+
 @login_required(login_url='admin_login')
 def product_list(request):
     products = Product.objects.all()
@@ -306,6 +318,7 @@ class OrderView(LoginRequiredMixin, View):
             "current_product_slug":  request.GET.get("product", ""),
             "products": products,
         }
+        print("current product slug: ", request.GET.get("product", ""))
         if request.htmx:
             return render(request, "db_order/partial/partial_order_list.html", context)
         return render(request, "db_order/order_list.html", context)
