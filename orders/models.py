@@ -55,6 +55,8 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     delivery_date = models.DateField(null=True, blank=True)
     delivery_type = models.CharField(max_length=50, choices=DELIVERY_TYPE.choices, default=DELIVERY_TYPE.COD)
+    note = models.TextField(blank=True, null=True)
+    work_assign = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_orders")
 
     def get_order_status_choise(self):
         return ORDER_STATUS.choices
@@ -150,7 +152,7 @@ class OrderItem(models.Model):
 
 class Shipment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='shipments')
-    courier = models.CharField(max_length=255, blank=True, null=True)
+    courier = models.ForeignKey("orders.DeliveryOption", on_delete=models.SET_NULL, null=True, blank=True, related_name='shipments')
     tracking_number = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, default='pending')
     items = models.JSONField(default=list, blank=True)
@@ -158,6 +160,8 @@ class Shipment(models.Model):
     delivered_at = models.DateTimeField(null=True, blank=True)
     shipping_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     label_url = models.URLField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Shipment {self.courier} for {self.order.order_id}"

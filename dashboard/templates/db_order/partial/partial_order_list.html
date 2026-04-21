@@ -58,7 +58,7 @@
 
 
 
-    <div class="row g-3">
+    <div class="row g-3  align-items-end mb-3">
 
         <div class="col-auto">
             <div class="position-relative">
@@ -69,35 +69,19 @@
                     class="material-icons-outlined position-absolute ms-3 translate-middle-y start-0 top-50 fs-5">search</span>
             </div>
         </div>
-
-        <!-- Product Filter -->
-        <!-- <div class="col-auto">
-            <div class="btn-group position-static">
-                <select class="form-control" name="product" id="product_slug" hx-get="{% url 'order_list' %}"
-                    hx-trigger="change" hx-target="#content-area" hx-push-url="true">
-
-                    <option value="">All Products</option>
-
-                    {% for product in products %}
-                    <option value="{{ product.slug }}" {% if product.slug == current_product_slug %}selected{% endif %}>
-                        {{ product.title }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div> -->
+        
         <!-- Product Filter -->
         <div class="col-auto">
             <div class="btn-group position-static">
                 <select class="form-control" name="product" id="product_slug"
                         hx-get="{% url 'order_list' %}?status={{ current_status }}&q={{ current_search }}&start_date={{ start_date }}&end_date={{ end_date }}&per_page={{ per_page }}"
                         hx-target="#content-area" hx-push-url="true">
-                    <option value="">All Products</option>
+                    <option value="" selected>All Products</option>
                     <hr class="dropdown-divider">
                     {% for product in products %}
-                    <option value="{{ product.slug|urlencode }}" {% if product.slug == current_product_slug %} selected {% endif %}>
-                        {{ product.title }}
-                    </option>
+                        <option value="{{ product.slug }}" {% if product.slug == current_product_slug %}selected{% endif %}>
+                            {{ product.title }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
