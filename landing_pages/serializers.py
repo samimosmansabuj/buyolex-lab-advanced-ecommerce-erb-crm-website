@@ -35,10 +35,14 @@ class LandingPageProductSerializer(serializers.ModelSerializer):
 
     def get_images(self, obj):
         request = self.context.get("request")
+
+        if not request:
+            return []
+
         return [
             request.build_absolute_uri(img.image.url)
             for img in obj.images.all()
-            if img.image
+            if img.image and hasattr(img.image, "url")
         ]
 
     def get_variants(self, obj):

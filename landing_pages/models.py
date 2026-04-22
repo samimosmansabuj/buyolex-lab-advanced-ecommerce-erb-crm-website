@@ -4,6 +4,7 @@ from .utix import LandingPageHeroType
 
 
 class HomePageLandingPage(models.Model):
+    code = models.CharField(max_length=100, unique=True, null=True, blank=True)
     product = models.OneToOneField(Product, on_delete=models.SET_NULL, blank=True, null=True)
     product_details_section_title = models.CharField(max_length=255, blank=True, null=True)
     product_variation_section_title = models.CharField(max_length=255, blank=True, null=True)

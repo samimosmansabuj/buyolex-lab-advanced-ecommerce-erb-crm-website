@@ -5,28 +5,51 @@ from rest_framework import status
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
+from decimal import Decimal
+
 from catalog.models import Product, ProductVariant
 from orders.models import Order, OrderItem
 from accounts.models import CustomerProfile
+from landing_pages.models import HomePageLandingPage
 
 from .serializers import LandingPageProductSerializer
 
 
 # ===============================
-# 1. PRODUCT API
+# 1. PRODUCT API (CODE BASED)
 # ===============================
 class LandingPageProductAPIView(APIView):
 
     def get(self, request):
+        code = request.query_params.get("code")
         product_id = request.query_params.get("product_id")
 
-        if not product_id:
+        product = None
+
+        # -------- CODE BASED LANDING --------
+        if code:
+            landing = HomePageLandingPage.objects.filter(
+                code=code,
+                is_active=True
+            ).first()
+
+            if not landing or not landing.product:
+                return Response({
+                    "success": False,
+                    "message": "Invalid or inactive landing code"
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            product = landing.product
+
+        # -------- PRODUCT ID FALLBACK --------
+        elif product_id:
+            product = get_object_or_404(Product, id=product_id)
+
+        else:
             return Response({
                 "success": False,
-                "message": "product_id is required"
+                "message": "code or product_id is required"
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        product = get_object_or_404(Product, id=product_id)
 
         serializer = LandingPageProductSerializer(
             product,
@@ -40,7 +63,7 @@ class LandingPageProductAPIView(APIView):
 
 
 # ===============================
-# 2. ORDER API
+# 2. ORDER API (PRODUCTION SAFE)
 # ===============================
 class LandingPageOrderAPIView(APIView):
 
@@ -63,7 +86,7 @@ class LandingPageOrderAPIView(APIView):
 
                 variant = None
 
-                # SAFE VARIANT VALIDATION
+                # -------- VARIANT SAFE CHECK --------
                 if data.get("variant_id"):
                     variant = get_object_or_404(
                         ProductVariant,
@@ -71,59 +94,64 @@ class LandingPageOrderAPIView(APIView):
                         product=product
                     )
 
-                # ===============================
-                # FIX 1: SAFE QTY VALIDATION
-                # ===============================
-                qty = int(data.get("qty", 1))
+                # -------- QTY SAFE --------
+                try:
+                    qty = int(data.get("qty", 1))
+                except:
+                    qty = 1
+
                 if qty <= 0:
                     return Response({
                         "success": False,
                         "message": "Quantity must be greater than 0"
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                # ===============================
-                # SAFE PRICE LOGIC
-                # ===============================
+                # -------- PRICE SAFE --------
                 if variant:
                     unit_price = variant.discount_price or variant.price
                 else:
                     unit_price = product.discount_price or product.price
 
-                # ===============================
-                # CUSTOMER
-                # ===============================
+                # -------- DELIVERY SAFE --------
+                delivery_charge = data.get("delivery_charge", 0)
+                try:
+                    delivery_charge = Decimal(str(delivery_charge))
+                except:
+                    delivery_charge = Decimal("0")
+
+                # -------- CUSTOMER SAFE --------
+                phone = str(data.get("phone")).strip()
+
                 customer, _ = CustomerProfile.objects.get_or_create(
-                    phone=data["phone"],
-                    defaults={"full_name": data.get("name")}
+                    phone=phone,
+                    defaults={
+                        "full_name": data.get("name", "").strip()
+                    }
                 )
 
-                # ===============================
-                # ORDER CREATE
-                # ===============================
+                # -------- ORDER CREATE --------
                 order = Order.objects.create(
                     customer=customer,
-                    shipping_total=data.get("delivery_charge", 0),
+                    shipping_total=delivery_charge,
                     metadata={
                         "source": "landing_page",
                         "notes": data.get("notes", ""),
                     }
                 )
 
-                # ===============================
-                # ORDER ITEM (SAFE SNAPSHOT FIXED)
-                # ===============================
+                # -------- ORDER ITEM --------
                 OrderItem.objects.create(
                     order=order,
                     product=product,
                     variant=variant,
                     quantity=qty,
-                    c_unit_price=product.price,
+                    c_unit_price = variant.price if variant else product.price,
                     d_unit_price=unit_price,
                     product_snapshot={
                         "product_id": product.id,
                         "title": product.title,
                         "variant_id": variant.id if variant else None,
-                        "attributes": variant.attributes if variant else None,
+                        "attributes": getattr(variant, "attributes", None),
                     }
                 )
 
