@@ -174,10 +174,8 @@ class ProductAPIViews(viewsets.ModelViewSet):
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def list(self, request, *args, **kwargs):
-        # return super().list(request, *args, **kwargs)
         try:
             products = self.get_queryset()
-            print("products: ===========", products)
             return Response(
                 {
                     "status": True,
@@ -252,3 +250,4 @@ class DeliveryChargeCalculate(views.APIView):
                     "message": str(e)
                 }
             )
+

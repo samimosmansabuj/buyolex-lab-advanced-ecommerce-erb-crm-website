@@ -9,5 +9,5 @@ urlpatterns = [
     path('order/<int:id>/', get_order, name="get_order"),
 
     path('api/product/', LandingPageProductAPIView.as_view(), name="LandingPageProductAPIView"),
-    path('api/order/', LandingPageOrderAPIView.as_view(), name="LandingPageOrderAPIView"),
+    path('api/order-create/', LandingPageOrderAPIView.as_view(), name="LandingPageOrderAPIView"),
 ]
