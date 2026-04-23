@@ -13,12 +13,14 @@ from accounts.models import CustomerProfile
 from landing_pages.models import HomePageLandingPage
 
 from .serializers import LandingPageProductSerializer
+from rest_framework.permissions import AllowAny
 
 
 # ===============================
 # 1. PRODUCT API (CODE BASED)
 # ===============================
 class LandingPageProductAPIView(APIView):
+    permission_classes = [AllowAny]
 
     def get(self, request):
         code = request.query_params.get("code")
@@ -26,7 +28,6 @@ class LandingPageProductAPIView(APIView):
 
         product = None
 
-        # -------- CODE BASED LANDING --------
         if code:
             landing = HomePageLandingPage.objects.filter(
                 code=code,
@@ -41,7 +42,6 @@ class LandingPageProductAPIView(APIView):
 
             product = landing.product
 
-        # -------- PRODUCT ID FALLBACK --------
         elif product_id:
             product = get_object_or_404(Product, id=product_id)
 
@@ -66,12 +66,14 @@ class LandingPageProductAPIView(APIView):
 # 2. ORDER API (PRODUCTION SAFE)
 # ===============================
 class LandingPageOrderAPIView(APIView):
+    permission_classes = [AllowAny]
+
 
     def post(self, request):
         data = request.data
 
         required_fields = ["product_id", "name", "phone", "qty"]
-        missing = [f for f in required_fields if not data.get(f)]
+        missing = [f for f in required_fields if data.get(f) is None]
 
         if missing:
             return Response({
@@ -86,7 +88,6 @@ class LandingPageOrderAPIView(APIView):
 
                 variant = None
 
-                # -------- VARIANT SAFE CHECK --------
                 if data.get("variant_id"):
                     variant = get_object_or_404(
                         ProductVariant,
@@ -94,7 +95,6 @@ class LandingPageOrderAPIView(APIView):
                         product=product
                     )
 
-                # -------- QTY SAFE --------
                 try:
                     qty = int(data.get("qty", 1))
                 except:
@@ -106,47 +106,67 @@ class LandingPageOrderAPIView(APIView):
                         "message": "Quantity must be greater than 0"
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                # -------- PRICE SAFE --------
                 if variant:
                     unit_price = variant.discount_price or variant.price
                 else:
                     unit_price = product.discount_price or product.price
 
-                # -------- DELIVERY SAFE --------
                 delivery_charge = data.get("delivery_charge", 0)
                 try:
-                    delivery_charge = Decimal(str(delivery_charge))
+                    delivery_charge = Decimal(str(delivery_charge or 0))
                 except:
                     delivery_charge = Decimal("0")
 
-                # -------- CUSTOMER SAFE --------
                 phone = str(data.get("phone")).strip()
 
                 customer, _ = CustomerProfile.objects.get_or_create(
-                    phone=phone,
+                    phone=phone.replace("+880", "0").strip(),
                     defaults={
                         "full_name": data.get("name", "").strip()
                     }
                 )
 
-                # -------- ORDER CREATE --------
+                # ✅ FIXED (float → str)
                 order = Order.objects.create(
                     customer=customer,
                     shipping_total=delivery_charge,
+
                     metadata={
                         "source": "landing_page",
-                        "notes": data.get("notes", ""),
+
+                        "name": data.get("name"),
+                        "phone": phone,
+
+                        "address": data.get("address"),
+                        "district": data.get("district"),
+
+                        "qty": qty,
+                        "product_id": product.id,
+                        "product_title": product.title,
+
+                        "variant_id": variant.id if variant else None,
+                        "variant_attributes": getattr(variant, "attributes", None),
+
+                        # 🔥 SAFE STRING
+                        "unit_price": str(unit_price),
+                        "delivery_charge": str(delivery_charge),
+                        "total_estimate": str((unit_price * qty) + delivery_charge),
                     }
                 )
 
-                # -------- ORDER ITEM --------
+                # ✅ FIXED (Decimal safe math)
                 OrderItem.objects.create(
                     order=order,
                     product=product,
                     variant=variant,
                     quantity=qty,
-                    c_unit_price = variant.price if variant else product.price,
+
+                    c_unit_price=unit_price,
                     d_unit_price=unit_price,
+
+                    total_price=Decimal(unit_price) * Decimal(qty),
+                    discount_total_price=Decimal(unit_price) * Decimal(qty),
+
                     product_snapshot={
                         "product_id": product.id,
                         "title": product.title,
