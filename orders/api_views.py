@@ -108,8 +108,9 @@ class OrderDeliveryOptionSubmitView(LoginRequiredMixin, View):
             raise Exception(str(e))
     
     def get_order_data(self, order):
-        email = (order.customer.email or order.customer.user.email if order.customer.user else None) or None
+        email = getattr(getattr(order.customer, "user", None), "email", None)
         whatsapp = order.customer.whatsapp if order.customer.whatsapp else None
+
         data = {
             "invoice": order.order_id,
             "recipient_name": order.customer.full_name,
@@ -120,11 +121,14 @@ class OrderDeliveryOptionSubmitView(LoginRequiredMixin, View):
             "total_lot": order.items.count(),
             "delivery_type": 1 if order.delivery_type == DELIVERY_TYPE.PICKUP else 0,
         }
+
         if whatsapp:
             data["alternative_phone"] = whatsapp
         if email:
             data["recipient_email"] = email
+
         return data
+    
     
     def steadfast_response(self, logistics_partner, order):
         order_data = self.get_order_data(order)
@@ -163,7 +167,13 @@ class OrderDeliveryOptionSubmitView(LoginRequiredMixin, View):
                 data = json.loads(request.body)
                 logistics_partner = self.get_logistics_partners(data)
                 order = self.get_order(kwargs.get("pk"))
+
+                 # 👇 ADD HERE
+                order_data = self.get_order_data(order)
+                print("ORDER DATA:", order_data)
+
                 steadfast_response = self.steadfast_response(logistics_partner, order)
+                
                 print("steadfast_response: ", steadfast_response)
                 if steadfast_response.get("status") == 200:
                     order_shipped_data = order.shipments.create(
