@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from .models import DeliveryOption
 import requests
+import json
 
 
 class SteadFastParcelAPI:
@@ -14,14 +15,23 @@ class SteadFastParcelAPI:
         except DeliveryOption.DoesNotExist:
             return None
 
+
     def create_order(self, order_data):
-        url = f"{self.get_steadfast_credentials().api_url}/create_order"
+        creds = self.get_steadfast_credentials()
+        url = f"{creds.api_url}/create_order"
+
         headers = {
-            "Content-Type": "application/json",
-            "Api-Key": self.get_steadfast_credentials().api_key,
-            "Secret-Key": self.get_steadfast_credentials().secret_key
+            "Content-Type": "application/json; charset=utf-8",
+            "Api-Key": creds.api_key,
+            "Secret-Key": creds.secret_key
         }
-        response = requests.post(url, headers=headers, json=order_data)
+
+        response = requests.post(
+            url,
+            headers=headers,
+            data=json.dumps(order_data, ensure_ascii=False).encode("utf-8")
+        )
+
         response.raise_for_status()
         return response.json()
 
